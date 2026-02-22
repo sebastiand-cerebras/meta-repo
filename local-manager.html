@@ -3,18 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Local Portfolio Manager</title>
+  <title>Portfolio Manager</title>
   <link rel="stylesheet" href="assets/styles.css" />
   <style>
-    /* Dashboard-specific styles */
     body { padding: 32px 20px 60px; }
 
-    /* Force light mode initially */
     html[data-theme="light"] {
       color-scheme: light;
     }
 
-    /* --- Hero --- */
     .hero {
       text-align: center;
       padding: 48px 20px 40px;
@@ -38,7 +35,6 @@
       line-height: 1.6;
     }
 
-    /* --- Section Titles --- */
     .section-header {
       display: flex;
       align-items: center;
@@ -57,31 +53,6 @@
       margin-top: 3px;
     }
 
-    /* --- Auth Status Card --- */
-    .auth-card {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg);
-      padding: 20px;
-      margin-bottom: 32px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .auth-status {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 15px;
-      font-weight: 500;
-    }
-    .auth-status.authenticated { color: var(--success-color); }
-    .auth-status.not-authenticated { color: var(--warning-color); }
-    .auth-icon {
-      font-size: 20px;
-    }
-
-    /* --- Username Bar --- */
     .username-bar {
       display: flex;
       gap: 12px;
@@ -102,7 +73,6 @@
       white-space: nowrap;
     }
 
-    /* --- Filter Bar --- */
     .filter-bar {
       display: flex;
       gap: 10px;
@@ -130,7 +100,6 @@
       border-color: var(--accent-color);
     }
 
-    /* --- Repo Grid --- */
     .repo-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -138,7 +107,6 @@
       margin-bottom: 32px;
     }
 
-    /* --- Repo Card --- */
     .repo-card {
       background: var(--bg-secondary);
       border: 2px solid var(--border-color);
@@ -247,18 +215,7 @@
       font-size: 12px;
       font-weight: 700;
     }
-    .view-link {
-      font-size: 12px;
-      color: var(--success-color);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 3px;
-      flex-shrink: 0;
-    }
-    .view-link:hover { text-decoration: underline; }
 
-    /* external badge on card */
     .external-tag {
       font-size: 11px;
       padding: 2px 7px;
@@ -269,18 +226,6 @@
       flex-shrink: 0;
     }
 
-    /* local badge on card */
-    .local-tag {
-      font-size: 11px;
-      padding: 2px 7px;
-      border-radius: 10px;
-      background: rgba(52, 199, 89, 0.12);
-      color: var(--success-color);
-      border: 1px solid rgba(52, 199, 89, 0.25);
-      flex-shrink: 0;
-    }
-
-    /* --- Selection Panel --- */
     #selectionPanel {
       position: sticky;
       bottom: 20px;
@@ -331,81 +276,6 @@
     }
     .chip-remove:hover { opacity: 1; }
 
-    /* --- Generate Command Panel --- */
-    #commandPanel {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg);
-      padding: 24px;
-      margin-bottom: 32px;
-      box-shadow: var(--shadow-md);
-    }
-    .command-title {
-      font-size: 15px;
-      font-weight: 600;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .command-box {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      padding: 14px 16px;
-      font-family: "SF Mono", "Fira Code", Consolas, monospace;
-      font-size: 14px;
-      overflow-x: auto;
-    }
-    .command-prompt {
-      color: var(--accent-color);
-      flex-shrink: 0;
-    }
-    .command-text {
-      flex: 1;
-      color: var(--text-primary);
-      word-break: break-all;
-    }
-    .copy-btn {
-      background: none;
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      padding: 6px 12px;
-      font-size: 13px;
-      cursor: pointer;
-      color: var(--text-secondary);
-      transition: all var(--transition);
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    .copy-btn:hover {
-      background: var(--accent-color);
-      color: white;
-      border-color: var(--accent-color);
-    }
-    .copy-btn.copied {
-      background: var(--success-color);
-      color: white;
-      border-color: var(--success-color);
-    }
-
-    /* --- External Repo Adder --- */
-    .external-adder {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    .external-adder input {
-      flex: 1;
-      min-width: 200px;
-      max-width: 320px;
-    }
-
-    /* --- Empty States --- */
     .empty-state {
       text-align: center;
       padding: 48px 20px;
@@ -423,19 +293,16 @@
       line-height: 1.6;
     }
 
-    /* --- Error Banner --- */
     #errorBanner {
       margin-bottom: 20px;
       display: none;
     }
 
-    /* --- Loading State --- */
     .repo-grid.loading {
       position: relative;
       min-height: 200px;
     }
 
-    /* Skeleton cards */
     .skeleton-card {
       background: var(--bg-secondary);
       border: 2px solid var(--border-color);
@@ -460,7 +327,110 @@
       100% { background-position: -200% 0; }
     }
 
-    /* Responsive */
+    /* Progress Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      max-width: 640px;
+      width: 90%;
+      max-height: 80vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .modal-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--border-color);
+      border-top-color: var(--accent-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    .modal-spinner.done {
+      border-color: var(--success-color);
+      animation: none;
+      background: var(--success-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .modal-logs {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      flex: 1;
+      overflow-y: auto;
+      font-family: "SF Mono", "Fira Code", Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      min-height: 200px;
+      max-height: 400px;
+    }
+    .log-line {
+      margin-bottom: 4px;
+    }
+    .log-line.stdout { color: var(--text-primary); }
+    .log-line.stderr { color: var(--error-color); }
+    .log-line.info { color: var(--text-secondary); font-style: italic; }
+    .log-line.success { color: var(--success-color); font-weight: 500; }
+    .log-line.error { color: var(--error-color); font-weight: 500; }
+    .modal-footer {
+      margin-top: 20px;
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+    .view-portfolio-btn {
+      display: none;
+      background: var(--accent-color);
+      color: white;
+      padding: 12px 24px;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all var(--transition);
+    }
+    .view-portfolio-btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+    .view-portfolio-btn.visible {
+      display: inline-block;
+    }
+
     @media (max-width: 640px) {
       .hero h2 { font-size: 28px; }
       .hero p { font-size: 15px; }
@@ -472,7 +442,6 @@
 <body>
   <div class="container">
 
-    <!-- ===== HEADER ===== -->
     <header class="header">
       <div class="logo">
         <img id="logoImg" class="logo-img" src="" alt="" style="display:none" />
@@ -483,8 +452,8 @@
           </svg>
         </div>
         <div class="logo-text">
-          <h1 id="siteTitle">Local Portfolio Manager</h1>
-          <p>powered by Cerebras AI</p>
+          <h1 id="siteTitle">Portfolio Manager</h1>
+          <p></p>
         </div>
       </div>
       <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
@@ -499,53 +468,13 @@
       </button>
     </header>
 
-    <!-- ===== HERO ===== -->
     <section class="hero">
-      <h2>Local Portfolio Manager</h2>
-      <p>Browse local and GitHub repositories, select up to 5, and generate beautiful portfolio pages with AI.</p>
+      <h2>Portfolio Manager</h2>
+      <p>Browse GitHub repositories, select up to 5, and generate beautiful portfolio pages with AI.</p>
     </section>
 
-    <!-- ===== ERROR BANNER ===== -->
     <div id="errorBanner" class="alert alert-warning"></div>
 
-    <!-- ===== GITHUB CLI AUTH ===== -->
-    <section style="margin-bottom: 32px">
-      <div class="section-header" style="margin-bottom: 16px">
-        <div>
-          <div class="section-title">GitHub CLI Auth</div>
-          <div class="section-subtitle">Check authentication status</div>
-        </div>
-        <button class="btn btn-secondary btn-sm" onclick="checkAuth()">Check Auth</button>
-      </div>
-      <div class="auth-card" id="authCard">
-        <div class="auth-status" id="authStatus">
-          <span class="auth-icon">⚠️</span>
-          <span>Checking authentication...</span>
-        </div>
-        <div style="margin-left: auto; font-size: 13px; color: var(--text-secondary);">
-          Used by: <code style="font-family:monospace; background:var(--bg-tertiary); padding:2px 6px; border-radius:4px;">generate.js</code>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== LOCAL REPOS ===== -->
-    <section id="localSection" style="margin-bottom: 40px">
-      <div class="section-header">
-        <div>
-          <div class="section-title">Local Repositories</div>
-          <div class="section-subtitle">Scan common code directories for git repos</div>
-        </div>
-        <button class="btn btn-primary btn-sm" onclick="scanLocalRepos()">↻ Scan Directories</button>
-      </div>
-      <div class="repo-grid" id="localRepoGrid">
-        <div class="empty-state">
-          <div class="empty-icon">📁</div>
-          <p>Click <strong>Scan Directories</strong> to find git repos in <code style="font-family:monospace">~/code</code>, <code style="font-family:monospace">~/dev</code>, <code style="font-family:monospace">~/projects</code></p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== GITHUB REPOS ===== -->
     <section id="githubSection" style="margin-bottom: 40px">
       <div class="section-header">
         <div>
@@ -554,9 +483,8 @@
         </div>
       </div>
 
-      <!-- Username input -->
       <div class="username-bar">
-        <input type="text" id="usernameInput" placeholder="GitHub username or owner/repo"
+        <input type="text" id="usernameInput" placeholder="GitHub username"
           onkeydown="if(event.key==='Enter') loadRepos()" />
         <button class="btn btn-primary" onclick="loadRepos()">
           <span id="loadBtnText">Load Repos</span>
@@ -565,7 +493,6 @@
         <span id="repoCountBadge" class="repo-count-badge" style="display:none"></span>
       </div>
 
-      <!-- Filter bar -->
       <div class="filter-bar" id="filterBar" style="display:none">
         <input type="search" id="searchInput" placeholder="Search repos…" oninput="filterRepos()" />
         <select id="sortSelect" onchange="filterRepos()">
@@ -578,7 +505,6 @@
         </select>
       </div>
 
-      <!-- Repo grid -->
       <div class="repo-grid" id="githubRepoGrid">
         <div class="empty-state">
           <div class="empty-icon">🔍</div>
@@ -587,77 +513,46 @@
       </div>
     </section>
 
-    <!-- ===== EXTERNAL REPOS ===== -->
-    <section style="margin-bottom: 40px">
-      <div class="section-header" style="margin-bottom: 16px">
-        <div>
-          <div class="section-title">Add External Repo</div>
-          <div class="section-subtitle">Generate a page for any public GitHub repo</div>
-        </div>
-      </div>
-      <div class="card" style="padding: 20px">
-        <div class="external-adder">
-          <input type="text" id="externalInput" placeholder="owner/repo-name (e.g. vercel/next.js)"
-            onkeydown="if(event.key==='Enter') addExternalRepo()" />
-          <button class="btn btn-secondary" onclick="addExternalRepo()">+ Add to Selection</button>
-        </div>
-        <div id="externalError" style="margin-top:10px; font-size:13px; color:var(--error-color); display:none"></div>
-      </div>
-    </section>
-
-    <!-- ===== SELECTION PANEL (sticky) ===== -->
     <div id="selectionPanel" style="display:none">
       <div class="selection-inner">
         <span class="selection-count" id="selectionCount">0 / 5 selected</span>
         <div class="selection-chips" id="selectionChips"></div>
-        <button class="btn btn-primary btn-sm" onclick="showCommandPanel()">
+        <button class="btn btn-primary btn-sm" onclick="generatePages()">
           Generate Pages →
         </button>
         <button class="btn btn-secondary btn-sm" onclick="clearSelection()">Clear</button>
       </div>
     </div>
 
-    <!-- ===== COMMAND PANEL ===== -->
-    <div id="commandPanel" style="display:none">
-      <div class="command-title">
-        <span>🚀</span> Run this command to generate your visual pages
-      </div>
-      <div class="command-box">
-        <span class="command-prompt">$</span>
-        <span class="command-text" id="commandText">node generate.js ...</span>
-        <button class="copy-btn" id="copyBtn" onclick="copyCommand()">Copy</button>
-      </div>
-      <div style="font-size: 13px; color: var(--text-secondary); margin-top: 12px; line-height: 1.6;">
-        Prerequisites: <code style="font-family:monospace">node generate.js</code> requires Node.js ≥18, a <code style="font-family:monospace">.env</code> file with <code style="font-family:monospace">CEREBRAS_API_KEY</code>, and this repo cloned locally.<br>
-        After generation, push to deploy to GitHub Pages.
-      </div>
-    </section>
-
-    <!-- ===== FOOTER ===== -->
     <footer class="footer">
-      <p>Local Manager &mdash; <a href="index.html" style="color:var(--accent-color); text-decoration:none">← Back to Portfolio</a> &mdash;
+      <p>Portfolio Manager &mdash; <a href="index.html" style="color:var(--accent-color); text-decoration:none">← Back to Portfolio</a> &mdash;
         Powered by <a href="https://cloud.cerebras.ai" style="color:var(--accent-color); text-decoration:none">Cerebras AI</a>
       </p>
     </footer>
 
-  </div><!-- /container -->
+    <div class="modal-overlay" id="progressModal">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-spinner" id="modalSpinner"></div>
+          <div class="modal-title" id="modalTitle">Generating pages...</div>
+        </div>
+        <div class="modal-logs" id="modalLogs"></div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary btn-sm" id="closeModalBtn" onclick="hideModal()" style="display:none">Close</button>
+          <a href="index.html" class="view-portfolio-btn" id="viewPortfolioBtn">View Your Portfolio →</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
 
   <script>
-    // ============================================================
-    // State
-    // ============================================================
     let allRepos = [];
     let filteredRepos = [];
-    let localRepos = [];
     let selectedRepos = new Set();
-    let externalRepos = [];
     let generatedSet = new Set();
 
-    // ============================================================
-    // Theme (force light mode initially)
-    // ============================================================
     function initTheme() {
-      // Default to light, allow toggle
       const saved = localStorage.getItem('local-manager-theme') || 'light';
       applyTheme(saved);
     }
@@ -676,9 +571,6 @@
       applyTheme(next);
     }
 
-    // ============================================================
-    // Logo
-    // ============================================================
     function tryLoadLogo(theme) {
       const src = theme === 'dark' ? 'assets/logo-dark-mode.png' : 'assets/logo-light-mode.png';
       const img = document.getElementById('logoImg');
@@ -696,146 +588,6 @@
       testImg.src = src;
     }
 
-    // ============================================================
-    // GitHub CLI Auth Check
-    // ============================================================
-    async function checkAuth() {
-      const statusDiv = document.getElementById('authStatus');
-      statusDiv.innerHTML = '<span class="auth-icon">⏳</span><span>Checking...</span>';
-
-      try {
-        // Show instructions to the user
-        statusDiv.innerHTML = `
-          <span class="auth-icon">💻</span>
-          <div>
-            <div style="font-weight:600;">Check manually:</div>
-            <div style="font-size:13px; color:var(--text-secondary); margin-top:4px;">
-              Run <code style="font-family:monospace; background:var(--bg-tertiary); padding:2px 6px; border-radius:4px;">gh auth status</code> in terminal
-            </div>
-          </div>
-        `;
-      } catch (err) {
-        statusDiv.innerHTML = `
-          <span class="auth-icon">⚠️</span>
-          <span>Unable to check. Run <code style="font-family:monospace">gh auth status</code> manually.</span>
-        `;
-      }
-    }
-
-    // ============================================================
-    // Local Repo Scanning
-    // ============================================================
-    async function scanLocalRepos() {
-      const grid = document.getElementById('localRepoGrid');
-      grid.innerHTML = renderSkeletons(4);
-
-      try {
-        const dirs = [`/Users/${process.env?.USER || localStorage.getItem('local-user') || 'seb'}/code`,
-                     `/Users/${process.env?.USER || localStorage.getItem('local-user') || 'seb'}/dev`,
-                     `/Users/${process.env?.USER || localStorage.getItem('local-user') || 'seb'}/projects`];
-
-        // For browser-based scanning, we need to use File System Access API or fallback
-        // This is a limitation - browser can't scan arbitrary filesystem
-        if ('showDirectoryPicker' in window) {
-          const dirHandle = await window.showDirectoryPicker();
-          localRepos = [];
-          for await (const [name, handle] of dirHandle.entries()) {
-            if (handle.kind === 'directory') {
-              try {
-                const hasGit = await dirHasGit(handle);
-                if (hasGit) {
-                  localRepos.push({ name, type: 'local' });
-                }
-              } catch {}
-            }
-          }
-        } else {
-          // Fallback: show instructions
-          grid.innerHTML = `
-            <div class="empty-state">
-              <div class="empty-icon">🔒</div>
-              <p>Browser-based scanning requires File System Access API.<br><br>
-              Alternatively, use GitHub repos above or enter external repos manually.<br><br>
-              Or run <code style="font-family:monospace">generate.js</code> locally with full filesystem access.</p>
-            </div>
-          `;
-          return;
-        }
-
-        renderLocalRepos();
-      } catch (err) {
-        grid.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-icon">⚠️</div>
-            <p>Scanning failed or was cancelled.<br><br>
-            Try: GitHub repos tab above, or add external repos manually.</p>
-          </div>
-        `;
-      }
-    }
-
-    async function dirHasGit(dirHandle) {
-      try {
-        await dirHandle.getDirectoryEntry('.git');
-        return true;
-      } catch {
-        return false;
-      }
-    }
-
-    function renderLocalRepos() {
-      const grid = document.getElementById('localRepoGrid');
-      if (!localRepos.length) {
-        grid.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-icon">📭</div>
-            <p>No git repositories found in scanned directories.</p>
-          </div>
-        `;
-        return;
-      }
-
-      grid.innerHTML = localRepos.map(repo => localRepoCardHTML(repo)).join('');
-    }
-
-    function localRepoCardHTML(repo) {
-      const isSelected = selectedRepos.has(`local:${repo.name}`);
-      const classes = ['repo-card', isSelected ? 'selected' : ''].filter(Boolean).join('');
-
-      return `
-        <div class="${classes}" onclick="toggleLocalRepo('${repo.name}')">
-          <div class="repo-card-top">
-            <div>
-              <div class="repo-name">${escHtml(repo.name)}</div>
-              <div style="font-size:11px;color:var(--text-secondary);margin-top:2px">Local repository</div>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-              <span class="local-tag">Local</span>
-              <div class="select-check"></div>
-            </div>
-          </div>
-        </div>`;
-    }
-
-    function toggleLocalRepo(name) {
-      const fullName = `local:${name}`;
-      if (selectedRepos.has(fullName)) {
-        selectedRepos.delete(fullName);
-      } else {
-        if (selectedRepos.size >= 5) {
-          showError('Maximum 5 repos per run. Deselect one first.');
-          return;
-        }
-        selectedRepos.add(fullName);
-      }
-      clearError();
-      updateSelectionUI();
-      renderLocalRepos();
-    }
-
-    // ============================================================
-    // GitHub API
-    // ============================================================
     async function loadRepos() {
       const raw = document.getElementById('usernameInput').value.trim();
       if (!raw) { showError('Enter a GitHub username.'); return; }
@@ -900,9 +652,6 @@
       renderGitHubRepos();
     }
 
-    // ============================================================
-    // Render GitHub Repo Cards
-    // ============================================================
     const LANG_COLORS = {
       JavaScript:'#f7df1e', TypeScript:'#3178c6', Python:'#3572a5', Rust:'#dea584',
       Go:'#00add8', Ruby:'#701516', Java:'#b07219', 'C++':'#f34b7d', C:'#555555',
@@ -918,22 +667,12 @@
         return;
       }
 
-      const allToRender = [
-        ...externalRepos.map(e => ({
-          full_name: e.full_name, name: e.name, owner: { login: e.owner },
-          description: e.description || '', language: null, stargazers_count: 0,
-          updated_at: new Date().toISOString(), _external: true
-        })),
-        ...filteredRepos
-      ];
-
-      grid.innerHTML = allToRender.map(repo => repoCardHTML(repo)).join('');
+      grid.innerHTML = filteredRepos.map(repo => repoCardHTML(repo)).join('');
     }
 
     function repoCardHTML(repo) {
       const isSelected = selectedRepos.has(repo.full_name);
       const isGenerated = generatedSet.has(repo.full_name);
-      const isExternal = repo._external;
 
       const langColor = repo.language ? (LANG_COLORS[repo.language] || '#86868b') : null;
       const updated = timeAgo(repo.updated_at);
@@ -944,14 +683,12 @@
       ].filter(Boolean).join(' ');
 
       return `
-        <div class="${classes}" onclick="toggleSelect('${repo.full_name}', '${repo.name}', '${(repo.owner?.login || repo.full_name.split('/')[0])}')">
+        <div class="${classes}" onclick="toggleSelect('${repo.full_name}', '${repo.name}', '${repo.owner.login}')">
           <div class="repo-card-top">
             <div>
               <div class="repo-name">${escHtml(repo.name)}</div>
-              ${isExternal ? `<div style="font-size:11px;color:var(--text-secondary);margin-top:2px">by ${escHtml(repo.owner?.login || '')}</div>` : ''}
             </div>
             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-              ${isExternal ? `<span class="external-tag">External</span>` : ''}
               <div class="select-check"></div>
             </div>
           </div>
@@ -964,9 +701,6 @@
         </div>`;
     }
 
-    // ============================================================
-    // Selection
-    // ============================================================
     function toggleSelect(fullName, repoName, owner) {
       if (selectedRepos.has(fullName)) {
         selectedRepos.delete(fullName);
@@ -989,14 +723,13 @@
 
       if (selectedRepos.size === 0) {
         panel.style.display = 'none';
-        document.getElementById('commandPanel').style.display = 'none';
         return;
       }
 
       panel.style.display = 'block';
       count.textContent = `${selectedRepos.size} / 5 selected`;
       chips.innerHTML = [...selectedRepos].map(fn => {
-        const name = fn.startsWith('local:') ? fn.replace('local:', '') : fn.split('/')[1] || fn;
+        const name = fn.split('/')[1] || fn;
         return `<span class="selection-chip">${escHtml(name)}<span class="chip-remove" onclick="event.stopPropagation();deselect('${fn}')">×</span></span>`;
       }).join('');
     }
@@ -1004,107 +737,142 @@
     function deselect(fullName) {
       selectedRepos.delete(fullName);
       updateSelectionUI();
-      if (fullName.startsWith('local:')) {
-        renderLocalRepos();
-      } else {
-        renderGitHubRepos();
-      }
+      renderGitHubRepos();
       clearError();
-      if (selectedRepos.size === 0) {
-        document.getElementById('commandPanel').style.display = 'none';
-      } else {
-        updateCommandPanel();
-      }
     }
 
     function clearSelection() {
       selectedRepos.clear();
-      externalRepos = [];
       updateSelectionUI();
       renderGitHubRepos();
-      renderLocalRepos();
-      document.getElementById('commandPanel').style.display = 'none';
       clearError();
     }
 
-    // ============================================================
-    // Command Panel
-    // ============================================================
-    function showCommandPanel() {
-      if (!selectedRepos.size) return;
-      updateCommandPanel();
-      document.getElementById('commandPanel').style.display = 'block';
-      document.getElementById('commandPanel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
+    async function generatePages() {
+      if (selectedRepos.size === 0) return;
 
-    function updateCommandPanel() {
-      const repos = [...selectedRepos]
-        .map(r => r.startsWith('local:') ? r : r)
-        .join(' ');
-      document.getElementById('commandText').textContent = `node generate.js ${repos}`;
-    }
+      const repos = [...selectedRepos];
+      showModal();
+      addLog('info', `Starting generation for ${repos.length} repositories...`);
+      repos.forEach(r => addLog('info', `  - ${r}`));
 
-    function copyCommand() {
-      const text = document.getElementById('commandText').textContent;
-      navigator.clipboard.writeText(text).then(() => {
-        const btn = document.getElementById('copyBtn');
-        btn.textContent = 'Copied!';
-        btn.classList.add('copied');
-        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
-      });
-    }
+      let hadError = false;
 
-    // ============================================================
-    // External Repos
-    // ============================================================
-    function addExternalRepo() {
-      const val = document.getElementById('externalInput').value.trim();
-      const errDiv = document.getElementById('externalError');
-      errDiv.style.display = 'none';
+      try {
+        const response = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ repos })
+        });
 
-      if (!val) return;
-      if (!val.includes('/') || val.split('/').length !== 2) {
-        errDiv.textContent = 'Format must be owner/repo-name';
-        errDiv.style.display = 'block';
-        return;
+        if (!response.ok) {
+          throw new Error(`Server error: ${response.status}`);
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop(); // keep any incomplete trailing line
+
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            const data = line.slice(6).trim();
+            if (!data) continue;
+
+            try {
+              const event = JSON.parse(data);
+              if (event.type === 'stdout') {
+                addLog('stdout', event.message);
+              } else if (event.type === 'stderr') {
+                addLog('stderr', event.message);
+              } else if (event.type === 'success') {
+                addLog('success', event.message);
+              } else if (event.type === 'error') {
+                hadError = true;
+                addLog('error', event.message);
+              }
+            } catch (e) {
+              console.error('Failed to parse SSE event:', e);
+            }
+          }
+        }
+
+        if (hadError) {
+          generationFailed();
+        } else {
+          generationComplete();
+        }
+
+      } catch (err) {
+        addLog('error', `Failed to generate: ${err.message}`);
+        generationFailed();
       }
-
-      const [owner, name] = val.split('/');
-      const fullName = `${owner}/${name}`;
-
-      if (selectedRepos.has(fullName)) {
-        errDiv.textContent = 'This repo is already in your selection.';
-        errDiv.style.display = 'block';
-        return;
-      }
-      if (selectedRepos.size >= 5) {
-        errDiv.textContent = 'Maximum 5 repos per run.';
-        errDiv.style.display = 'block';
-        return;
-      }
-
-      externalRepos.push({ full_name: fullName, owner, name, description: 'External repository' });
-      selectedRepos.add(fullName);
-      document.getElementById('externalInput').value = '';
-      updateSelectionUI();
-      renderGitHubRepos();
     }
 
-    // ============================================================
-    // Load existing generated pages
-    // ============================================================
+    function showModal() {
+      document.getElementById('progressModal').classList.add('active');
+      document.getElementById('modalLogs').innerHTML = '';
+      const spinner = document.getElementById('modalSpinner');
+      spinner.classList.remove('done');
+      spinner.textContent = '';
+      spinner.style.background = '';
+      document.getElementById('modalTitle').textContent = 'Generating pages...';
+      document.getElementById('viewPortfolioBtn').classList.remove('visible');
+      document.getElementById('closeModalBtn').style.display = 'none';
+    }
+
+    function hideModal() {
+      document.getElementById('progressModal').classList.remove('active');
+    }
+
+    function addLog(type, message) {
+      const logs = document.getElementById('modalLogs');
+      const line = document.createElement('div');
+      line.className = `log-line ${type}`;
+      line.textContent = message;
+      logs.appendChild(line);
+      logs.scrollTop = logs.scrollHeight;
+    }
+
+    function generationComplete() {
+      const spinner = document.getElementById('modalSpinner');
+      spinner.classList.add('done');
+      spinner.textContent = '✓';
+      document.getElementById('modalTitle').textContent = 'Generation complete!';
+      document.getElementById('viewPortfolioBtn').classList.add('visible');
+      document.getElementById('closeModalBtn').style.display = 'inline-block';
+
+      generatedSet = new Set([...generatedSet, ...selectedRepos]);
+      clearSelection();
+      loadManifest();
+    }
+
+    function generationFailed() {
+      const spinner = document.getElementById('modalSpinner');
+      spinner.classList.add('done');
+      spinner.style.background = 'var(--error-color)';
+      spinner.textContent = '✗';
+      document.getElementById('modalTitle').textContent = 'Generation failed';
+      document.getElementById('closeModalBtn').style.display = 'inline-block';
+    }
+
     async function loadManifest() {
       try {
-        const res = await fetch('repos/manifest.json?_=' + Date.now());
+        const res = await fetch('/api/manifest');
         if (!res.ok) return;
         const data = await res.json();
         generatedSet = new Set((data.generated || []).map(e => e.fullName));
-      } catch { }
+        renderGitHubRepos();
+      } catch {}
     }
 
-    // ============================================================
-    // Helpers
-    // ============================================================
     function setLoading(on) {
       document.getElementById('loadBtnText').textContent = on ? 'Loading…' : 'Load Repos';
       document.getElementById('loadSpinner').style.display = on ? 'inline-block' : 'none';
@@ -1152,22 +920,20 @@
         .replace(/"/g, '&quot;');
     }
 
-    // ============================================================
-    // Init
-    // ============================================================
     document.addEventListener('DOMContentLoaded', async () => {
       initTheme();
       await loadManifest();
 
-      // Try to load username from localStorage
+      // Close modal when clicking the backdrop
+      document.getElementById('progressModal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('progressModal')) hideModal();
+      });
+
       let username = localStorage.getItem('githubUsername');
       if (username) {
         document.getElementById('usernameInput').value = username;
         await loadRepos();
       }
-
-      // Check auth on load
-      checkAuth();
     });
   </script>
 </body>

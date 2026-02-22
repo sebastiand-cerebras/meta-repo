@@ -11,31 +11,29 @@ A clean, read-only portfolio gallery that showcases your generated pages. This i
 
 - **Purpose**: Display generated portfolio pages to visitors
 - **Deployment**: Hosted on GitHub Pages
-- **Features**: Clean gallery, "Clone Local Manager" button, how-to section
-- **No authentication or repo selection** - just for viewing results
+- **Features**: Clean gallery, "Open Portfolio Manager" button, how-to section
+- **No authentication or generation** - just for viewing results
 
-### 2. Local Manager (`local-manager.html`)
-A local tool for discovering repositories, managing selections, and generating pages.
+### 2. Portfolio Manager (`local-manager.html`)
+A local tool (with backend server) for discovering repositories and generating pages.
 
-- **Purpose**: Browse repos, select what to generate, run `generate.js`
-- **Runs**: Locally in your browser
+- **Purpose**: Browse GitHub repos, select what to generate, auto-generate pages
+- **Runs**: Locally with `npm start` (Express server on localhost:3000)
 - **Features**:
-  - Local repository scanning (via File System Access API)
-  - GitHub repository browsing
-  - External repo input
+  - GitHub repository browsing (by username)
   - Selection panel (max 5 repos at a time)
-  - gh CLI authentication status
-  - Generate command display
+  - **Automatic generation** (one click, no manual commands)
+  - Real-time progress streaming
+  - **Auto-deploys to your GitHub Pages** when complete
 - **Theme**: Light mode default
 
 ## Workflow
 
-1. **Download** - Clone this repo and open `local-manager.html` locally
-2. **Browse** - Scan local repos or browse GitHub repos
-3. **Select** - Choose up to 5 repositories (or enter external repos)
-4. **Generate** - Run the displayed `generate.js` command
-5. **Deploy** - Push changes to deploy to GitHub Pages
-6. **View** - Visitors see your portfolio gallery at the hosted URL
+1. **Start the server** - Run `npm start` to launch the local manager
+2. **Browse** - Enter your GitHub username to load your repositories
+3. **Select** - Choose up to 5 repositories by clicking on cards
+4. **Generate** - Click "Generate Pages" and watch the real-time progress
+5. **View** - When complete, click "View Your Portfolio" to see the hosted pages
 
 ## Getting Started
 
@@ -44,7 +42,6 @@ A local tool for discovering repositories, managing selections, and generating p
 - Node.js >= 18
 - A Cerebras API key from [cloud.cerebras.ai](https://cloud.cerebras.ai)
 - Git
-- gh CLI (optional, recommended)
 
 ### Installation
 
@@ -65,46 +62,53 @@ cp .env.example .env
 # Edit .env and add your CEREBRAS_API_KEY
 ```
 
-4. (Optional) Set up gh CLI for GitHub operations:
+4. Start the local manager:
 ```bash
-gh auth login
+npm start
+```
+
+5. Open your browser to:
+```
+http://localhost:3000
 ```
 
 ## Usage
 
-### Using the Local Manager
+### Generating Portfolio Pages
 
-1. Open `local-manager.html` in your browser:
-```bash
-open local-manager.html
-# or serve it
-npx serve . open http://localhost:3000/local-manager.html
-```
+1. **Open Portfolio Manager**
 
-2. Browse repositories:
-   - **Local Repos**: Click "Scan Directories" to search for git repos (uses File System Access API)
-   - **GitHub Repos**: Enter a username to browse public GitHub repositories
-   - **External**: Manually add any `owner/repo` for external repositories
+   After running `npm start`, open http://localhost:3000 in your browser
 
-3. Select repositories (up to 5) by clicking on cards
+2. **Load Your Repositories**
 
-4. Copy the generate command and run it:
-```bash
-node generate.js owner/repo1 owner/repo2 owner/repo3
-```
+   - Enter your GitHub username
+   - Click "Load Repos"
+   - Browse through your repositories
 
-5. Push to deploy:
-```bash
-git add repos/
-git commit -m "Generate pages for my repos"
-git push
-```
+3. **Select Repositories**
 
-6. Visit the hosted URL to see your portfolio gallery
+   - Click on up to 5 repository cards to select them
+   - Selected repos will be highlighted with an accent color
+
+4. **Generate Pages**
+
+   - Click "Generate Pages" in the sticky selection panel
+   - Watch the real-time progress as the AI:
+     - Clones your repositories
+     - Analyzes code structure
+     - Calls Cerebras AI to generate visual pages
+     - Creates beautiful, interactive showcase pages
+
+5. **View Your Portfolio**
+
+   - When generation completes, click "View Your Portfolio"
+   - This takes you to your hosted GitHub Pages site
+   - Your new pages will be visible in the gallery
 
 ### Viewing the Portfolio Gallery
 
-The gallery is automatically deployed to GitHub Pages when you push. Visit:
+The gallery is automatically deployed to GitHub Pages. Visit:
 - **Your site**: `https://sebastiand-cerebras.github.io/meta-repo`
 - Or your configured `homepageUrl` if different
 
@@ -112,9 +116,10 @@ The gallery is automatically deployed to GitHub Pages when you push. Visit:
 
 ```
 meta-repo/
+├── server.js               # Backend server for auto-generation (new)
 ├── index.html              # Hosted: Portfolio gallery (read-only showcase)
-├── local-manager.html      # Local: Repo browser, auth, generation interface
-├── generate.js             # Page generation script
+├── local-manager.html      # Local: Repo browser with auto-generation
+├── generate.js             # Page generation script (used by server)
 ├── config.js               # Optional branding config
 ├── assets/
 │   └── styles.css          # Shared design system
@@ -131,7 +136,7 @@ meta-repo/
 
 ## Generate.js Options
 
-Generate pages with options:
+The generation happens automatically when you click "Generate Pages", but you can also run it manually with options:
 
 ```bash
 # Basic usage
@@ -182,17 +187,13 @@ The deployment URL is: `https://sebastiand-cerebras.github.io/meta-repo`
 
 ## Troubleshooting
 
-### Local Manager Issues
+### Server Not Starting
 
-**Local repo scanning not working?**
-- File System Access API requires HTTPS or localhost
-- Try using `npx serve .` instead of opening `file://`
-- Or use GitHub repos / external repos instead
+**Port 3000 already in use?**
+- Change the port by editing `server.js` and modifying `const PORT = 3000;`
 
-**GitHub repos not loading?**
-- Check GitHub API rate limits
-- Verify username is correct
-- Try refreshing after a minute
+**Dependencies missing?**
+- Run `npm install` to install all required packages
 
 ### Generation Issues
 
@@ -200,22 +201,27 @@ The deployment URL is: `https://sebastiand-cerebras.github.io/meta-repo`
 - Ensure your `.env` file has a valid `CEREBRAS_API_KEY`
 - Check [cloud.cerebras.ai](https://cloud.cerebras.ai) for your API status
 
-**gh CLI not authenticated**
-- Run `gh auth login` in your terminal
-- Check status with `gh auth status`
-- Local Manager shows auth status manually
+**Generation stuck or slow?**
+- Cerebras AI generation can take 1-3 minutes per repository
+- Watch the progress modal for real-time updates
+- If it fails, check the error message in the modal
 
-**Generated Pages Not Showing**
-- Refresh the dashboard after generation
-- Check that `repos/manifest.json` was updated
-- Verify the pages are in `repos/{repo-name}/index.html`
+**Pages not appearing after generation?**
+- The manager will automatically reload the manifest
+- If you're viewing the hosted site, wait 1-2 minutes for GitHub Actions to deploy
+- Check the Actions tab on GitHub to see deployment status
 
-### Deployment Issues
+### GitHub API Issues
 
-**GitHub Pages Not Deploying**
-- Check the Actions tab for workflow errors
-- Ensure GitHub Pages is enabled in repo settings
-- Verify the `.github/workflows/deploy.yml` file exists
+**Rate limit hit?**
+- GitHub API allows 60 requests/hour for unauthenticated requests
+- Wait an hour and try again
+- Consider creating a GitHub personal access token
+
+**Repos not loading?**
+- Verify the username is correct
+- Check that the account has public repositories
+- Try a different username to test
 
 ## License
 

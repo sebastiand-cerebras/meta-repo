@@ -4,10 +4,14 @@
   "description": "Visual portfolio generator for GitHub repositories powered by Cerebras AI",
   "type": "module",
   "scripts": {
-    "generate": "node generate.js"
+    "generate": "node generate.js",
+    "start": "node server.js",
+    "server": "node server.js"
   },
   "dependencies": {
-    "dotenv": "^16.4.5"
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
   },
   "engines": {
     "node": ">=18.0.0"
