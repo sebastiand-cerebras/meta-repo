@@ -181,6 +181,10 @@
       .selection-inner { padding: 12px 16px; }
       .hero-steps { gap: 8px; }
     }
+    @media (max-width: 700px) {
+      .get-started-grid { grid-template-columns: 1fr !important; }
+      .qr-panel { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -207,8 +211,8 @@
 
     <!-- ===== HERO ===== -->
     <section class="hero">
-      <h2>Visualize Repositories @ Lightning Fast Speed</h2>
-      <p>A showcase of visual repo pages generated in real-time with Cerebras AI.</p>
+      <h2>Cerebras-Powered Visualization</h2>
+      <p>Beautiful, AI-generated visual pages for any GitHub repository — built in seconds, not hours.</p>
     </section>
 
     <!-- ===== GENERATED PAGES ===== -->
@@ -223,47 +227,76 @@
       <div class="generated-grid" id="generatedGrid"></div>
     </section>
 
-    <!-- ===== HOW-THIS-WORKS ===== -->
+    <!-- ===== GET STARTED ===== -->
     <section style="margin-bottom: 48px">
-      <div class="section-header" style="margin-bottom: 16px; justify-content: center;">
+      <div class="section-header" style="margin-bottom: 24px; justify-content: center;">
         <div style="text-align: center;">
-          <div class="section-title">How This Works</div>
-          <div class="section-subtitle">Add more pages to your repos</div>
+          <div class="section-title">Get Started in 5 Minutes</div>
+          <div class="section-subtitle">Everything you need to generate your own repo visualizations</div>
         </div>
       </div>
-      <div class="card" style="padding: 32px; max-width: 640px; margin: 0 auto;">
-        <div style="display: flex; flex-direction: column; gap: 20px;">
-          <div style="display: flex; gap: 16px; align-items: flex-start;">
-            <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent-subtle); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">1</div>
-            <div>
-              <div style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">Download Local Manager</div>
-              <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;">Clone this repo and run locally with Node.js</div>
-              <a href="https://github.com/sebastiand-cerebras/meta-repo/archive/refs/heads/main.zip" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Download ZIP
-              </a>
+
+      <div class="get-started-grid" style="display: grid; grid-template-columns: 1fr 200px; gap: 32px; max-width: 800px; margin: 0 auto; align-items: start;">
+        <div class="card" style="padding: 32px;">
+          <div style="display: flex; flex-direction: column; gap: 24px;">
+
+            <div style="display: flex; gap: 16px; align-items: flex-start;">
+              <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent-subtle); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">1</div>
+              <div>
+                <div style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">Get a Cerebras API Key</div>
+                <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;">Sign up at Cerebras Cloud and create an API key — it's free to start.</div>
+                <a href="https://cloud.cerebras.ai/" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/></svg>
+                  cloud.cerebras.ai
+                </a>
+              </div>
             </div>
+
+            <div style="display: flex; gap: 16px; align-items: flex-start;">
+              <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent-subtle); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">2</div>
+              <div>
+                <div style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">Create a GitHub Personal Access Token</div>
+                <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;">Generate a PAT with <code style="font-family: monospace; background: var(--bg-tertiary); padding: 1px 5px; border-radius: 4px; font-size: 12px;">repo</code> scope so generated pages can be pushed automatically.</div>
+                <a href="https://github.com/settings/tokens/new?scopes=repo&description=meta-repo-visualizer" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/></svg>
+                  Create Token
+                </a>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 16px; align-items: flex-start;">
+              <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent-subtle); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">3</div>
+              <div>
+                <div style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">Download &amp; Run</div>
+                <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 6px;">Download the starter code, add your keys to <code style="font-family: monospace; background: var(--bg-tertiary); padding: 1px 5px; border-radius: 4px; font-size: 12px;">.env</code>, and start the server.</div>
+                <div style="font-family: 'SF Mono', monospace; font-size: 12px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; line-height: 1.7; color: var(--text-secondary); margin-bottom: 8px;">
+                  <span style="color: var(--text-secondary);">$</span> <span style="color: var(--text-primary);">unzip meta-repo-main.zip && cd meta-repo-main</span><br>
+                  <span style="color: var(--text-secondary);">$</span> <span style="color: var(--text-primary);">echo "CEREBRAS_API_KEY=your-key" > .env</span><br>
+                  <span style="color: var(--text-secondary);">$</span> <span style="color: var(--text-primary);">npm install && node server.js</span>
+                </div>
+                <a href="https://github.com/sebastiand-cerebras/meta-repo/archive/refs/heads/main.zip" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Download Starter Code
+                </a>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 16px; align-items: flex-start;">
+              <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent-subtle); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">4</div>
+              <div>
+                <div style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">Select Repos &amp; Generate</div>
+                <div style="font-size: 14px; color: var(--text-secondary);">Browse any GitHub user's repos, select up to 5, and generate visual pages. They auto-deploy to GitHub Pages.</div>
+              </div>
+            </div>
+
           </div>
-          <div style="display: flex; gap: 16px; align-items: flex-start;">
-            <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent-subtle); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">2</div>
-            <div>
-              <div style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">Select Repositories</div>
-              <div style="font-size: 14px; color: var(--text-secondary);">Browse GitHub repos by username, choose up to 5 at a time</div>
-            </div>
-          </div>
-          <div style="display: flex; gap: 16px; align-items: flex-start;">
-            <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent-subtle); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">3</div>
-            <div>
-              <div style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">Generate Pages</div>
-              <div style="font-size: 14px; color: var(--text-secondary);">Run the generate command – AI creates beautiful visual pages</div>
-            </div>
-          </div>
-          <div style="display: flex; gap: 16px; align-items: flex-start;">
-            <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent-subtle); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">4</div>
-            <div>
-              <div style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">Deploy Automatically</div>
-              <div style="font-size: 14px; color: var(--text-secondary);">Push changes and GitHub Pages updates automatically</div>
-            </div>
+        </div>
+
+        <!-- QR Code -->
+        <div class="qr-panel" style="text-align: center; padding-top: 16px;">
+          <div class="card" style="padding: 20px; display: inline-block;">
+            <img src="assets/qr-repo.svg" alt="Scan to get started" style="width: 148px; height: 148px; border-radius: 8px;" />
+            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 10px; line-height: 1.4;">Scan to get<br>the starter code</div>
           </div>
         </div>
       </div>
