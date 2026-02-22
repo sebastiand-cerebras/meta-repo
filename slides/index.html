@@ -669,25 +669,32 @@
     function goTo(idx) {
       if (idx < 0 || idx >= total || idx === current) return;
       const dir = idx > current ? 1 : -1;
+      const old = current;
+      current = idx;
 
-      slides[current].classList.remove('active');
-      slides[current].classList.add(dir > 0 ? 'prev' : '');
-      slides[current].classList.remove(dir > 0 ? '' : 'prev');
+      // Outgoing slide: forward → exit left (prev), backward → exit right (default)
+      slides[old].classList.remove('active');
+      if (dir > 0) slides[old].classList.add('prev');
 
-      // Reset non-active slides
+      // Incoming slide: if going backward, start from the left first
+      if (dir < 0) {
+        slides[idx].style.transition = 'none';
+        slides[idx].classList.add('prev');       // position at translateX(-80px)
+        slides[idx].offsetHeight;                // force reflow
+        slides[idx].style.transition = '';
+        slides[idx].classList.remove('prev');
+      }
+      slides[idx].classList.add('active');
+
+      // Clean up old classes after transition ends
       setTimeout(() => {
         slides.forEach((s, i) => {
-          if (i !== idx) {
+          if (i !== current) {
             s.classList.remove('active', 'prev');
-            s.style.transform = i < idx ? 'translateX(-80px)' : 'translateX(80px)';
+            s.style.transform = '';
           }
         });
-      }, 50);
-
-      current = idx;
-      slides[current].style.transform = '';
-      slides[current].classList.remove('prev');
-      slides[current].classList.add('active');
+      }, 650);
 
       updateProgress();
     }
