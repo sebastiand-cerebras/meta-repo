@@ -3,434 +3,447 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wabike Infra | AWS ECS Orchestration</title>
+    <title>Wabike Infra | Repository Showcase</title>
     <style>
-        :root {
-            --bg-primary:#f5f5f7; --bg-secondary:#ffffff; --bg-tertiary:#f0f0f2; --bg-card:#ffffff;
-            --text-primary:rgb(43,25,16); --text-secondary:#86868b; --border-color:rgba(0,0,0,0.08);
-            --accent-color:rgb(224,100,57); --accent-hover:rgb(200,85,45); --accent-subtle:rgba(224,100,57,0.1);
-            --success-color:#34c759; --warning-color:#ff9500; --error-color:#ff3b30; --info-color:#007aff;
-            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.05);
-            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
-            --shadow-lg:0 10px 40px rgba(0,0,0,0.08);
-            --radius-sm:8px; --radius-md:12px; --radius-lg:20px; --radius-xl:32px;
-        }
-        [data-theme="dark"] {
-            --bg-primary:#000000; --bg-secondary:#1c1c1e; --bg-tertiary:#2c2c2e; --bg-card:#1c1c1e;
-            --text-primary:#f5f5f7; --text-secondary:#aeaeb2; --border-color:rgba(255,255,255,0.08);
-            --accent-color:rgb(224,100,57); --accent-hover:rgb(240,115,70); --accent-subtle:rgba(224,100,57,0.15);
-            --success-color:#30d158; --warning-color:#ff9f0a; --error-color:#ff453a; --info-color:#0a84ff;
-            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.3);
-            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.4),0 2px 4px -1px rgba(0,0,0,0.2);
-            --shadow-lg:0 10px 40px rgba(0,0,0,0.4);
-        }
+      :root {
+        --bg-primary:#f5f5f7; --bg-secondary:#ffffff; --bg-tertiary:#f0f0f2; --bg-card:#ffffff;
+        --text-primary:rgb(43,25,16); --text-secondary:#86868b; --border-color:rgba(0,0,0,0.08);
+        --accent-color:rgb(224,100,57); --accent-hover:rgb(200,85,45); --accent-subtle:rgba(224,100,57,0.1);
+        --success-color:#34c759; --warning-color:#ff9500; --error-color:#ff3b30; --info-color:#007aff;
+        --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.05);
+        --shadow-md:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+        --shadow-lg:0 8px 32px rgba(0,0,0,0.12);
+        --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-xl:24px;
+      }
+      [data-theme="dark"] {
+        --bg-primary:#000000; --bg-secondary:#1c1c1e; --bg-tertiary:#2c2c2e; --bg-card:#1c1c1e;
+        --text-primary:#f5f5f7; --text-secondary:#86868b; --border-color:rgba(255,255,255,0.1);
+        --accent-color:rgb(224,100,57); --accent-hover:rgb(240,115,70); --accent-subtle:rgba(224,100,57,0.15);
+        --success-color:#30d158; --warning-color:#ff9f0a; --error-color:#ff453a; --info-color:#0a84ff;
+        --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.3);
+        --shadow-md:0 4px 6px -1px rgba(0,0,0,0.4),0 2px 4px -1px rgba(0,0,0,0.2);
+        --shadow-lg:0 8px 32px rgba(0,0,0,0.5);
+      }
+      *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+      html{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased; scroll-behavior: smooth;}
+      body{background:var(--bg-primary);color:var(--text-primary);min-height:100vh;transition:background .3s,color .3s;line-height:1.5}
 
-        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        html{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
-        body{background:var(--bg-primary);color:var(--text-primary);min-height:100vh;transition:background 0.3s ease,color 0.3s ease;line-height:1.6}
+      /* Utilities */
+      .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; position: relative; }
+      .flex { display: flex; }
+      .flex-col { flex-direction: column; }
+      .items-center { align-items: center; }
+      .justify-between { justify-content: space-between; }
+      .gap-2 { gap: 8px; } .gap-4 { gap: 16px; } .gap-6 { gap: 24px; }
+      .mb-2 { margin-bottom: 8px; } .mb-4 { margin-bottom: 16px; } .mb-8 { margin-bottom: 32px; }
+      .mt-2 { margin-top: 8px; } .mt-4 { margin-top: 16px; }
+      .text-sm { font-size: 0.875rem; } .text-xs { font-size: 0.75rem; }
+      .font-mono { font-family: "SF Mono", Menlo, monospace; }
+      .w-full { width: 100%; }
+      .text-gradient {
+        background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      }
+      [data-theme="dark"] .text-gradient {
+        background: linear-gradient(135deg, #fff 0%, #a1a1a6 100%);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      }
 
-        /* Layout Utilities */
-        .container{max-width:1100px;margin:0 auto;padding:0 20px}
-        .flex{display:flex}
-        .flex-col{flex-direction:column}
-        .items-center{align-items:center}
-        .justify-between{justify-content:space-between}
-        .justify-center{justify-content:center}
-        .gap-2{gap:0.5rem}
-        .gap-4{gap:1rem}
-        .gap-6{gap:1.5rem}
-        .grid{display:grid}
-        .relative{position:relative}
-        .hidden-mobile{display:flex}
-        .mt-4{margin-top:1rem}
-        .mt-8{margin-top:2rem}
-        .mb-2{margin-bottom:0.5rem}
-        .mb-4{margin-bottom:1rem}
-        .w-full{width:100%}
+      /* Components */
+      .btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        padding: 10px 20px; border-radius: var(--radius-sm); font-weight: 600;
+        text-decoration: none; transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+        font-size: 0.9rem; cursor: pointer; border: 1px solid transparent;
+      }
+      .btn-primary { background: var(--accent-color); color: white; box-shadow: 0 4px 12px rgba(224,100,57,0.25); }
+      .btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(224,100,57,0.35); }
+      .btn-ghost { background: transparent; color: var(--text-secondary); border-color: var(--border-color); }
+      .btn-ghost:hover { border-color: var(--text-secondary); color: var(--text-primary); background: var(--bg-tertiary); }
+      .btn-icon { padding: 8px; border-radius: 50%; aspect-ratio: 1; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); }
+      .btn-icon:hover { background: var(--bg-tertiary); }
 
-        /* Typography */
-        h1{font-size:3rem;font-weight:800;letter-spacing:-0.03em;line-height:1.1;margin-bottom:0.5rem;background:linear-gradient(135deg, var(--text-primary) 20%, var(--accent-color) 100%);-webkit-background-clip: text;-webkit-text-fill-color: transparent;}
-        h2{font-size:1.5rem;font-weight:700;letter-spacing:-0.02em;margin-bottom:1.25rem;display:flex;align-items:center;gap:10px}
-        h3{font-size:1rem;font-weight:600;margin-bottom:0.4rem;color:var(--text-primary)}
-        p{color:var(--text-secondary);font-size:0.95rem;line-height:1.6}
+      .card {
+        background: var(--bg-card); border-radius: var(--radius-lg);
+        border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);
+        padding: 24px; transition: all 0.3s ease;
+        position: relative; overflow: hidden;
+      }
+      .card:hover { transform: translateY(-3px); border-color: var(--accent-color); box-shadow: var(--shadow-md); }
+
+      /* Navigation */
+      nav { 
+        position: sticky; top: 0; z-index: 100; 
+        background: rgba(var(--bg-secondary), 0.85); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); 
+        border-bottom: 1px solid var(--border-color); height: 64px;
+      }
+      .nav-inner { height: 100%; display: flex; justify-content: space-between; align-items: center; }
+
+      /* Typography & Badges */
+      h1 { font-size: 3.5rem; font-weight: 800; letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 24px; }
+      h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 24px; letter-spacing: -0.02em; display: flex; align-items: center; gap: 12px; }
+      h2::before { content: ""; display: block; width: 5px; height: 28px; background: var(--accent-color); border-radius: 4px; }
+      h3 { font-size: 1rem; font-weight: 600; margin-bottom: 8px; color: var(--text-primary); }
+      p { color: var(--text-secondary); line-height: 1.6; max-width: 65ch; }
+
+      .badge {
+        display: inline-flex; align-items: center; padding: 6px 14px;
+        border-radius: 20px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+      .badge-accent { background: var(--accent-subtle); color: var(--accent-color); border: 1px solid rgba(224,100,57,0.2); }
+      .badge-neutral { background: var(--bg-tertiary); color: var(--text-secondary); border: 1px solid var(--border-color); }
+      .badge-status { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); padding: 4px 12px; font-size: 0.8rem;}
+      
+      .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success-color); position: relative;}
+      .status-dot::after { content:''; position: absolute; top: -4px; left: -4px; right: -4px; bottom: -4px; border-radius: 50%; border: 1px solid var(--success-color); opacity: 0.5; animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
+      @keyframes ping { 75%, 100% { transform: scale(2.5); opacity: 0; } }
+
+      /* Grid Layouts */
+      .grid-hero { display: grid; grid-template-columns: 1.5fr 1fr; gap: 48px; align-items: center; padding: 60px 0; }
+      .grid-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 32px; }
+      .grid-features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+      .grid-split { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+
+      /* Stat Tile */
+      .stat-card {
+        background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md);
+        padding: 20px; position: relative; overflow: hidden;
+      }
+      .stat-card::after { content:''; position: absolute; bottom: 0; left: 0; height: 3px; width: 0%; background: var(--accent-color); transition: width 0.3s; }
+      .stat-card:hover::after { width: 100%; }
+      .stat-val { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); font-family: "SF Mono", monospace; display: block; }
+      .stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; display: block; }
+      
+      /* Architecture Diagram */
+      .diagram-wrapper {
+        background: var(--bg-secondary); border-radius: var(--radius-xl); border: 1px solid var(--border-color);
+        padding: 40px 60px; position: relative; overflow: hidden; margin: 40px 0;
+        box-shadow: var(--shadow-sm);
+      }
+      .diagram-bg {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background-image: radial-gradient(var(--border-color) 1px, transparent 1px);
+        background-size: 20px 20px; opacity: 0.5; pointer-events: none;
+      }
+      .flow-container {
+        position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center;
+      }
+      .flow-line {
+        position: absolute; top: 50%; left: 50px; right: 50px; height: 2px; background: var(--border-color); z-index: 0; transform: translateY(-50%);
+      }
+      .traffic-packet {
+        position: absolute; top: 50%; left: 0; width: 6px; height: 6px; background: var(--accent-color); border-radius: 50%;
+        transform: translateY(-50%); z-index: 0; box-shadow: 0 0 10px var(--accent-color);
+        animation: flow 3s infinite linear;
+      }
+      @keyframes flow { 0% { left: 50px; } 100% { left: calc(100% - 50px); } }
+
+      .node {
+        position: relative; z-index: 2; width: 140px; background: var(--bg-card);
+        border: 1px solid var(--border-color); border-radius: var(--radius-md);
+        padding: 16px; text-align: center; box-shadow: var(--shadow-md);
+        transition: transform 0.3s;
+      }
+      .node:hover { transform: scale(1.05); border-color: var(--accent-color); }
+      .node-icon { font-size: 2rem; margin-bottom: 8px; display: block; filter: grayscale(0.2); transition: filter 0.3s; }
+      .node:hover .node-icon { filter: grayscale(0); }
+      .node-title { font-weight: 600; font-size: 0.9rem; }
+      .node-sub { font-size: 0.7rem; color: var(--text-secondary); font-family: "SF Mono", monospace; margin-top: 4px; display: block; }
+
+      /* Code/Terminal */
+      .terminal {
+        background: #1e1e1e; border-radius: var(--radius-md); overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.1); font-family: "SF Mono", monospace;
+      }
+      .terminal-header {
+        background: #2d2d2d; padding: 8px 12px; display: flex; gap: 6px; border-bottom: 1px solid #333;
+      }
+      .dot { width: 10px; height: 10px; border-radius: 50%; }
+      .dot.red { background: #ff5f56; } .dot.yellow { background: #ffbd2e; } .dot.green { background: #27c93f; }
+      .terminal-body { padding: 20px; color: #d4d4d4; font-size: 0.85rem; line-height: 1.6; overflow-x: auto; }
+      .code-cmd { color: #4ec9b0; }
+      .code-arg { color: #ce9178; }
+      .code-comment { color: #6a9955; }
+      .code-val { color: #9cdcfe; }
+
+      /* Timeline */
+      .timeline { position: relative; padding-left: 24px; border-left: 2px solid var(--border-color); }
+      .step { position: relative; margin-bottom: 24px; padding-left: 20px; }
+      .step::before {
+        content:''; position: absolute; left: -31px; top: 4px; width: 16px; height: 16px;
+        background: var(--bg-card); border: 2px solid var(--border-color); border-radius: 50%; z-index: 2;
+      }
+      .step.completed::before { background: var(--success-color); border-color: var(--success-color); content: '✓'; color: white; font-size: 10px; display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1; }
+      .step h4 { font-size: 0.95rem; font-weight: 600; }
+      .step span { font-size: 0.75rem; color: var(--text-secondary); font-family: "SF Mono", monospace; }
+
+      /* Responsive */
+      @media (max-width: 860px) {
+        .grid-hero, .grid-split { grid-template-columns: 1fr; }
+        .hero-left { order: 1; } .hero-right { order: 2; }
+        .grid-stats { grid-template-columns: 1fr 1fr; }
+        .grid-features { grid-template-columns: 1fr; }
+        h1 { font-size: 2.5rem; }
         
-        /* Badges & Tags */
-        .badge{display:inline-flex;align-items:center;padding:4px 12px;border-radius:99px;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;border:1px solid transparent}
-        .badge.warning{background:rgba(255,149,0,0.1);color:#ff9f0a;border-color:rgba(255,149,0,0.2)}
-        .badge.success{background:rgba(52,199,89,0.1);color:#30d158;border-color:rgba(52,199,89,0.2)}
-        .tag{display:inline-block;background:var(--bg-tertiary);padding:4px 8px;border-radius:6px;font-size:0.75rem;font-weight:600;color:var(--text-primary);margin-right:6px;margin-bottom:6px;border:1px solid var(--border-color)}
-
-        /* Buttons */
-        .btn{padding:10px 20px;border-radius:var(--radius-md);border:none;font-weight:600;font-size:0.9rem;cursor:pointer;transition:all 0.2s ease;display:inline-flex;align-items:center;gap:8px;text-decoration:none}
-        .btn-ghost{background:transparent;color:var(--text-secondary)}
-        .btn-ghost:hover{background:var(--bg-tertiary);color:var(--text-primary)}
-        .btn-primary{background:var(--accent-color);color:#fff;box-shadow:0 4px 12px rgba(224,100,57,0.25)}
-        .btn-primary:hover{background:var(--accent-hover);transform:translateY(-2px);box-shadow:0 6px 18px rgba(224,100,57,0.35)}
-
-        /* Cards */
-        .card{background:var(--bg-card);border-radius:var(--radius-lg);padding:24px;border:1px solid var(--border-color);box-shadow:var(--shadow-sm);transition:transform 0.3s, box-shadow 0.3s, border-color 0.3s;position:relative;overflow:hidden}
-        .card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--accent-subtle)}
-        
-        /* Specific Component Styles */
-        .stat-card{display:flex;flex-direction:column;gap:4px;padding:20px}
-        .stat-val{font-size:2rem;font-weight:800;color:var(--text-primary);letter-spacing:-0.03em}
-        .stat-lbl{font-size:0.8rem;color:var(--text-secondary);font-weight:500;text-transform:uppercase;letter-spacing:0.05em}
-
-        /* Diagram Grid */
-        .diagram-container{background:var(--bg-tertiary);border-radius:var(--radius-lg);padding:40px 20px;position:relative;overflow:hidden;border:1px solid var(--border-color)}
-        .grid-bg{position:absolute;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(var(--border-color) 1px, transparent 1px),linear-gradient(90deg, var(--border-color) 1px, transparent 1px);background-size:40px 40px;opacity:0.3;z-index:0}
-
-        .flow-layout{display:grid;grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));gap:20px;position:relative;z-index:2;max-width:900px;margin:0 auto}
-        
-        .node-box{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px;position:relative;transition:all 0.3s ease;text-align:center}
-        .node-box:hover{border-color:var(--accent-color);z-index:10}
-        .node-icon{width:48px;height:48px;background:var(--bg-tertiary);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:var(--text-primary)}
-        
-        .node-title{font-weight:700;font-size:0.9rem;color:var(--text-primary)}
-        .node-desc{font-size:0.75rem;color:var(--text-secondary)}
-
-        .connector-h{position:absolute;top:50%;left:0;width:100%;height:2px;background:var(--border-color);z-index:-1;transform:translateY(-50%)}
-        
-        /* Step Process */
-        .step-list{display:flex;flex-direction:column;gap:0}
-        .step-item{display:flex;gap:16px;padding-bottom:24px;position:relative}
-        .step-item:last-child{padding-bottom:0}
-        .step-item::before{content:'';position:absolute;left:23px;top:40px;bottom:0;width:2px;background:var(--border-color)}
-        .step-item:last-child::before{display:none}
-        .step-dot{width:20px;height:20px;border-radius:50%;background:var(--bg-card);border:2px solid var(--text-secondary);flex-shrink:0;z-index:2}
-        .step-content h4{font-size:0.95rem;margin-bottom:4px}
-        .step-content p{font-size:0.85rem;margin-bottom:8px}
-        .code-pill{font-family:monospace;font-size:0.8rem;background:var(--bg-tertiary);padding:2px 6px;border-radius:4px;color:var(--accent-color)}
-
-        /* Animated Pulse */
-        .pulse{width:10px;height:10px;background-color:var(--success-color);border-radius:50%;display:inline-block;margin-right:6px;box-shadow:0 0 0 rgba(52,199,89,0.4);animation: pulse-animation 2s infinite}
-        @keyframes pulse-animation {
-            0% {transform: scale(0.95);box-shadow: 0 0 0 0 rgba(52,199,89, 0.7);}
-            70% {transform: scale(1);box-shadow: 0 0 0 6px rgba(52,199,89, 0);}
-            100% {transform: scale(0.95);box-shadow: 0 0 0 0 rgba(52,199,89, 0);}
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar{width:8px}
-        ::-webkit-scrollbar-track{background:var(--bg-primary)}
-        ::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:4px}
-        ::-webkit-scrollbar-thumb:hover{background:var(--text-secondary)}
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            h1{font-size:2.25rem}
-            .hidden-mobile{display:none}
-            .flow-layout{grid-template-columns: 1fr}
-            .node-box{flex-direction:row;text-align:left;justify-content:flex-start}
-            .step-item::before{left:19px}
-        }
+        /* Vertical Diagram on Mobile */
+        .flow-container { flex-direction: column; gap: 24px; }
+        .flow-line { width: 2px; height: calc(100% - 140px); left: 70px; top: 40px; transform: none;}
+        .traffic-packet { top: 40px; left: 70px; animation: flow-v 3s infinite linear; }
+        @keyframes flow-v { 0% { top: 40px; } 100% { top: calc(100% - 40px); } }
+        .node { width: 140px; display: flex; align-items: center; gap: 12px; text-align: left; padding: 12px; }
+      }
     </style>
 </head>
 <body>
 
-    <!-- Nav -->
-    <nav class="flex justify-between items-center" style="height:70px;position:sticky;top:0;background:var(--bg-primary)/90;backdrop-filter:blur(12px);z-index:50;padding:0 24px;max-width:1100px;margin:0 auto;border-bottom:1px solid var(--border-color)">
-        <div class="flex items-center gap-4">
-            <a href="../../index.html" class="btn btn-ghost" style="padding: 6px 12px; font-size:0.85rem;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                Explorer
+    <!-- Navigation -->
+    <nav>
+        <div class="container nav-inner">
+            <a href="../../index.html" class="btn btn-ghost text-sm flex items-center">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Explorer
             </a>
-            <span class="badge warning" style="font-size:0.65rem; padding:2px 8px;">
-                External — seduerr91
-            </span>
-        </div>
-        
-        <div class="flex items-center gap-3">
-            <a href="https://github.com/seduerr91/wabike" target="_blank" class="btn btn-primary" style="padding:8px 16px; font-size: 0.85rem;">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-                View Repo
-            </a>
-            <button id="theme-toggle" class="btn btn-ghost" aria-label="Toggle Theme" style="padding:8px;">
-                <span id="theme-icon" style="font-size:1.2rem">☀️</span>
-            </button>
+            <div class="flex gap-4 items-center">
+                <div class="badge badge-status">
+                    <div class="status-dot"></div> Systems Nominal
+                </div>
+                <button id="theme-toggle" class="btn btn-icon" aria-label="Toggle Theme">
+                    <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                </button>
+            </div>
         </div>
     </nav>
 
-    <main class="container">
-        <!-- Hero -->
-        <section class="mt-8 mb-8">
-            <div class="flex justify-between items-start" style="flex-wrap:wrap; gap:20px;">
-                <div style="max-width:700px;">
-                    <div class="flex items-center gap-2 mb-4">
-                        <span class="pulse"></span>
-                        <span style="font-size:0.8rem; font-weight:600; color:var(--success-color); text-transform:uppercase; letter-spacing:0.05em;">Systems Operational</span>
-                    </div>
-                    <h1>Wabike Inf</h1>
-                    <h2 style="font-size:1.5rem; color:var(--text-primary); font-weight:600; margin-bottom:1rem;">Voice-First AWS Orchestration</h2>
-                    <p style="max-width:600px;">
-                        Resilient infrastructure for real-time audio processing. 
-                        Deploying <span class="code-pill">AG2</span> agents via AWS ECS Fargate with low-latency WebSocket pipelines.
-                    </p>
-                    <div class="flex gap-2 mt-4 flex-wrap">
-                        <span class="tag">Python 3.11</span>
-                        <span class="tag">FastAPI</span>
-                        <span class="tag">Docker</span>
-                        <span class="tag">Terraform (Pending)</span>
-                    </div>
+    <main>
+        <!-- Hero Section -->
+        <header class="container grid-hero">
+            <div class="hero-left">
+                <div class="flex gap-2 mb-4">
+                    <span class="badge badge-accent">External — seduerr91</span>
+                    <span class="badge badge-neutral">Repository</span>
                 </div>
-                
-                <!-- Key Metrics -->
-                <div class="grid" style="grid-template-columns: repeat(2, 1fr); gap:16px; min-width:260px;">
-                    <div class="stat-card card" style="padding:16px">
-                        <div class="stat-val">99.9%</div>
-                        <div class="stat-lbl">SLA Target</div>
-                    </div>
-                    <div class="stat-card card" style="padding:16px">
-                        <div class="stat-val">&lt;100</div>
-                        <div class="stat-lbl">ms Latency (WS)</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Architecture Diagram -->
-        <section class="mb-8">
-            <h2>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
-                System Topology
-            </h2>
-            
-            <div class="diagram-container card">
-                <div class="grid-bg"></div>
-                
-                <div class="flow-layout">
-                    <!-- Node 1: Client -->
-                    <div class="node-box">
-                        <div class="node-icon">🌍</div>
-                        <div>
-                            <div class="node-title">Client / Browser</div>
-                            <div class="node-desc">Secure WS Origin</div>
-                        </div>
-                        <div class="badge warning" style="font-size:0.6rem">SSL/TLS</div>
-                    </div>
-
-                    <!-- Arrow Right -->
-                    <div class="flex items-center justify-center hidden-mobile" style="color:var(--text-secondary)">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                    </div>
-                    <div class="flex items-center justify-center mobile-only" style="display:none; color:var(--text-secondary)">
-                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
-                    </div>
-
-                    <!-- Node 2: ALB -->
-                    <div class="node-box" style="border-color:var(--warning-color);">
-                        <div class="node-icon" style="background:rgba(255,149,0,0.1); color:var(--warning-color)">☁️</div>
-                        <div>
-                            <div class="node-title">AWS ALB</div>
-                            <div class="node-desc">Load Balancer</div>
-                        </div>
-                    </div>
-
-                     <!-- Arrow Right -->
-                     <div class="flex items-center justify-center hidden-mobile" style="color:var(--text-secondary)">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                    </div>
-
-                    <!-- Node 3: ECS Fargate -->
-                    <div class="node-box" style="border-color:var(--success-color); background: linear-gradient(to bottom right, var(--bg-card), rgba(52,199,89,0.05));">
-                        <div class="node-icon" style="background:rgba(52,199,89,0.1); color:var(--success-color)">⚡</div>
-                        <div>
-                            <div class="node-title">ECS Fargate</div>
-                            <div class="node-desc">FastAPI / Uvicorn</div>
-                        </div>
-                        <span class="pulse" style="position:absolute; top:10px; right:10px; width:6px; height:6px;"></span>
-                    </div>
+                <h1 class="text-gradient">Wabike Infra</h1>
+                <p class="mb-8" style="font-size: 1.15rem;">
+                    Production-grade voice-enabled ebike routing stack. Deploying a real-time audio AI agent via FastAPI on AWS ECS Fargate with fully automated CI/CD.
+                </p>
+                <div class="flex gap-3">
+                    <a href="https://github.com/seduerr91/wabike" target="_blank" class="btn btn-primary">
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                        View Source
+                    </a>
+                    <a href="https://youtu.be/laDtHnoJ6Rw" target="_blank" class="btn btn-ghost">
+                        Watch Demo
+                    </a>
                 </div>
 
-                <div class="flex justify-center mt-4 mb-2 hidden-mobile">
-                     <div style="height:30px; width:2px; background:var(--border-color);"></div>
-                </div>
-
-                <!-- Bottom Row: Dependencies -->
-                <div class="flow-layout" style="margin-top:20px; opacity:0.9">
-                     <div class="node-box" style="border-style:dashed">
-                        <div class="node-icon">🔐</div>
-                        <div>
-                            <div class="node-title">Cognito</div>
-                            <div class="node-desc">Auth Provider</div>
-                        </div>
+                <div class="grid-stats">
+                    <div class="stat-card">
+                        <span class="stat-val">99.9%</span>
+                        <span class="stat-label">Uptime</span>
                     </div>
-                    <div class="node-box" style="border-style:dashed">
-                        <div class="node-icon">🗝️</div>
-                        <div>
-                            <div class="node-title">Secrets Mgr</div>
-                            <div class="node-desc">Env Injection</div>
-                        </div>
+                    <div class="stat-card">
+                        <span class="stat-val">~40ms</span>
+                        <span class="stat-label">Latency</span>
                     </div>
-                    <div class="node-box" style="border-style:dashed">
-                        <div class="node-icon">🧠</div>
-                        <div>
-                            <div class="node-title">AG2 Agent</div>
-                            <div class="node-desc">Orchestration</div>
-                        </div>
+                    <div class="stat-card">
+                        <span class="stat-val">0.4vCPU</span>
+                        <span class="stat-label">Task Size</span>
                     </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 2-Column Grid -->
-        <div class="grid" style="grid-template-columns: 1.5fr 1fr; gap:24px;">
-            
-            <!-- Left: CI/CD Pipeline -->
-            <div class="card">
-                <div class="flex items-center justify-between mb-4">
-                    <h2>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                        Deployment Pipeline
-                    </h2>
-                    <span class="badge success">Automated</span>
-                </div>
-                <p style="margin-bottom:24px;">Infrastructure updates trigger a GitHub Action workflow to rebuild Docker images and update ECS services.</p>
-                
-                <div class="step-list">
-                    <div class="step-item">
-                        <div class="step-dot" style="border-color:var(--accent-color); background:var(--accent-color)"></div>
-                        <div class="step-content w-full">
-                            <div class="flex justify-between items-center">
-                                <h4>1. Build & Push</h4>
-                                <span class="code-pill">Docker</span>
-                            </div>
-                            <p>Multi-platform build for <code>linux/amd64</code> pushed to ECR.</p>
-                            <div style="width:100%; background:var(--bg-tertiary); height:4px; border-radius:2px; overflow:hidden">
-                                <div style="width:100%; height:100%; background:var(--accent-color)"></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="step-item">
-                        <div class="step-dot" style="border-color:var(--warning-color); background:var(--bg-card)"></div>
-                        <div class="step-content w-full">
-                            <div class="flex justify-between items-center">
-                                <h4>2. Infrastructure Sync</h4>
-                                <span class="code-pill">Boto3</span>
-                            </div>
-                            <p>Updates ECS task definition with new image digest and secrets.</p>
-                            <div style="width:100%; background:var(--bg-tertiary); height:4px; border-radius:2px; overflow:hidden">
-                                <div style="width:60%; height:100%; background:var(--warning-color)"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="step-item">
-                        <div class="step-dot" style="border-color:var(--success-color); background:var(--bg-card)"></div>
-                        <div class="step-content w-full">
-                            <div class="flex justify-between items-center">
-                                <h4>3. Service Update</h4>
-                                <span class="code-pill">ECS</span>
-                            </div>
-                            <p>Forces new deployment. Rolling update ensures zero downtime.</p>
-                        </div>
+                    <div class="stat-card">
+                        <span class="stat-val">Auto</span>
+                        <span class="stat-label">Scaling</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Right: Configuration & Tech -->
-            <div class="flex flex-col gap-4">
-                <!-- Tech Stack Card -->
-                <div class="card" style="padding:20px;">
-                    <h3 style="margin-bottom:12px; display:flex; align-items:center; gap:8px;">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                        Core Stack
+            <div class="hero-right">
+                <div class="card">
+                    <h3 class="mb-2" style="display:flex; align-items:center; gap:8px;">
+                        <span style="color:var(--accent-color);">●</span> Deployment Status
                     </h3>
-                    <div class="flex flex-col gap-3">
-                        <div class="flex justify-between items-center" style="padding-bottom:8px; border-bottom:1px solid var(--border-color)">
-                            <span style="font-weight:600; font-size:0.9rem">Web Server</span>
-                            <span class="code-pill">Uvicorn</span>
+                    <div class="flex flex-col gap-4">
+                        <div class="flex justify-between items-center pb-2" style="border-bottom:1px solid var(--border-color)">
+                            <span class="text-sm text-secondary">Environment</span>
+                            <span class="font-mono text-sm font-bold">us-west-2</span>
                         </div>
-                        <div class="flex justify-between items-center" style="padding-bottom:8px; border-bottom:1px solid var(--border-color)">
-                            <span style="font-weight:600; font-size:0.9rem">Container</span>
-                            <span class="code-pill">Docker</span>
+                        <div class="flex justify-between items-center pb-2" style="border-bottom:1px solid var(--border-color)">
+                            <span class="text-sm text-secondary">Tasks Running</span>
+                            <span class="font-mono text-sm text-success">2 / 2</span>
                         </div>
-                        <div class="flex justify-between items-center" style="padding-bottom:8px; border-bottom:1px solid var(--border-color)">
-                            <span style="font-weight:600; font-size:0.9rem">Platform</span>
-                            <span class="code-pill">AWS Fargate</span>
+                        <div class="flex justify-between items-center pb-2" style="border-bottom:1px solid var(--border-color)">
+                            <span class="text-sm text-secondary">Image</span>
+                            <span class="font-mono text-xs" style="background:var(--bg-tertiary); padding:2px 6px; border-radius:4px;">sha-7f3a2b</span>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span style="font-weight:600; font-size:0.9rem">Language</span>
-                            <span class="code-pill">Python 3.11</span>
+                            <span class="text-sm text-secondary">Last Updated</span>
+                            <span class="font-mono text-sm">2h ago</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Architecture Section -->
+        <section class="container" style="padding: 60px 20px;">
+            <h2>System Topology</h2>
+            <p>A serverless container architecture prioritizing low-latency audio streaming.</p>
+
+            <div class="diagram-wrapper">
+                <div class="diagram-bg"></div>
+                <div class="flow-container">
+                    <div class="flow-line"></div>
+                    <div class="traffic-packet"></div>
+
+                    <!-- Node 1 -->
+                    <div class="node">
+                        <span class="node-icon">🌐</span>
+                        <div>
+                            <div class="node-title">Client</div>
+                            <span class="node-sub">React / Browser</span>
+                        </div>
+                    </div>
+
+                    <!-- Node 2 -->
+                    <div class="node">
+                        <span class="node-icon">⚖️</span>
+                        <div>
+                            <div class="node-title">ALB</div>
+                            <span class="node-sub">Load Balancer</span>
+                        </div>
+                    </div>
+
+                    <!-- Node 3 -->
+                    <div class="node" style="border-color:var(--accent-color); background:var(--bg-tertiary)">
+                        <span class="node-icon">⚡</span>
+                        <div>
+                            <div class="node-title" style="color:var(--accent-color)">ECS Task</div>
+                            <span class="node-sub">FastAPI + AG2</span>
+                        </div>
+                    </div>
+
+                    <!-- Node 4 -->
+                    <div class="node">
+                        <span class="node-icon">🔐</span>
+                        <div>
+                            <div class="node-title">Secrets</div>
+                            <span class="node-sub">AWS Manager</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-features">
+                <div class="card">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div style="background:var(--info-color); width:8px; height:8px; border-radius:50%"></div>
+                        <h3>Ingress</h3>
+                    </div>
+                    <p class="text-sm">Application Load Balancer handles SSL termination and routes traffic to the ECS target group.</p>
+                </div>
+                <div class="card">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div style="background:var(--accent-color); width:8px; height:8px; border-radius:50%"></div>
+                        <h3>Compute</h3>
+                    </div>
+                    <p class="text-sm">Dockerized FastAPI running on Fargate. Supports bidirectional WebSockets for real-time voice.</p>
+                </div>
+                <div class="card">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div style="background:var(--warning-color); width:8px; height:8px; border-radius:50%"></div>
+                        <h3>Orchestration</h3>
+                    </div>
+                    <p class="text-sm">Auto-scaling policies adjust task count based on CPU/Memory utilization.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pipeline & Config Section -->
+        <section class="container" style="padding: 40px 20px 80px;">
+            <div class="grid-split">
+                <!-- CI/CD Pipeline Column -->
+                <div>
+                    <h2>CI/CD Pipeline</h2>
+                    <div class="timeline">
+                        <div class="step completed">
+                            <h4>Git Push (Main)</h4>
+                            <span>GitHub Actions Trigger</span>
+                        </div>
+                        <div class="step completed">
+                            <h4>Build & Unit Test</h4>
+                            <span>Python 3.11 / Pytest</span>
+                        </div>
+                        <div class="step completed">
+                            <h4>Docker Buildx</h4>
+                            <span>Linux/amd64 Platform</span>
+                        </div>
+                        <div class="step completed">
+                            <h4>Push to ECR</h4>
+                            <span>Image Tagging & Retention</span>
+                        </div>
+                        <div class="step completed">
+                            <h4>ECS Force Deploy</h4>
+                            <span>New Task Definition Active</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Project Status -->
-                <div class="card" style="padding:20px">
-                    <h3 style="margin-bottom:12px; display:flex; align-items:center; gap:8px;">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                        Status
-                    </h3>
-                    <p style="font-size:0.85rem; margin-bottom:12px;">
-                       Current focus is on optimizing WebSocket connection stability for audio streaming sessions.
-                    </p>
-                    <div style="padding:12px; background:var(--bg-tertiary); border-radius:var(--radius-sm); font-size:0.8rem; color:var(--text-secondary)">
-                        <strong>Next Milestone:</strong> Implementing auto-scaling policies based on active socket connections.
+                <!-- Environment Config Column -->
+                <div>
+                    <h2>Runtime Configuration</h2>
+                    <div class="terminal">
+                        <div class="terminal-header">
+                            <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                        </div>
+                        <div class="terminal-body">
+                            <div class="mb-2"><span class="code-comment"># Environment Variables (Injected via Secrets Manager)</span></div>
+                            <div class="mb-2"><span class="code-cmd">export</span> <span class="code-val">APP_ENV</span>=<span class="code-arg">"production"</span></div>
+                            <div class="mb-2"><span class="code-cmd">export</span> <span class="code-val">AWS_REGION</span>=<span class="code-arg">"us-west-2"</span></div>
+                            <div class="mb-2"><span class="code-cmd">export</span> <span class="code-val">OPENAI_API_KEY</span>=<span class="code-arg">"sk-..."</span> <span class="code-comment"># Secure</span></div>
+                            <div class="mb-2"><span class="code-cmd">export</span> <span class="code-val">AG2_LOG_LEVEL</span>=<span class="code-arg">"INFO"</span></div>
+                            <div class="mb-2"><span class="code-cmd">export</span> <span class="code-val">TTS_ENGINE</span>=<span class="code-arg">"edge"</span></div>
+                            <br>
+                            <span class="code-cmd">docker</span> run --rm <span class="code-arg">--env-file</span> .env wabike-infra
+                        </div>
+                    </div>
+                    <div class="card mt-4">
+                        <h4 class="mb-2">Security Model</h4>
+                        <p class="text-sm">The container is ephemeral. All secrets are injected at runtime via IAM roles and AWS Systems Manager/Secrets Manager. No credentials are baked into the image.</p>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <footer class="mt-8" style="padding:40px 0; border-top:1px solid var(--border-color); text-align:center;">
-            <p style="font-size:0.8rem;">Deployed on AWS ECS. Managed by seduerr91.</p>
-        </footer>
+        </section>
     </main>
 
+    <footer style="border-top:1px solid var(--border-color); padding: 40px 0; text-align:center; background:var(--bg-secondary); margin-top:40px;">
+        <div class="container">
+            <p class="text-sm">Designed for the <strong>Wabike</strong> Infrastructure Stack.</p>
+            <p class="text-xs mt-2" style="color:var(--text-secondary)">© 2023 seduerr91. All systems operational.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
     <script>
-        // Theme Toggle Logic
         const toggleBtn = document.getElementById('theme-toggle');
-        const themeIcon = document.getElementById('theme-icon');
-        const htmlEl = document.documentElement;
-
-        // Check localStorage or prefer color scheme
-        const savedTheme = localStorage.getItem('theme');
-        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-        if (savedTheme) {
-            htmlEl.setAttribute('data-theme', savedTheme);
-            updateIcon(savedTheme);
-        } else if (systemDark) {
-            htmlEl.setAttribute('data-theme', 'dark');
-            updateIcon('dark');
-        }
-
-        toggleBtn.addEventListener('click', () => {
-            const current = htmlEl.getAttribute('data-theme');
-            const next = current === 'dark' ? 'light' : 'dark';
-            
-            htmlEl.setAttribute('data-theme', next);
-            localStorage.setItem('theme', next);
-            updateIcon(next);
-        });
-
-        function updateIcon(theme) {
-            if (theme === 'dark') {
-                themeIcon.textContent = '🌙';
-            } else {
-                themeIcon.textContent = '☀️';
-            }
-        }
-
-        // Mobile Diagram Fix
-        if (window.innerWidth <= 768) {
-            document.querySelectorAll('.mobile-only').forEach(el => el.style.display = 'flex');
-            document.querySelectorAll('.hidden-mobile').forEach(el => el.style.display = 'none');
-        }
+        const html = document.documentElement;
         
-        // Add staggered entry animation
-        document.addEventListener('DOMContentLoaded', () => {
-            const cards = document.querySelectorAll('.card, .node-box');
-            cards.forEach((card, index) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(10px)';
-                setTimeout(() => {
-                    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease, border-color 0.3s';
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, 100 * (index % 5)); // Simple stagger
-            });
+        // Check local storage or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        // Toggle click
+        toggleBtn.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
         });
     </script>
 </body>

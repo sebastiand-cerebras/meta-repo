@@ -58,7 +58,17 @@
       "url": "repos/wabike/",
       "isExternal": true,
       "type": "infra",
-      "generatedAt": "2026-02-22T16:00:45.113Z"
+      "generatedAt": "2026-02-22T16:11:43.854Z"
+    },
+    {
+      "owner": "seduerr91",
+      "repo": "Cerebras-Inference-Cookbook",
+      "fullName": "seduerr91/Cerebras-Inference-Cookbook",
+      "path": "repos/Cerebras-Inference-Cookbook/index.html",
+      "url": "repos/Cerebras-Inference-Cookbook/",
+      "isExternal": true,
+      "type": "ml",
+      "generatedAt": "2026-02-22T16:24:55.347Z"
     }
   ]
 }

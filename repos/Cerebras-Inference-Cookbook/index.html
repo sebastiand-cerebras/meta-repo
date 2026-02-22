@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>seduerr91/Cerebras-Inference-Cookbook</title>
+    <style>
+        :root {
+            --bg-primary:#f5f5f7; --bg-secondary:#ffffff; --bg-tertiary:#f0f0f2; --bg-card:#ffffff;
+            --text-primary:rgb(43,25,16); --text-secondary:#86868b; --border-color:rgba(0,0,0,0.08);
+            --accent-color:rgb(224,100,57); --accent-hover:rgb(200,85,45); --accent-subtle:rgba(224,100,57,0.1);
+            --success-color:#34c759; --warning-color:#ff9500; --error-color:#ff3b30; --info-color:#007aff;
+            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.05);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg:0 8px 32px rgba(0,0,0,0.12);
+            --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-xl:24px;
+        }
+        [data-theme="dark"] {
+            --bg-primary:#000000; --bg-secondary:#1c1c1e; --bg-tertiary:#2c2c2e; --bg-card:#1c1c1e;
+            --text-primary:#f5f5f7; --text-secondary:#86868b; --border-color:rgba(255,255,255,0.1);
+            --accent-color:rgb(224,100,57); --accent-hover:rgb(240,115,70); --accent-subtle:rgba(224,100,57,0.15);
+            --success-color:#30d158; --warning-color:#ff9f0a; --error-color:#ff453a; --info-color:#0a84ff;
+            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.3);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.4),0 2px 4px -1px rgba(0,0,0,0.2);
+            --shadow-lg:0 8px 32px rgba(0,0,0,0.5);
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased; scroll-behavior: smooth;}
+        body{background:var(--bg-primary);color:var(--text-primary);min-height:100vh;transition:background .3s,color .3s; line-height: 1.5; -webkit-font-smoothing: antialiased;}
+
+        /* Utilities */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-6 { gap: 1.5rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mt-6 { margin-top: 1.5rem; }
+        .mt-8 { margin-top: 2rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mb-8 { margin-bottom: 2rem; }
+        .text-sm { font-size: 0.875rem; }
+        .text-xs { font-size: 0.75rem; }
+        .font-bold { font-weight: 700; }
+        .font-medium { font-weight: 500; }
+        .w-full { width: 100%; }
+        .relative { position: relative; }
+        .hidden-mobile { display: none; }
+
+        /* Grid System */
+        .grid { display: grid; gap: 1.5rem; }
+        .grid-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+        .grid-3 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+        .grid-4 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+        
+        /* Bento Grid for Features */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: minmax(200px, auto);
+            gap: 1rem;
+        }
+        .bento-col-2 { grid-column: span 2; }
+        .bento-row-2 { grid-row: span 2; }
+
+        /* Components */
+        .badge {
+            display: inline-flex; align-items: center; padding: 0.25rem 0.75rem;
+            border-radius: 99px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .badge-external { background: var(--bg-tertiary); color: var(--text-secondary); border: 1px solid var(--border-color); }
+        .badge-accent { background: var(--accent-subtle); color: var(--accent-color); border: 1px solid var(--accent-color); }
+        .badge-success { background: rgba(52, 199, 89, 0.15); color: var(--success-color); }
+
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+            padding: 0.75rem 1.5rem; border-radius: var(--radius-md);
+            font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease;
+            border: 1px solid transparent; text-decoration: none;
+        }
+        .btn-primary { background: var(--text-primary); color: var(--bg-primary); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); opacity: 0.9; }
+        .btn-outline { background: transparent; color: var(--text-primary); border: 1px solid var(--border-color); }
+        .btn-outline:hover { background: var(--bg-tertiary); border-color: var(--text-secondary); }
+        .btn-ghost { background: transparent; color: var(--text-secondary); padding: 0.5rem; border-radius: var(--radius-sm); }
+        .btn-ghost:hover { color: var(--text-primary); background: var(--bg-tertiary); }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative; overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+        .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--accent-color); }
+        .card-glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); }
+        [data-theme="dark"] .card-glass { background: rgba(28, 28, 30, 0.7); }
+
+        /* Header */
+        header { 
+            padding: 1rem 0; border-bottom: 1px solid var(--border-color); 
+            background: rgba(var(--bg-secondary), 0.85); backdrop-filter: blur(12px); 
+            position: sticky; top: 0; z-index: 50;
+        }
+
+        /* Hero */
+        .hero { padding: 6rem 0 4rem; position: relative; overflow: hidden; }
+        .hero::before {
+            content: ''; position: absolute; top: -50%; right: -10%; width: 600px; height: 600px;
+            background: radial-gradient(circle, var(--accent-subtle) 0%, transparent 70%); opacity: 0.6; z-index: -1; filter: blur(60px);
+        }
+        .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+        .hero h1 { 
+            font-size: 3.8rem; font-weight: 800; letter-spacing: -0.04em; 
+            margin-bottom: 1.5rem; line-height: 1.1; 
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .hero-desc { font-size: 1.25rem; color: var(--text-secondary); max-width: 520px; margin-bottom: 2.5rem; line-height: 1.6; }
+        .tech-pill { 
+            padding: 0.4rem 1rem; background: var(--bg-tertiary); 
+            border-radius: var(--radius-sm); color: var(--text-primary); 
+            font-size: 0.8rem; font-weight: 600; border: 1px solid var(--border-color); 
+            display: inline-flex; align-items: center; gap: 0.5rem; margin-right: 0.5rem; margin-bottom: 0.5rem;
+        }
+
+        /* Pipeline Flow Diagram */
+        .pipeline-section { padding: 4rem 0; }
+        .flow-container {
+            display: flex; align-items: center; justify-content: space-between;
+            position: relative; margin: 3rem 0;
+        }
+        .flow-line-bg {
+            position: absolute; top: 40px; left: 50px; right: 50px; height: 2px;
+            background: var(--border-color); z-index: 0; border-bottom: 2px dashed var(--border-color); background: none;
+        }
+        .flow-step {
+            position: relative; z-index: 1; background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 1.5rem; border-radius: var(--radius-lg);
+            text-align: center; width: 180px;
+            transition: all 0.3s ease;
+        }
+        .flow-step.active { border-color: var(--accent-color); box-shadow: var(--shadow-md); transform: scale(1.05); }
+        .flow-icon-wrap {
+            width: 56px; height: 56px; background: var(--bg-tertiary); color: var(--text-primary);
+            border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1rem; font-size: 1.5rem; border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        .flow-step.active .flow-icon-wrap { background: var(--accent-color); color: white; border-color: var(--accent-color); }
+        .flow-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.25rem; }
+        .flow-desc { font-size: 0.75rem; color: var(--text-secondary); }
+
+        /* Stat Tiles & Metrics */
+        .metric-card { text-align: center; padding: 2rem; border-radius: var(--radius-lg); background: var(--bg-card); border: 1px solid var(--border-color); }
+        .metric-val { font-size: 2.5rem; font-weight: 800; display: block; margin-bottom: 0.25rem; background: linear-gradient(to bottom, var(--text-primary), var(--text-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .metric-label { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+
+        /* Code Block Styling */
+        .code-block {
+            background: #0d1117;
+            border-radius: var(--radius-md);
+            padding: 0;
+            overflow: hidden;
+            font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .code-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0.75rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: #161b22;
+        }
+        .window-controls { display: flex; gap: 6px; }
+        .win-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .wd-red { background: #ff5f56; }
+        .wd-yellow { background: #ffbd2e; }
+        .wd-green { background: #27c93f; }
+        .code-body { padding: 1.25rem; color: #c9d1d9; overflow-x: auto; line-height: 1.6; }
+        .code-comment { color: #8b949e; font-style: italic; }
+        .code-cmd { color: #79c0ff; }
+        .code-str { color: #a5d6ff; }
+        .code-kw { color: #ff7b72; }
+
+        footer { margin-top: 6rem; padding: 3rem 0; border-top: 1px solid var(--border-color); color: var(--text-secondary); font-size: 0.85rem; text-align: center; }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .bento-grid { grid-template-columns: 1fr 1fr; }
+            .hero { padding: 4rem 0; }
+            .hero-grid { grid-template-columns: 1fr; text-align: center; gap: 3rem; }
+            .hero h1 { font-size: 2.8rem; }
+            .hero-desc { margin-left: auto; margin-right: auto; }
+            .tech-pill { display: inline-flex; }
+            .pipeline-section { overflow-x: auto; padding-bottom: 2rem; }
+            .flow-container { width: max-content; padding-left: 1rem; padding-right: 1rem; }
+            .flow-line-bg { display: none; }
+            .flow-step { margin-right: 2rem; min-width: 160px; }
+        }
+        @media (max-width: 600px) {
+            .bento-grid { grid-template-columns: 1fr; }
+            .bento-col-2, .bento-row-2 { grid-column: span 1; grid-row: span 1; }
+            .hero-grid { gap: 2rem; }
+            .hero h1 { font-size: 2.2rem; }
+        }
+
+        /* Animation Utilities */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate { animation: fadeIn 0.6s ease-out forwards; opacity: 0; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container flex justify-between items-center">
+            <a href="../../index.html" class="flex items-center gap-2 btn-ghost" style="text-decoration: none; display: inline-flex;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                <span class="font-bold text-sm">Back to Explorer</span>
+            </a>
+            <div class="flex items-center gap-4">
+                <span class="badge badge-external font-bold">External — seduerr91</span>
+                <button id="theme-toggle" class="btn-ghost" aria-label="Toggle Theme" style="border: 1px solid var(--border-color);">
+                    <!-- Sun Icon -->
+                    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-grid">
+                    <div class="animate">
+                        <div class="mb-4">
+                            <span class="tech-pill"><span style="color: var(--accent-color);">⚡</span> Cerebras WSE</span>
+                            <span class="tech-pill">Python 3.10+</span>
+                        </div>
+                        <h1>Cerebras<br>Inference Cookbook</h1>
+                        <p class="hero-desc">
+                            A production-grade pipeline for hyper-speed NLP inference.  
+                            Leverage the Cerebras WSE architecture for sub-10ms latency, streaming tokens, and strict Pydantic validation.
+                        </p>
+                        <div class="flex gap-4" style="flex-wrap: wrap; justify-content: flex-start;">
+                            <a href="https://github.com/seduerr91/Cerebras-Inference-Cookbook" target="_blank" class="btn btn-primary">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                                Get Started
+                            </a>
+                            <a href="#" class="btn btn-outline">View Docs</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Hero Visual: Interactive Dashboard Mockup -->
+                    <div class="card animate delay-2 relative" style="border: 1px solid var(--accent-color); background: linear-gradient(180deg, var(--bg-card) 0%, rgba(224,100,57,0.05) 100%);">
+                        <div class="flex justify-between items-start mb-6">
+                            <div>
+                                <h3 class="font-bold text-lg">System Health</h3>
+                                <div class="text-xs text-secondary flex items-center gap-2 mt-1">
+                                    <span style="width: 8px; height: 8px; background: var(--success-color); border-radius: 50%; display: inline-block; box-shadow: 0 0 0 2px rgba(52,199,89,0.2);"></span>
+                                    Operational • Node US-EAST-1
+                                </div>
+                            </div>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="1.5"><path d="M12 2v20M2 12h20"/></svg>
+                        </div>
+
+                        <div class="grid grid-2 gap-4 mb-6">
+                            <div style="background: var(--bg-secondary); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                                <div class="text-xs text-secondary mb-1">Avg Latency</div>
+                                <div class="font-bold" style="font-size: 1.5rem; color: var(--accent-color);">8.4<span class="text-sm text-secondary">ms</span></div>
+                                <div class="text-xs text-secondary mt-1" style="color: var(--success-color);">↓ 12% vs GPU</div>
+                            </div>
+                            <div style="background: var(--bg-secondary); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                                <div class="text-xs text-secondary mb-1">Requests / Sec</div>
+                                <div class="font-bold" style="font-size: 1.5rem; color: var(--info-color);">1.2k</div>
+                                <div class="text-xs text-secondary mt-1">Peak Load</div>
+                            </div>
+                        </div>
+
+                        <!-- Simulated Log Stream -->
+                        <div style="background: rgba(0,0,0,0.03); border-radius: var(--radius-sm); padding: 0.75rem; font-family: monospace; font-size: 0.75rem; color: var(--text-secondary);">
+                            <div>> [INFO] Inference request received...</div>
+                            <div>> [INFO] Validating Pydantic schema... OK</div>
+                            <div>> [INFO] Streaming tokens (512)...</div>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span style="width: 6px; height: 6px; background: var(--accent-color); border-radius: 50%; animation: bounce 1s infinite;"></span>
+                                <span>Processing...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture Diagram -->
+        <section class="pipeline-section">
+            <div class="container">
+                <div class="flex flex-col items-center">
+                    <h2 class="font-bold text-2xl mb-2">Inference Architecture</h2>
+                    <p class="text-secondary text-sm mb-6">End-to-end data flow optimization</p>
+                </div>
+
+                <div class="flow-container animate delay-2">
+                    <div class="flow-line-bg"></div>
+                    
+                    <div class="flow-step">
+                        <div class="flow-icon-wrap">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                        </div>
+                        <div class="flow-title">Request</div>
+                        <div class="flow-desc">Client Input</div>
+                    </div>
+                    
+                    <div class="flow-step">
+                        <div class="flow-icon-wrap">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                        </div>
+                        <div class="flow-title">Validation</div>
+                        <div class="flow-desc">Pydantic Schema</div>
+                    </div>
+                    
+                    <div class="flow-step active">
+                        <div class="flow-icon-wrap">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                        </div>
+                        <div class="flow-title" style="color: var(--accent-color);">Cerebras WSE</div>
+                        <div class="flow-desc">LLM Inference</div>
+                    </div>
+                    
+                    <div class="flow-step">
+                        <div class="flow-icon-wrap">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                        </div>
+                        <div class="flow-title">Response</div>
+                        <div class="flow-desc">SSE / WebSocket</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bento Grid Features -->
+        <section class="container mb-8">
+            <div class="bento-grid animate delay-3">
+                <!-- Main Feature Card -->
+                <div class="card bento-col-2 bento-row-2">
+                    <div class="flex justify-between items-start mb-4">
+                        <div style="background: var(--info-color); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                        </div>
+                        <span class="badge badge-success">Live</span>
+                    </div>
+                    <h3 class="font-bold text-xl mb-2">Streaming Inference</h3>
+                    <p class="text-secondary text-sm mb-4">Experience real-time token generation. The implementation uses Server-Sent Events (SSE) to push tokens as they are generated by the Cerebras cloud, removing the wait time for full completion.</p>
+                    <ul class="text-sm" style="list-style: disc; padding-left: 1.2rem; color: var(--text-primary);">
+                        <li class="mb-1">Zero-copy data transfer</li>
+                        <li class="mb-1">Automatic reconnection handling</li>
+                        <li>Supported on WebSocket & HTTP</li>
+                    </ul>
+                </div>
+
+                <!-- Stat Card 1 -->
+                <div class="card justify-center items-center text-center">
+                    <span class="metric-val" style="color: var(--accent-color);">10x</span>
+                    <span class="metric-label">Faster than GPU</span>
+                    <div class="mt-4 w-full" style="background: var(--bg-tertiary); height: 4px; border-radius: 99px;">
+                        <div style="width: 90%; height: 100%; background: var(--accent-color); border-radius: 99px;"></div>
+                    </div>
+                </div>
+
+                <!-- Code Snippet Card -->
+                <div class="card" style="padding: 0; background: #0d1117; border: none;">
+                    <div class="code-header" style="background: #161b22;">
+                        <div class="window-controls"><div class="win-dot wd-red"></div><div class="win-dot wd-yellow"></div><div class="win-dot wd-green"></div></div>
+                        <span class="text-xs" style="color: #8b949e;">main.py</span>
+                    </div>
+                    <div class="code-body text-xs">
+                        <div><span class="code-kw">from</span> cerebras_model <span class="code-kw">import</span> Client</div>
+                        <div class="mt-2"><span class="code-comment"># Initialize the client</span></div>
+                        <div>client = Client(api_key=<span class="code-str">os.getenv</span>())</div>
+                        <div class="mt-2"><span class="code-comment"># Stream response</span></div>
+                        <div><span class="code-kw">for</span> token <span class="code-kw">in</span> client.stream(prompt):</div>
+                        <div style="padding-left: 1rem;">print(token, end=<span class="code-str">""</span>)</div>
+                    </div>
+                </div>
+
+                <!-- Feature Card 2 -->
+                <div class="card">
+                    <div style="color: var(--warning-color); font-size: 1.5rem; margin-bottom: 0.5rem;">🛡️</div>
+                    <h4 class="font-bold text-sm">Type Safety</h4>
+                    <p class="text-xs text-secondary mt-2">Enforced schemas using Pydantic V2. Ensure your LLM outputs valid JSON/Objects every time.</p>
+                </div>
+
+                 <!-- Feature Card 3 -->
+                 <div class="card">
+                    <div style="color: var(--success-color); font-size: 1.5rem; margin-bottom: 0.5rem;">🐳</div>
+                    <h4 class="font-bold text-sm">Container Ready</h4>
+                    <p class="text-xs text-secondary mt-2">Optimized multi-stage Dockerfiles. Production builds are < 50MB.</p>
+                </div>
+
+                <!-- Large Card Bottom -->
+                <div class="card bento-col-2">
+                    <div class="flex gap-4 items-start">
+                         <div style="background: var(--bg-tertiary); padding: 0.8rem; border-radius: var(--radius-md); color: var(--text-primary);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm mb-1">Async Architecture</h4>
+                            <p class="text-xs text-secondary">Built with FastAPI and `asyncio` to handle high concurrency without blocking the event loop. Perfect for real-time applications.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Installation Section -->
+        <section class="container mb-8">
+            <div class="card animate delay-4" style="border-left: 4px solid var(--accent-color);">
+                <div class="flex flex-col md:flex-row gap-6 items-center">
+                    <div style="flex: 1;">
+                        <h3 class="font-bold text-xl mb-2">Quick Deploy</h3>
+                        <p class="text-secondary text-sm mb-4">Get the inference server running locally in under 30 seconds. Requires Python 3.10+.</p>
+                        <div class="flex gap-2 flex-wrap">
+                            <span class="badge badge-external">uv</span>
+                            <span class="badge badge-external">just</span>
+                            <span class="badge badge-external">docker</span>
+                        </div>
+                    </div>
+                    <div style="flex: 1; width: 100%;">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="text-xs font-bold text-secondary">Terminal</span>
+                                <button class="text-xs text-secondary hover:text-white" onclick="alert('Copied!')">Copy</button>
+                            </div>
+                            <div class="code-body">
+                                <div><span class="code-comment"># Clone the repository</span></div>
+                                <div>$ git clone https://github.com/seduerr91/cookbook</div>
+                                <div class="mt-2"><span class="code-comment"># Install dependencies (via uv)</span></div>
+                                <div>$ uv pip install -r requirements.txt</div>
+                                <div class="mt-2"><span class="code-comment"># Set environment variables</span></div>
+                                <div>$ export CEREBRAS_API_KEY="sk-..."</div>
+                                <div class="mt-2"><span class="code-kw">$</span> python main.py</div>
+                                <div style="margin-top: 0.5rem; color: var(--success-color);">✔ Server listening on http://0.0.0.0:8000</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="flex flex-col items-center gap-4">
+                <div class="font-bold text-lg">seduerr91</div>
+                <p>High-performance ML Engineering</p>
+                <div class="flex gap-4 mt-2">
+                    <a href="#" class="text-secondary hover:text-primary">GitHub</a>
+                    <a href="#" class="text-secondary hover:text-primary">Documentation</a>
+                    <a href="#" class="text-secondary hover:text-primary">License</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle Logic with Persistence
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            applyTheme(newTheme);
+        }
+
+        // Initialize Theme
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme) {
+            applyTheme(savedTheme);
+        } else if (systemPrefersDark) {
+            applyTheme('dark');
+        }
+
+        themeToggleBtn.addEventListener('click', toggleTheme);
+
+        // Optional: Simple Bounce Animation CSS Injection
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes bounce {
+                0%, 100% { transform: translateY(-25%); animation-timing-function: cubic-bezier(0.8,0,1,1); }
+                50% { transform: translateY(0); animation-timing-function: cubic-bezier(0,0,0.2,1); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
