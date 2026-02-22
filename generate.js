@@ -406,7 +406,7 @@ async function callCerebras(apiKey, messages) {
         body: JSON.stringify({
           model: MODEL,
           messages,
-          max_tokens: 8192,
+          max_tokens: 16384,
           temperature: 0.7,
         }),
         signal: AbortSignal.timeout(120_000), // 2-minute timeout
@@ -521,7 +521,7 @@ Output only the complete HTML document.`;
 
 Current version:
 \`\`\`html
-${html.slice(0, 12000)}
+${html.slice(0, 24000)}
 \`\`\`
 
 This is iteration ${i} of ${iterations}. Make SIGNIFICANT improvements:
@@ -594,7 +594,8 @@ function log(msg) { process.stdout.write(msg + '\n'); }
 async function main() {
   loadEnv();
 
-  const { repos: repoArgs, noPush, noClone, iterations } = parseArgs(process.argv.slice(2));
+  const { repos: repoArgs, noPush: noPushArg, noClone, iterations } = parseArgs(process.argv.slice(2));
+  const noPush = noPushArg || process.env.NO_PUSH === '1';
 
   if (repoArgs.length === 0) {
     log('Usage: node generate.js owner/repo1 owner/repo2 ...');

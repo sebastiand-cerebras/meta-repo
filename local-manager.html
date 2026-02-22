@@ -443,18 +443,10 @@
   <div class="container">
 
     <header class="header">
-      <div class="logo">
-        <img id="logoImg" class="logo-img" src="" alt="" style="display:none" />
-        <div id="logoIcon" class="logo-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-          </svg>
-        </div>
-        <div class="logo-text">
-          <h1 id="siteTitle">Repository Explorer</h1>
-          <p></p>
-        </div>
+      <div class="logo" style="display:flex; align-items:center; gap:16px;">
+        <img src="assets/logo-light-mode.png" alt="Cerebras" id="cerebrasLogo" style="height:28px; width:auto;" />
+        <span style="font-size:20px; color:var(--text-secondary); font-weight:300;">&times;</span>
+        <img id="githubLogo" src="assets/GitHub_Invertocat_Black_Clearspace.svg" alt="GitHub" style="height:28px; width:auto;" />
       </div>
       <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
         <svg id="sunIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -469,8 +461,8 @@
     </header>
 
     <section class="hero">
-      <h2>Repository Explorer</h2>
-      <p>Browse GitHub repositories, select up to 5, and generate beautiful repo pages with AI.</p>
+      <h2>Visualize Repositories @ Lightning Fast Speed</h2>
+      <p>Browse GitHub repositories, select up to 5, and generate beautiful repo pages in real-time.</p>
     </section>
 
     <div id="errorBanner" class="alert alert-warning"></div>
@@ -525,7 +517,7 @@
     </div>
 
     <footer class="footer">
-      <p>Repository Explorer &mdash; <a href="index.html" style="color:var(--accent-color); text-decoration:none">← Back to Explorer</a> &mdash;
+      <p><a href="https://sebastiand-cerebras.github.io/meta-repo" style="color:var(--accent-color); text-decoration:none">View Hosted Pages &rarr;</a> &mdash;
         Powered by <a href="https://cloud.cerebras.ai" style="color:var(--accent-color); text-decoration:none">Cerebras AI</a>
       </p>
     </footer>
@@ -539,7 +531,7 @@
         <div class="modal-logs" id="modalLogs"></div>
         <div class="modal-footer">
           <button class="btn btn-secondary btn-sm" id="closeModalBtn" onclick="hideModal()" style="display:none">Close</button>
-          <a href="index.html" class="view-repos-btn" id="viewReposBtn">View Your Repos →</a>
+          <a href="https://sebastiand-cerebras.github.io/meta-repo" class="view-repos-btn" id="viewReposBtn">View Hosted Pages &rarr;</a>
         </div>
       </div>
     </div>
@@ -561,7 +553,7 @@
       document.documentElement.setAttribute('data-theme', theme);
       document.getElementById('sunIcon').style.display  = theme === 'dark' ? 'none' : 'block';
       document.getElementById('moonIcon').style.display = theme === 'dark' ? 'block' : 'none';
-      tryLoadLogo(theme);
+      updateLogos(theme);
     }
 
     function toggleTheme() {
@@ -571,21 +563,11 @@
       applyTheme(next);
     }
 
-    function tryLoadLogo(theme) {
-      const src = theme === 'dark' ? 'assets/logo-dark-mode.png' : 'assets/logo-light-mode.png';
-      const img = document.getElementById('logoImg');
-      const icon = document.getElementById('logoIcon');
-      const testImg = new Image();
-      testImg.onload = () => {
-        img.src = src;
-        img.style.display = 'block';
-        icon.style.display = 'none';
-      };
-      testImg.onerror = () => {
-        img.style.display = 'none';
-        icon.style.display = 'flex';
-      };
-      testImg.src = src;
+    function updateLogos(theme) {
+      const cerebras = document.getElementById('cerebrasLogo');
+      const github = document.getElementById('githubLogo');
+      if (cerebras) cerebras.src = theme === 'dark' ? 'assets/logo-dark-mode.png' : 'assets/logo-light-mode.png';
+      if (github) github.src = theme === 'dark' ? 'assets/GitHub_Invertocat_White_Clearspace.svg' : 'assets/GitHub_Invertocat_Black_Clearspace.svg';
     }
 
     async function loadRepos() {

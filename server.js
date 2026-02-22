@@ -30,9 +30,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// GET / — redirect to local manager
+// GET / — serve local manager directly as the default page
 app.get('/', (req, res) => {
-  res.redirect('/local-manager.html');
+  res.sendFile(path.join(__dirname, 'local-manager.html'));
 });
 
 // GET /local-manager — serve without .html extension
@@ -61,10 +61,9 @@ app.post('/api/generate', (req, res) => {
   res.write(`data: ${JSON.stringify({ type: 'start', message: 'Starting generation...' })}\n\n`);
 
   // Spawn generate.js as child process
-  const args = ['generate.js', ...repos];
-  const child = spawn('node', args, {
+  const args = [path.join(__dirname, 'generate.js'), ...repos];
+  const child = spawn(process.execPath, args, {
     cwd: __dirname,
-    shell: true,
     env: { ...process.env, NO_PUSH: '1' } // Don't auto-push
   });
 

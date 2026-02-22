@@ -187,18 +187,10 @@
 
     <!-- ===== HEADER ===== -->
     <header class="header">
-      <div class="logo">
-        <img id="logoImg" class="logo-img" src="" alt="" style="display:none" />
-        <div id="logoIcon" class="logo-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-          </svg>
-        </div>
-        <div class="logo-text">
-          <h1 id="siteTitle">Repository Explorer</h1>
-          <p>powered by Cerebras AI</p>
-        </div>
+      <div class="logo" style="display:flex; align-items:center; gap:16px;">
+        <img src="assets/logo-light-mode.png" alt="Cerebras" id="cerebrasLogo" style="height:28px; width:auto;" />
+        <span style="font-size:20px; color:var(--text-secondary); font-weight:300;">&times;</span>
+        <img id="githubLogo" src="assets/GitHub_Invertocat_Black_Clearspace.svg" alt="GitHub" style="height:28px; width:auto;" />
       </div>
       <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
         <svg id="sunIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -214,11 +206,11 @@
 
     <!-- ===== HERO ===== -->
     <section class="hero">
-      <h2>Repository Explorer</h2>
-      <p>A showcase of visual repo pages generated with Cerebras AI.</p>
+      <h2>Visualize Repositories @ Lightning Fast Speed</h2>
+      <p>A showcase of visual repo pages generated in real-time with Cerebras AI.</p>
       <div style="margin-top: 32px; display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
-        <a href="local-manager.html" class="btn btn-primary">
-          <span>Open Repository Explorer</span>
+        <a href="http://localhost:3000" class="btn btn-primary">
+          <span>Launch Local Manager</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
       </div>
@@ -303,7 +295,7 @@
       document.documentElement.setAttribute('data-theme', theme);
       document.getElementById('sunIcon').style.display  = theme === 'dark' ? 'none' : 'block';
       document.getElementById('moonIcon').style.display = theme === 'dark' ? 'block' : 'none';
-      tryLoadLogo(theme);
+      updateLogos(theme);
     }
     function toggleTheme() {
       const cur = document.documentElement.getAttribute('data-theme');
@@ -315,21 +307,11 @@
     // ============================================================
     // Logo (optional branded image, fallback to SVG icon)
     // ============================================================
-    function tryLoadLogo(theme) {
-      const src = theme === 'dark' ? 'assets/logo-dark-mode.png' : 'assets/logo-light-mode.png';
-      const img = document.getElementById('logoImg');
-      const icon = document.getElementById('logoIcon');
-      const testImg = new Image();
-      testImg.onload = () => {
-        img.src = src;
-        img.style.display = 'block';
-        icon.style.display = 'none';
-      };
-      testImg.onerror = () => {
-        img.style.display = 'none';
-        icon.style.display = 'flex';
-      };
-      testImg.src = src;
+    function updateLogos(theme) {
+      const cerebras = document.getElementById('cerebrasLogo');
+      const github = document.getElementById('githubLogo');
+      if (cerebras) cerebras.src = theme === 'dark' ? 'assets/logo-dark-mode.png' : 'assets/logo-light-mode.png';
+      if (github) github.src = theme === 'dark' ? 'assets/GitHub_Invertocat_White_Clearspace.svg' : 'assets/GitHub_Invertocat_Black_Clearspace.svg';
     }
 
     // ============================================================

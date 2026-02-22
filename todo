@@ -1,0 +1,22 @@
+- [ ] Generated pages all look somehow cut off, can you revisit them and have like 2 loops of HTML generation or just make the response token length some 80k tokens?!
+- Then locally shall just always start the manager - so make that the default page (localhost3000) which shall haev a link to the github pages hosted version, and the github pages version shall link to locally but we don't need the manager there linked. So it can really be two autonomous apps almost. 
+- In the header just do cerebras inference logo x Github logo - I added both assets into assets. Remove the repository explorer title from the header. 
+Then it really only takes the github name, and then has a Get button. Then you can filters as for now.
+- Wehn i select one and click generate htis happens for me:
+
+Starting generation for 1 repositories...
+- seduerr91/cbrsclaw
+Generation failed with exit code null
+
+
+Yeah that is bad 
+
+This header shall be renamed from:
+
+Repository Explorer
+Browse GitHub repositories, select up to 5, and generate beautiful repo pages with AI.
+
+to 
+
+Visualize Repositories @ Lightning Fast Speed
+Browse GitHub repositories, select up to 5, and generate beautiful repo pages in real-time.
