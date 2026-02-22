@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>meta-repo | The Unified Orchestration Layer</title>
+    <style>
+        :root {
+            --bg-primary:#f5f5f7; --bg-secondary:#ffffff; --bg-tertiary:#f0f0f2; --bg-card:#ffffff;
+            --text-primary:rgb(43,25,16); --text-secondary:#86868b; --border-color:rgba(0,0,0,0.08);
+            --accent-color:rgb(224,100,57); --accent-hover:rgb(200,85,45); --accent-subtle:rgba(224,100,57,0.1);
+            --success-color:#34c759; --warning-color:#ff9500; --error-color:#ff3b30; --info-color:#007aff;
+            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.05);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg:0 8px 32px rgba(0,0,0,0.12);
+            --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-xl:24px;
+        }
+        [data-theme="dark"] {
+            --bg-primary:#000000; --bg-secondary:#1c1c1e; --bg-tertiary:#2c2c2e; --bg-card:#1c1c1e;
+            --text-primary:#f5f5f7; --text-secondary:#86868b; --border-color:rgba(255,255,255,0.1);
+            --accent-color:rgb(224,100,57); --accent-hover:rgb(240,115,70); --accent-subtle:rgba(224,100,57,0.15);
+            --success-color:#30d158; --warning-color:#ff9f0a; --error-color:#ff453a; --info-color:#0a84ff;
+            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.3);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.4),0 2px 4px -1px rgba(0,0,0,0.2);
+            --shadow-lg:0 8px 32px rgba(0,0,0,0.5);
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased; scroll-behavior: smooth;}
+        body{background:var(--bg-primary);color:var(--text-primary);min-height:100vh;transition:background .3s,color .3s;line-height: 1.5; overflow-x: hidden;}
+
+        /* --- Layout Utilities --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .gap-sm { gap: 8px; } .gap-md { gap: 16px; } .gap-lg { gap: 32px; }
+        .grid { display: grid; gap: 24px; }
+        .w-full { width: 100%; } .mt-lg { margin-top: 48px; } .mb-lg { margin-bottom: 48px; }
+
+        /* --- Typography --- */
+        h1, h2, h3 { font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; color: var(--text-primary); }
+        h1 { font-size: clamp(2.5rem, 6vw, 4rem); margin-bottom: 24px; }
+        h2 { font-size: clamp(1.8rem, 4vw, 2.25rem); margin-bottom: 16px; }
+        h3 { font-size: 1.25rem; margin-bottom: 8px; font-weight: 600; }
+        p { color: var(--text-secondary); font-size: 1.05rem; line-height: 1.6; }
+        .text-gradient {
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-color) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .mono { font-family: "SF Mono", Monaco, "Cascadia Code", monospace; font-size: 0.9em; }
+
+        /* --- Header --- */
+        header {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: color-mix(in srgb, var(--bg-secondary), transparent 20%);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            z-index: 100; border-bottom: 1px solid var(--border-color);
+            height: 70px; transition: all 0.3s ease;
+        }
+        .nav-inner { height: 100%; display: flex; align-items: center; justify-content: space-between; }
+        
+        /* --- Back Link --- */
+        .back-link {
+            text-decoration: none; color: var(--text-secondary);
+            font-size: 0.9rem; font-weight: 500;
+            display: flex; align-items: center; gap: 6px;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: var(--accent-color); transform: translateX(-2px); transition: all 0.2s; }
+        .back-link svg { width: 16px; height: 16px; }
+
+        /* --- Theme Toggle --- */
+        .theme-toggle {
+            background: var(--bg-tertiary); border: 1px solid var(--border-color);
+            color: var(--text-primary); width: 40px; height: 40px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .theme-toggle:hover { border-color: var(--accent-color); color: var(--accent-color); transform: rotate(15deg); }
+
+        /* --- Main Content --- */
+        main { padding-top: 140px; padding-bottom: 80px; }
+
+        /* --- Hero Section --- */
+        .hero { text-align: center; margin-bottom: 100px; position: relative; }
+        .hero-blob {
+            position: absolute; top: -50px; left: 50%; transform: translateX(-50%);
+            width: 100%; height: 100%; max-width: 800px; max-height: 800px;
+            background: var(--accent-subtle);
+            filter: blur(80px); z-index: -1; border-radius: 50%; opacity: 0.6; pointer-events: none;
+        }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: 100px;
+            background: var(--bg-secondary); border: 1px solid var(--border-color);
+            color: var(--text-secondary); font-size: 0.8rem; font-weight: 600; margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+        .status-dot { width: 8px; height: 8px; background: var(--success-color); border-radius: 50%; box-shadow: 0 0 8px var(--success-color); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        
+        .hero-desc { max-width: 650px; margin: 0 auto 40px auto; font-size: 1.25rem; }
+        
+        .btn-group { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 14px 32px; border-radius: var(--radius-md);
+            font-weight: 600; text-decoration: none; font-size: 1rem;
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); border: none; cursor: pointer; gap: 10px;
+        }
+        .btn-primary { background: var(--accent-color); color: #fff; box-shadow: 0 4px 14px 0 rgba(224,100,57,0.39); }
+        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(224,100,57,0.23); }
+        .btn-secondary { background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { border-color: var(--text-secondary); background: var(--bg-tertiary); }
+
+        /* --- Stats Row --- */
+        .stats-row {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px; margin-bottom: 120px;
+        }
+        .stat-card {
+            background: var(--bg-secondary); padding: 24px;
+            border-radius: var(--radius-lg); border: 1px solid var(--border-color);
+            text-align: center; transition: transform 0.2s, border-color 0.2s;
+            position: relative; overflow: hidden;
+        }
+        .stat-card:hover { transform: translateY(-4px); border-color: var(--accent-color); box-shadow: var(--shadow-md); }
+        .stat-icon { margin-bottom: 8px; color: var(--accent-color); opacity: 0.8; }
+        .stat-val { font-size: 2.25rem; font-weight: 800; color: var(--text-primary); display: block; margin-bottom: 4px; letter-spacing: -1px; }
+        .stat-label { font-size: 0.75rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        /* --- Architecture Diagram --- */
+        .diagram-section { margin-bottom: 120px; }
+        .section-header { text-align: center; margin-bottom: 60px; }
+        .diagram-container {
+            background: var(--bg-secondary); border-radius: var(--radius-xl);
+            border: 1px solid var(--border-color); overflow: hidden;
+            box-shadow: var(--shadow-lg); position: relative;
+        }
+        .diagram-header { padding: 20px 32px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .diagram-title { font-weight: 600; color: var(--text-primary); font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
+        .diagram-body { padding: 60px 20px; display: flex; justify-content: center; background: radial-gradient(circle at center, var(--bg-tertiary) 0%, var(--bg-secondary) 100%); }
+        
+        /* SVG Diagram Styles */
+        .flow-svg { width: 100%; max-width: 800px; height: auto; }
+        .node-rect { fill: var(--bg-card); stroke: var(--border-color); stroke-width: 2; rx: 8; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.08)); transition: all 0.3s; }
+        .node-rect:hover { stroke: var(--accent-color); filter: drop-shadow(0 8px 20px rgba(224,100,57,0.2)); }
+        .node-text { fill: var(--text-primary); font-size: 14px; font-weight: 600; font-family: sans-serif; text-anchor: middle; dominant-baseline: middle; pointer-events: none; }
+        .node-subtext { fill: var(--text-secondary); font-size: 10px; font-family: sans-serif; text-anchor: middle; dominant-baseline: middle; pointer-events: none; }
+        .conn-line { stroke: var(--border-color); stroke-width: 2; fill: none; }
+        .conn-active { stroke: var(--accent-color); stroke-width: 2; fill: none; stroke-dasharray: 6; animation: dash 30s linear infinite; opacity: 0.6; }
+        @keyframes dash { to { stroke-dashoffset: -1000; } }
+
+        /* --- Bento Grid --- */
+        .bento-grid {
+            display: grid; grid-template-columns: repeat(12, 1fr);
+            grid-auto-rows: minmax(280px, auto);
+            gap: 24px; margin-bottom: 120px;
+        }
+        .bento-card {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg); padding: 32px;
+            display: flex; flex-direction: column; justify-content: space-between;
+            transition: all 0.3s ease; position: relative; overflow: hidden;
+            grid-column: span 4;
+        }
+        .bento-card:hover { border-color: var(--accent-color); box-shadow: var(--shadow-md); transform: translateY(-4px); }
+        .bento-card.span-12 { grid-column: span 12; }
+        .bento-card.span-8 { grid-column: span 8; }
+        .bento-card.span-6 { grid-column: span 6; }
+        
+        @media (max-width: 900px) {
+            .bento-card.span-12, .bento-card.span-8, .bento-card.span-6, .bento-card.span-4 { grid-column: span 12; }
+            .diagram-body { padding: 20px; }
+        }
+
+        .bento-icon-bg {
+            position: absolute; top: -20px; right: -20px; width: 120px; height: 120px;
+            background: var(--bg-tertiary); border-radius: 50%; opacity: 0.5; z-index: 0;
+            transition: background 0.3s;
+        }
+        .bento-card:hover .bento-icon-bg { background: var(--accent-subtle); }
+        
+        .bento-content { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; }
+        .bento-tag { 
+            font-size: 0.75rem; font-weight: 700; color: var(--accent-color); text-transform: uppercase; 
+            margin-bottom: 8px; display: block; letter-spacing: 0.05em;
+        }
+        .bento-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 12px; }
+        .bento-desc { font-size: 1rem; color: var(--text-secondary); flex-grow: 1; margin-bottom: 20px; }
+
+        /* Progress Bars */
+        .metric-row { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-color); }
+        .metric-item { margin-bottom: 12px; }
+        .metric-item:last-child { margin-bottom: 0; }
+        .metric-label { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-primary); }
+        .progress-track { height: 6px; background: var(--bg-tertiary); border-radius: 100px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--accent-color); border-radius: 100px; width: 0; transition: width 1s ease-out; }
+        .progress-fill.blue { background: var(--info-color); }
+        .progress-fill.green { background: var(--success-color); }
+
+        /* Feature List Styles */
+        .feature-list { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+        .feature-item { display: flex; align-items: center; gap: 10px; font-size: 0.95rem; color: var(--text-primary); }
+        .check-icon { color: var(--success-color); flex-shrink: 0; }
+
+        /* Code Block */
+        .code-block {
+            background: #1e1e1e; border-radius: var(--radius-md); overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1); margin-top: 24px;
+            font-family: "SF Mono", Monaco, monospace; font-size: 0.9rem;
+        }
+        .code-header {
+            background: rgba(255,255,255,0.05); padding: 10px 16px; display: flex; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background: #ff5f56; }
+        .dot.yellow { background: #ffbd2e; }
+        .dot.green { background: #27c93f; }
+        .code-content { padding: 20px; color: #d4d4d4; overflow-x: auto; display: flex; gap: 16px; }
+        .line-num { color: #6e7681; user-select: none; text-align: right; min-width: 30px; }
+        .code-line { white-space: pre; color: #e6edf3; }
+        .kwd { color: #ff7b72; } /* Keyword */
+        .str { color: #a5d6ff; } /* String */
+        .cmd { color: #d2a8ff; } /* Command */
+        .arg { color: #79c0ff; } /* Argument */
+
+        /* Footer */
+        footer { border-top: 1px solid var(--border-color); padding: 40px 0; text-align: center; color: var(--text-secondary); font-size: 0.9rem; }
+        .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 20px; }
+        .footer-links a { color: var(--text-primary); text-decoration: none; font-weight: 500; }
+        .footer-links a:hover { color: var(--accent-color); }
+
+        /* Animations */
+        .fade-in-up { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+        .fade-in-up.visible { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container nav-inner">
+            <a href="../../index.html" class="back-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                Back to Portfolio
+            </a>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                <!-- Sun Icon -->
+                <svg class="sun-icon" style="display:none" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                <!-- Moon Icon -->
+                <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <main class="container">
+        
+        <!-- Hero Section -->
+        <section class="hero fade-in-up">
+            <div class="hero-blob"></div>
+            <div class="hero-badge">
+                <span class="status-dot"></span>
+                v2.4.0 Stable Release
+            </div>
+            <h1>The Unified Orchestration<br><span class="text-gradient">Layer for Modern Ops</span></h1>
+            <p class="hero-desc">
+                meta-repo synchronizes distributed microservices, manages configuration drift, and enforces governance policies across your entire infrastructure with a single declarative manifest.
+            </p>
+            <div class="btn-group">
+                <a href="#" class="btn btn-primary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Get Started
+                </a>
+                <a href="#" class="btn btn-secondary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                    View Source
+                </a>
+            </div>
+        </section>
+
+        <!-- Stats Row -->
+        <section class="stats-row fade-in-up">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                </div>
+                <span class="stat-val">99.99%</span>
+                <span class="stat-label">Uptime SLA</span>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                </div>
+                <span class="stat-val">42k+</span>
+                <span class="stat-label">Lines Managed</span>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                </div>
+                <span class="stat-val">< 10ms</span>
+                <span class="stat-label">Sync Latency</span>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                </div>
+                <span class="stat-val">MIT</span>
+                <span class="stat-label">License</span>
+            </div>
+        </section>
+
+        <!-- Architecture Diagram -->
+        <section class="diagram-section fade-in-up">
+            <div class="section-header">
+                <h2>How it Works</h2>
+                <p>Atomic commits distributed across your fleet instantly.</p>
+            </div>
+            <div class="diagram-container">
+                <div class="diagram-header">
+                    <span class="diagram-title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                        Topology View
+                    </span>
+                    <span style="font-size: 0.8rem; color: var(--text-secondary); font-family: monospace;">LIVE STATUS</span>
+                </div>
+                <div class="diagram-body">
+                    <svg class="flow-svg" viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Defs for markers/gradients -->
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="var(--accent-color)" />
+                            </marker>
+                        </defs>
+
+                        <!-- Connectors -->
+                        <!-- Left to Center -->
+                        <path d="M180 150 L320 150" class="conn-active" marker-end="url(#arrowhead)"/>
+                        <!-- Center to Right Top -->
+                        <path d="M480 150 C550 150, 550 80, 620 80" class="conn-line" />
+                        <!-- Center to Right Bottom -->
+                        <path d="M480 150 C550 150,

@@ -1,0 +1,14 @@
+# Env secrets
+.env
+
+# Temp clones during generation
+tmp/
+
+# Internal design reference (private — not for public repo)
+cerebras-style-html-raws/
+
+# OS
+.DS_Store
+
+# Node
+node_modules/
