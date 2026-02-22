@@ -69,6 +69,26 @@
       "isExternal": true,
       "type": "ml",
       "generatedAt": "2026-02-22T16:24:55.347Z"
+    },
+    {
+      "owner": "seduerr91",
+      "repo": "seduerr91.github.io",
+      "fullName": "seduerr91/seduerr91.github.io",
+      "path": "repos/seduerr91.github.io/index.html",
+      "url": "repos/seduerr91.github.io/",
+      "isExternal": true,
+      "type": "ml",
+      "generatedAt": "2026-02-22T19:07:52.642Z"
+    },
+    {
+      "owner": "seduerr91",
+      "repo": "cbrsclaw",
+      "fullName": "seduerr91/cbrsclaw",
+      "path": "repos/cbrsclaw/index.html",
+      "url": "repos/cbrsclaw/",
+      "isExternal": true,
+      "type": "api",
+      "generatedAt": "2026-02-22T19:08:27.622Z"
     }
   ]
 }

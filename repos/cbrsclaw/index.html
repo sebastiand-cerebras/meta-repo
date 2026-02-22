@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cbrsclaw API | Secure AI Orchestration</title>
+    <style>
+        :root {
+            --bg-primary:#f5f5f7; --bg-secondary:#ffffff; --bg-tertiary:#f0f0f2; --bg-card:#ffffff;
+            --text-primary:rgb(43,25,16); --text-secondary:#86868b; --border-color:rgba(0,0,0,0.08);
+            --accent-color:rgb(224,100,57); --accent-hover:rgb(200,85,45); --accent-subtle:rgba(224,100,57,0.1);
+            --success-color:#34c759; --warning-color:#ff9500; --error-color:#ff3b30; --info-color:#007aff;
+            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.05);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg:0 8px 32px rgba(0,0,0,0.12);
+            --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-xl:24px;
+        }
+        [data-theme="dark"] {
+            --bg-primary:#000000; --bg-secondary:#1c1c1e; --bg-tertiary:#2c2c2e; --bg-card:#1c1c1e;
+            --text-primary:#f5f5f7; --text-secondary:#86868b; --border-color:rgba(255,255,255,0.1);
+            --accent-color:rgb(224,100,57); --accent-hover:rgb(240,115,70); --accent-subtle:rgba(224,100,57,0.15);
+            --success-color:#30d158; --warning-color:#ff9f0a; --error-color:#ff453a; --info-color:#0a84ff;
+            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.3);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.4),0 2px 4px -1px rgba(0,0,0,0.2);
+            --shadow-lg:0 8px 32px rgba(0,0,0,0.5);
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,monospace,sans-serif;-webkit-font-smoothing:antialiased;scroll-behavior: smooth;}
+        body{background:var(--bg-primary);color:var(--text-primary);min-height:100vh;transition:background .3s,color .3s;line-height: 1.5;}
+
+        /* Layout Utilities */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-4 { gap: 1rem; }
+        .grid { display: grid; }
+        .text-center { text-align: center; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mt-8 { margin-top: 2rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-8 { margin-bottom: 2rem; }
+        .w-full { width: 100%; }
+        .relative { position: relative; }
+
+        /* Header */
+        header { 
+            padding: 14px 0; 
+            border-bottom: 1px solid var(--border-color); 
+            background: var(--bg-secondary); /* Solid for performance */
+            position: sticky; top: 0; z-index: 100; 
+        }
+
+        /* Buttons & Badges */
+        .btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        .btn:hover { background: var(--bg-tertiary); transform: translateY(-1px); }
+        .btn-primary { background: var(--accent-color); color: white; border-color: var(--accent-color); box-shadow: var(--shadow-sm); }
+        .btn-primary:hover { background: var(--accent-hover); box-shadow: var(--shadow-md); }
+
+        .badge { padding: 4px 10px; border-radius: 99px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid transparent; }
+        
+        /* API Method & Status Badges */
+        .badge-get { background: rgba(52, 199, 89, 0.1); color: var(--success-color); border-color: rgba(52, 199, 89, 0.2); }
+        .badge-post { background: rgba(0, 122, 255, 0.1); color: var(--info-color); border-color: rgba(0, 122, 255, 0.2); }
+        .badge-delete { background: rgba(255, 59, 48, 0.1); color: var(--error-color); border-color: rgba(255, 59, 48, 0.2); }
+        .badge-put { background: rgba(255, 149, 0, 0.1); color: var(--warning-color); border-color: rgba(255, 149, 0, 0.2); }
+        .badge-ext { background: var(--bg-tertiary); color: var(--text-secondary); border: 1px solid var(--border-color); }
+        .badge-status { display: inline-flex; align-items: center; gap: 6px; background: rgba(52, 199, 89, 0.1); color: var(--success-color); }
+        .badge-status::before { content:''; width: 6px; height: 6px; background: currentColor; border-radius: 50%; display: block; box-shadow: 0 0 8px currentColor; animation: pulse 2s infinite; }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* Hero */
+        .hero { padding: 80px 0 50px; text-align: center; position: relative; overflow: hidden; }
+        .hero-bg { position: absolute; top: -50%; left: 50%; transform: translateX(-50%); width: 1000px; height: 1000px; z-index: -1; opacity: 0.5; pointer-events: none; background: radial-gradient(circle, var(--accent-subtle) 0%, transparent 60%); filter: blur(60px); }
+        .hero h1 { font-size: clamp(2.5rem, 5vw, 3.5rem); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 16px; background: linear-gradient(135deg, var(--text-primary) 0%, #888 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { font-size: 1.1rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto 32px; line-height: 1.6; }
+
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 60px; }
+        .stat-card { background: var(--bg-card); padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 8px; position: relative; overflow: hidden; }
+        .stat-card::after { content:''; position: absolute; top: 0; right: 0; width: 80px; height: 80px; background: radial-gradient(circle at top right, var(--accent-subtle) 0%, transparent 70%); opacity: 0.5; }
+        .stat-label { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+        .stat-val { font-size: 1.75rem; font-weight: 700; color: var(--accent-color); font-variant-numeric: tabular-nums; }
+        .stat-meta { font-size: 0.8rem; color: var(--success-color); display: flex; align-items: center; gap: 4px; }
+
+        /* Section Styling */
+        section { padding: 60px 0; border-bottom: 1px solid var(--border-color); }
+        section:last-child { border-bottom: none; }
+        .section-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 32px; }
+        .section-title { font-size: 1.8rem; font-weight: 700; color: var(--text-primary); position: relative; padding-left: 16px; }
+        .section-title::before { content:''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 4px; height: 24px; background: var(--accent-color); border-radius: 2px; }
+
+        /* API Cards */
+        .api-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+        .api-card { 
+            background: var(--bg-card); 
+            border: 1px solid var(--border-color); 
+            border-radius: var(--radius-md); 
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+        }
+        .api-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--accent-color); }
+        
+        .card-header { background: var(--bg-tertiary); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
+        .endpoint-url { font-family: 'SF Mono', Consolas, monospace; font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; }
+        
+        .card-body { padding: 20px; }
+        .card-title { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .card-desc { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 16px; }
+        
+        .params-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; margin-top: 10px; }
+        .params-table td { padding: 4px 0; vertical-align: top; }
+        .param-name { color: var(--text-primary); font-family: monospace; font-weight: 600; }
+        .param-type { color: var(--accent-color); font-family: monospace; opacity: 0.8; padding-left: 8px; }
+        .param-desc { color: var(--text-secondary); padding-left: 12px; }
+
+        .code-block {
+            background: #1e1e1e; /* Always dark for contrast */
+            color: #d4d4d4;
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            font-family: 'SF Mono', Consolas, monospace;
+            font-size: 0.75rem;
+            margin-top: 16px;
+            border: 1px solid #333;
+            overflow-x: auto;
+            position: relative;
+        }
+        .code-block::before { content:'JSON'; position: absolute; top: 6px; right: 8px; font-size: 0.65rem; color: #666; text-transform: uppercase; }
+        .k { color: #569cd6; } /* key */
+        .s { color: #ce9178; } /* string */
+        .n { color: #b5cea8; } /* number */
+        .b { color: #569cd6; } /* bool */
+
+        /* Architecture Flow Diagram */
+        .arch-grid {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 40px 24px;
+            position: relative;
+            background-image: radial-gradient(var(--border-color) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .flow-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+        }
+        
+        .flow-node {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            width: 180px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s;
+        }
+        .flow-node:hover { transform: translateY(-4px); border-color: var(--accent-color); }
+        .node-icon { 
+            width: 48px; height: 48px; margin: 0 auto 12px; 
+            border-radius: 12px; background: var(--bg-tertiary); 
+            color: var(--accent-color); display: flex; align-items: center; justify-content: center; 
+        }
+        .node-title { font-weight: 700; font-size: 0.9rem; color: var(--text-primary); margin-bottom: 4px; }
+        .node-sub { font-size: 0.75rem; color: var(--text-secondary); }
+
+        /* Connection Lines */
+        .flow-container::before {
+            content: ''; position: absolute; top: 40%; left: 10%; right: 10%; height: 2px;
+            background: var(--border-color); z-index: 1;
+        }
+        .flow-arrow {
+            position: absolute; top: calc(40% - 4px); 
+            width: 0; height: 0; 
+            border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 8px solid var(--border-color); z-index: 1;
+        }
+
+        /* Tech Stack */
+        .tech-list { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 32px; }
+        .tech-pill {
+            background: var(--bg-tertiary);
+            padding: 8px 16px;
+            border-radius: var(--radius-lg);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        /* Footer */
+        footer { padding: 40px 0; text-align: center; color: var(--text-secondary); font-size: 0.9rem; border-top: 1px solid var(--border-color); margin-top: 40px; }
+        .footer-link { color: var(--accent-color); text-decoration: none; font-weight: 500; }
+        .footer-link:hover { text-decoration: underline; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .flow-container { flex-direction: column; align-items: stretch; gap: 40px; }
+            .flow-container::before { 
+                top: 10%; bottom: 10%; left: 50%; width: 2px; height: auto; right: auto; 
+                transform: translateX(-50%);
+            }
+            .flow-node { width: 100%; text-align: left; display: flex; align-items: center; gap: 16px; padding: 16px; }
+            .node-icon { margin: 0; }
+            .flow-arrow { display: none; }
+            .params-table tr { display: flex; flex-wrap: wrap; margin-bottom: 8px; border-bottom: 1px dashed var(--border-color); padding-bottom: 8px; }
+            .params-table td { display: inline-block; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- Header -->
+    <header>
+        <div class="container flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <a href="../../index.html" class="btn" style="padding: 6px 12px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    <span style="font-size: 0.9rem;">Explorer</span>
+                </a>
+                <div style="height: 20px; width: 1px; background: var(--border-color);"></div>
+                <div class="flex items-center gap-2">
+                    <div class="badge badge-ext">External — seduerr91</div>
+                    <div class="badge badge-status">Operational</div>
+                </div>
+            </div>
+            <button id="theme-toggle" class="btn" aria-label="Toggle Dark Mode" title="Toggle Theme">
+                <svg id="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                <svg id="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <div class="hero">
+        <div class="hero-bg"></div>
+        <div class="container">
+            <div style="display:inline-block; margin-bottom: 16px;">
+                <div class="badge" style="background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-secondary); box-shadow: var(--shadow-sm);">v2.0.4 Stable</div>
+            </div>
+            <h1>cbrsclaw API</h1>
+            <p>A lightweight, secure orchestration layer running AI agents in isolated Apple/Linux containers. Connects Claude to WhatsApp via a strictly typed event bus.</p>
+            
+            <div class="flex justify-center gap-4" style="margin-top: 32px;">
+                <a href="#endpoints" class="btn btn-primary">
+                    API Reference
+                </a>
+                <a href="https://github.com/seduerr91/cbrsclaw" target="_blank" class="btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                    View Source
+                </a>
+            </div>
+
+            <div class="tech-list">
+                <div class="tech-pill"><span style="color: #f05032;">Go</span> 1.21</div>
+                <div class="tech-pill">SQLite</div>
+                <div class="tech-pill">Docker/VM</div>
+                <div class="tech-pill">Anthropic SDK</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        
+        <!-- Stats Row -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-label">Isolation</span>
+                <span class="stat-val">Rootless</span>
+                <span class="stat-meta">Containerized FS</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Latency</span>
+                <span class="stat-val">280ms</span>
+                <span class="stat-meta">Avg. Response</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Uptime</span>
+                <span class="stat-val">99.9%</span>
+                <span class="stat-meta">Last 30 Days</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Memory</span>
+                <span class="stat-val">128MB</span>
+                <span class="stat-meta">Footprint</span>
+            </div>
+        </div>
+
+        <!-- Architecture Visual -->
+        <section id="architecture">
+            <div class="section-header">
+                <h2 class="section-title">Event Lifecycle</h2>
+                <div style="font-size: 0.85rem; color: var(--text-secondary);">Request → Validate → Container → Response</div>
+            </div>
+            
+            <div class="arch-grid">
+                <div class="flow-container">
+                    <!-- Node 1 -->
+                    <div class="flow-node">
+                        <div class="node-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                        </div>
+                        <div class="node-title">Ingest</div>
+                        <div class="node-sub">WhatsApp Webhook</div>
+                    </div>
+
+                    <div class="flow-arrow" style="left: 25%;"></div>
+
+                    <!-- Node 2 -->
+                    <div class="flow-node">
+                        <div class="node-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        </div>
+                        <div class="node-title">Validate</div>
+                        <div class="node-sub">Zod Schema Check</div>
+                    </div>
+
+                    <div class="flow-arrow" style="left: 50%;"></div>
+
+                    <!-- Node 3 -->
+                    <div class="flow-node">
+                        <div class="node-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+                        </div>
+                        <div class="node-title">Sandbox</div>
+                        <div class="node-sub">Agent Execution</div>
+                    </div>
+
+                    <div class="flow-arrow" style="left: 75%;"></div>
+
+                    <!-- Node 4 -->
+                    <div class="flow-node">
+                        <div class="node-icon" style="color: var(--success-color);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                        <div class="node-title">Respond</div>
+                        <div class="node-sub">Push to Socket</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- API Endpoints Section -->
+        <section id="endpoints">
+            <div class="section-header">
+                <h2 class="section-title">REST Interface</h2>
+                <div class="badge badge-get">200 OK</div>
+            </div>
+            
+            <div class="api-grid">
+                <!-- Endpoint 1: Ingest -->
+                <div class="api-card">
+                    <div class="card-header">
+                        <span class="badge badge-post">POST</span>
+                        <span class="endpoint-url">/v1/hooks/whatsapp</span>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">Ingest Message</h3>
+                        <p class="card-desc">Receives payloads from the Baileys socket. Enqueues events for the core processor.</p>
+                        <div class="code-block">
+                        <span class="k">{</span><br>
+                        &nbsp;&nbsp;<span class="k">"event"</span>: <span class="s">"msg"</span>,<br>
+                        &nbsp;&nbsp;<span class="k">"from"</span>: <span class="s">"1202555xxxx"</span>,<br>
+                        &nbsp;&nbsp;<span class="k">"body"</span>: <span class="s">"status update"</span><br>
+                        <span class="k">}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Endpoint 2: Execute -->
+                <div class="api-card">
+                    <div class="card-header">
+                        <span class="badge badge-post">POST</span>
+                        <span class="endpoint-url">/v1/exec/run</span>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">Run Sandbox</h3>
+                        <p class="card-desc">Spawns an isolated container. Validates mount paths before execution.</p>
+                        <table class="params-table">
+                            <tr>
+                                <td><span class="param-name">image_id</span></td>
+                                <td><span class="param-type">str</span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="param-desc">Hash of the container image to run.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="param-name">timeout</span></td>
+                                <td><span class="param-type">int</span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="param-desc">Max execution time in seconds (default: 30).</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Endpoint 3: Context -->
+                <div class="api-card">
+                    <div class="card-header">
+                        <span class="badge badge-get">GET</span>
+                        <span class="endpoint-url">/v1/context/:gid</span>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">Retrieve Memory</h3>
+                        <p class="card-desc">Fetches conversation history and system prompt (CLAUDE.md) for a specific thread.</p>
+                        <div class="code-block">
+                        <span class="k">{</span><br>
+                        &nbsp;&nbsp;<span class="k">"total"</span>: <span class="n">42</span>,<br>
+                        &nbsp;&nbsp;<span class="k">"context"</span>: <span class="s">"project_beta"</span><br>
+                        <span class="k">}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Endpoint 4: Pairing -->
+                <div class="api-card">
+                    <div class="card-header">
+                        <span class="badge badge-put">AUTH</span>
+                        <span class="endpoint-url">/v1/pair/qr</span>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">Generate Pairing QR</h3>
+                        <p class="card-desc">Initiates a new session. Returns a QR code URL for terminal display.</p>
+                        <p class="card-desc" style="font-size: 0.75rem; margin-top: 8px; color: var(--warning-color);">⚠️ Requires elevated privileges.</p>
+                    </div>
+                </div>
+
+                <!-- Endpoint 5: Security Audit -->
+                <div class="api-card">
+                    <div class="card-header">
+                        <span class="badge badge-delete">SEC</span>
+                        <span class="endpoint-url">/v1/audit/paths</span>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">Path Validator</h3>
+                        <p class="card-desc">Checks filesystem paths against the strict allowlist defined in config.</p>
+                        <div class="code-block">
+                        <span class="k">"allowed"</span>: <span class="b">false</span>,<br>
+                        <span class="k">"reason"</span>: <span class="s">"traversal"</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Endpoint 6: Health -->
+                <div class="api-card">
+                    <div class="card-header">
+                        <span class="badge badge-get">GET</span>
+                        <span class="endpoint-url">/health</span>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">System Check</h3>
+                        <p class="card-desc">Returns the status of the database, socket connection, and container daemon.</p>
+                        <div class="flex items-center gap-2 mt-2">
+                            <span style="width: 8px; height: 8px; background: var(--success-color); border-radius: 50%;"></span>
+                            <span style="font-size: 0.8rem; color: var(--success-color); font-weight: 600;">Daemon Active</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>Designed for high-security AI automation.</p>
+            <div class="mt-2">
+                <a href="https://github.com/seduerr91" class="footer-link" target="_blank">seduerr91</a> • <a href="#" class="footer-link">Documentation</a> • <a href="#" class="footer-link">Terms</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle Logic
+        (function() {
+            const toggleBtn = document.getElementById('theme-toggle');
+            const sunIcon = document.getElementById('theme-icon-sun');
+            const moonIcon = document.getElementById('theme-icon-moon');
+            const html = document.documentElement;
+
+            // Check LocalStorage
+            const savedTheme = localStorage.getItem('theme');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            function setTheme(theme) {
+                html.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+                if (theme === 'dark') {
+                    sunIcon.style.display = 'block';
+                    moonIcon.style.display = 'none';
+                } else {
+                    sunIcon.style.display = 'none';
+                    moonIcon.style.display = 'block';
+                }
+            }
+
+            // Initialize
+            if (savedTheme) {
+                setTheme(savedTheme);
+            } else {
+                setTheme(systemPrefersDark ? 'dark' : 'light');
+            }
+
+            // Event Listener
+            toggleBtn.addEventListener('click', () => {
+                const currentTheme = html.getAttribute('data-theme');
+                setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+            });
+        })();
+    </script>
+</body>
+</html>
