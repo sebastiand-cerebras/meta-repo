@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pydantic AI | GenAI Agent Framework</title>
+    <style>
+        :root {
+            --bg-primary:#f5f5f7; --bg-secondary:#ffffff; --bg-tertiary:#f0f0f2; --bg-card:#ffffff;
+            --text-primary:rgb(43,25,16); --text-secondary:#86868b; --border-color:rgba(0,0,0,0.08);
+            --accent-color:rgb(224,100,57); --accent-hover:rgb(200,85,45); --accent-subtle:rgba(224,100,57,0.1);
+            --success-color:#34c759; --warning-color:#ff9500; --error-color:#ff3b30; --info-color:#007aff;
+            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.05);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg:0 8px 32px rgba(0,0,0,0.12);
+            --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-xl:24px;
+        }
+        [data-theme="dark"] {
+            --bg-primary:#000000; --bg-secondary:#1c1c1e; --bg-tertiary:#2c2c2e; --bg-card:#1c1c1e;
+            --text-primary:#f5f5f7; --text-secondary:#86868b; --border-color:rgba(255,255,255,0.1);
+            --accent-color:rgb(224,100,57); --accent-hover:rgb(240,115,70); --accent-subtle:rgba(224,100,57,0.15);
+            --success-color:#30d158; --warning-color:#ff9f0a; --error-color:#ff453a; --info-color:#0a84ff;
+            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.3);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.4),0 2px 4px -1px rgba(0,0,0,0.2);
+            --shadow-lg:0 8px 32px rgba(0,0,0,0.5);
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased; scroll-behavior: smooth;}
+        body{background:var(--bg-primary);color:var(--text-primary);min-height:100vh;transition:background .3s,color .3s;line-height:1.6}
+
+        /* --- Utilities --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-6 { gap: 1.5rem; }
+        .grid { display: grid; }
+        .grid-cols-1 { grid-template-columns: 1fr; }
+        .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+        .text-center { text-align: center; }
+        .font-mono { font-family: 'SF Mono', 'Roboto Mono', monospace; }
+        .mt-4 { margin-top: 1rem; }
+        .mt-8 { margin-top: 2rem; }
+        .mt-12 { margin-top: 3rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-8 { margin-bottom: 2rem; }
+        .w-full { width: 100%; }
+
+        /* --- Components --- */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 12px 24px; border-radius: var(--radius-md); font-weight: 600;
+            cursor: pointer; border: none; transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); font-size: 0.95rem;
+            text-decoration: none; gap: 8px;
+        }
+        .btn-primary { background: var(--accent-color); color: white; box-shadow: 0 4px 12px rgba(224,100,57,0.3); }
+        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(224,100,57,0.4); }
+        .btn-ghost { background: transparent; color: var(--text-primary); border: 1px solid var(--border-color); }
+        .btn-ghost:hover { background: var(--bg-tertiary); border-color: var(--text-secondary); }
+        .btn-sm { padding: 8px 16px; font-size: 0.85rem; }
+
+        .card {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg); padding: 24px;
+            box-shadow: var(--shadow-sm); transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative; overflow: hidden;
+        }
+        .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--accent-color); }
+
+        .badge {
+            display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 6px;
+            font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .badge.v1 { background: var(--accent-subtle); color: var(--accent-color); }
+
+        /* --- Header --- */
+        header { padding: 16px 0; position: sticky; top: 0; z-index: 100; background: rgba(var(--bg-primary), 0.85); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid var(--border-color); }
+        .logo { font-weight: 800; font-size: 1.2rem; letter-spacing: -0.03em; display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text-primary); }
+        .logo span { color: var(--accent-color); }
+        .nav-link { color: var(--text-secondary); text-decoration: none; font-weight: 500; font-size: 0.9rem; transition: color 0.2s; }
+        .nav-link:hover { color: var(--accent-color); }
+
+        /* --- Hero --- */
+        .hero { padding: 120px 0 80px; text-align: center; position: relative; overflow: hidden; }
+        .hero::before {
+            content: ''; position: absolute; top: -20%; left: 50%; transform: translateX(-50%);
+            width: 1200px; height: 800px; background: radial-gradient(circle, var(--accent-subtle) 0%, transparent 60%);
+            opacity: 0.5; z-index: -1; pointer-events: none;
+        }
+        .hero h1 { font-size: 4rem; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 24px; line-height: 1.1; background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent-color) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { font-size: 1.25rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto 40px; line-height: 1.6; }
+        
+        /* --- Stats --- */
+        .stats-wrapper { margin-top: 60px; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 32px 0; background: var(--bg-secondary); }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+        .stat-item { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .stat-val { font-size: 2rem; font-weight: 800; color: var(--text-primary); line-height: 1; }
+        .stat-lbl { font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px; font-weight: 500; text-transform: uppercase; }
+
+        /* --- Architecture Diagram --- */
+        .diagram-section { padding: 80px 0; }
+        .arch-container {
+            background: var(--bg-secondary); border-radius: var(--radius-xl); padding: 40px;
+            border: 1px solid var(--border-color); position: relative; overflow: hidden;
+        }
+        .arch-flow {
+            display: flex; align-items: center; justify-content: space-between;
+            position: relative; margin-top: 40px;
+        }
+        .arch-node {
+            z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 12px;
+            width: 160px;
+        }
+        .arch-icon {
+            width: 56px; height: 56px; background: var(--bg-primary); border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; box-shadow: var(--shadow-md); transition: all 0.3s;
+        }
+        .arch-node:hover .arch-icon { border-color: var(--accent-color); color: var(--accent-color); transform: scale(1.1); }
+        .arch-label { font-weight: 600; font-size: 0.9rem; }
+        .arch-sub { font-size: 0.75rem; color: var(--text-secondary); }
+
+        .arch-line {
+            flex-grow: 1; height: 2px; background: var(--border-color); position: relative; margin: 0 12px;
+        }
+        .arch-line::after {
+            content: ''; position: absolute; top: -4px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 8px solid var(--border-color);
+            animation: flow 2s infinite;
+        }
+        @keyframes flow { 0% { left: 0; opacity: 0; } 50% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+
+        /* --- Features Grid --- */
+        .features-section { padding: 60px 0; }
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+        .feature-card { background: var(--bg-card); padding: 32px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); transition: all 0.3s; }
+        .feature-card:hover { border-color: var(--accent-color); transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+        .feature-icon { width: 48px; height: 48px; background: var(--accent-subtle); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--accent-color); margin-bottom: 20px; }
+        .feature-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+        .feature-desc { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; }
+
+        /* --- Code/API Section --- */
+        .api-section { padding: 60px 0 100px; }
+        .code-window {
+            background: var(--bg-primary); border-radius: var(--radius-lg); border: 1px solid var(--border-color);
+            overflow: hidden; box-shadow: var(--shadow-lg);
+        }
+        .code-header {
+            background: var(--bg-tertiary); padding: 12px 16px; display: flex; align-items: center; gap: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background: var(--error-color); }
+        .dot.yellow { background: var(--warning-color); }
+        .dot.green { background: var(--success-color); }
+        .code-title { margin-left: 12px; font-size: 0.8rem; color: var(--text-secondary); font-family: monospace; }
+        
+        .code-content { padding: 24px; overflow-x: auto; font-family: 'SF Mono', 'Roboto Mono', monospace; font-size: 0.9rem; line-height: 1.7; }
+        .line { display: block; }
+        .ln { color: var(--text-secondary); opacity: 0.5; margin-right: 16px; user-select: none; display: inline-block; width: 20px; text-align: right; }
+        
+        .kwd { color: var(--accent-color); }
+        .str { color: var(--success-color); }
+        .func { color: var(--info-color); }
+        .cls { color: #d19a66; }
+        .cmt { color: var(--text-secondary); font-style: italic; }
+        .var { color: #e06c75; }
+
+        /* --- Footer --- */
+        footer { border-top: 1px solid var(--border-color); padding: 40px 0; background: var(--bg-secondary); text-align: center; }
+        .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 24px; }
+        .footer-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--accent-color); }
+        .copyright { color: var(--text-secondary); font-size: 0.8rem; }
+
+        /* --- Icons --- */
+        svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .icon-lg { width: 24px; height: 24px; }
+
+        /* --- Mobile --- */
+        @media (max-width: 900px) {
+            .hero h1 { font-size: 3rem; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .arch-flow { flex-direction: column; gap: 32px; }
+            .arch-line { width: 2px; height: 40px; min-width: 2px; transform: rotate(90deg); margin: 0; }
+            .arch-line::after { transform: rotate(90deg); top: 50%; left: -4px; }
+        }
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 2.5rem; }
+            .hero p { font-size: 1rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .container { padding: 0 16px; }
+            .grid-cols-2, .grid-cols-3, .grid-cols-4 { grid-template-columns: 1fr; }
+            .btn { width: 100%; }
+            .btn-group { flex-direction: column; width: 100%; }
+            .nav-link span { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <header>
+        <div class="container flex justify-between items-center">
+            <a href="../../index.html" class="btn btn-ghost btn-sm" style="padding: 6px 12px; border:none;">
+                <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                <span>Portfolio</span>
+            </a>
+            
+            <div class="flex items-center gap-6">
+                <nav class="flex gap-4" style="display: none;">
+                    <a href="#" class="nav-link">Docs</a>
+                    <a href="#" class="nav-link">Examples</a>
+                </nav>
+                <a href="https://github.com/pydantic-ai/pydantic-ai" target="_blank" class="btn btn-ghost btn-sm">
+                    <svg viewBox="0 0 24 24" style="fill:currentColor"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                    <span>GitHub</span>
+                </a>
+                <button id="theme-toggle" class="btn btn-ghost btn-sm" style="padding: 8px;">
+                    <svg id="moon-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    <svg id="sun-icon" viewBox="0 0 24 24" style="display:none;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="badge v1 mb-4">v0.0.15 Released</div>
+                <h1>Agent framework<br>powered by <span>Pydantic</span></h1>
+                <p>Build production-grade Python AI agents with type-safe validation, structured outputs, and deep testing tools. Wraps LLMs, not your brain.</p>
+                <div class="flex justify-center gap-4 btn-group">
+                    <a href="#" class="btn btn-primary">
+                        <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                        Quick Start
+                    </a>
+                    <a href="https://github.com/pydantic-ai/pydantic-ai" class="btn btn-ghost">
+                        <svg viewBox="0 0 24 24" style="fill:currentColor"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                        View Source
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <div class="stats-wrapper">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-val">100%</span>
+                        <span class="stat-lbl">Type Safe</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-val">Zero</span>
+                        <span class="stat-lbl">Dependencies</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-val">Pydantic</span>
+                        <span class="stat-lbl">V2 Powered</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-val">Logfire</span>
+                        <span class="stat-lbl">Integrated</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Architecture Diagram -->
+        <section class="diagram-section">
+            <div class="container">
+                <h2 class="text-center" style="font-size: 2rem; font-weight: 700; margin-bottom: 16px;">How it Works</h2>
+                <p class="text-center" style="color: var(--text-secondary); margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto;">
+                    A declarative flow where the Agent negotiates with the LLM, and Pydantic guarantees the structure.
+                </p>
+                
+                <div class="arch-container">
+                    <div class="arch-flow">
+                        <!-- Node 1 -->
+                        <div class="arch-node">
+                            <div class="arch-icon">
+                                <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><path d="M12 6v6l4 2"/></svg>
+                            </div>
+                            <div class="arch-label">User</div>
+                            <div class="arch-sub">Request</div>
+                        </div>
+                        
+                        <div class="arch-line"></div>
+
+                        <!-- Node 2 -->
+                        <div class="arch-node">
+                            <div class="arch-icon" style="color: var(--accent-color);">
+                                <svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v4a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                            </div>
+                            <div class="arch-label">Agent</div>
+                            <div class="arch-sub">Logic & Tools</div>
+                        </div>
+
+                        <div class="arch-line"></div>
+
+                        <!-- Node 3 -->
+                        <div class="arch-node">
+                            <div class="arch-icon">
+                                <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                            </div>
+                            <div class="arch-label">LLM</div>
+                            <div class="sub">GPT-4o / Claude</div>
+                        </div>
+
+                        <div class="arch-line"></div>
+
+                        <!-- Node 4 -->
+                        <div class="arch-node">
+                            <div class="arch-icon" style="color: var(--success-color);">
+                                <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            </div>
+                            <div class="arch-label">Pydantic</div>
+                            <div class="arch-sub">Validated Model</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Grid -->
+        <section class="features-section">
+            <div class="container">
+                <div class="grid grid-cols-2 gap-6" style="margin-bottom: 60px;">
+                    <!-- Feature 1 -->
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </div>
+                        <h3 class="feature-title">Type-Safe Validation</h3>
+                        <p class="feature-desc">Leverage Pydantic V2 to ensure LLM outputs
