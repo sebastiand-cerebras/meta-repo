@@ -28,7 +28,6 @@ const PORT = 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(__dirname));
 
 // GET / — serve local manager directly as the default page
 app.get('/', (req, res) => {
@@ -39,6 +38,9 @@ app.get('/', (req, res) => {
 app.get('/local-manager', (req, res) => {
   res.sendFile(path.join(__dirname, 'local-manager.html'));
 });
+
+// Static files — AFTER custom routes so / serves local-manager, not index.html
+app.use(express.static(__dirname));
 
 // POST /api/generate — runs generate.js and streams output
 app.post('/api/generate', (req, res) => {

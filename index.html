@@ -67,22 +67,22 @@
     #generatedSection { margin-bottom: 48px; }
     .generated-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
     }
     .generated-card {
       background: var(--bg-secondary);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-lg);
-      padding: 24px;
+      padding: 24px 24px 20px;
       text-decoration: none;
       color: inherit;
       transition: all var(--transition);
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
       position: relative;
-      overflow: hidden;
+      min-height: 100px;
     }
     .generated-card::before {
       content: '';
@@ -107,14 +107,15 @@
     }
     .generated-card-arrow {
       position: absolute;
-      top: 24px; right: 24px;
+      top: 50%; right: 20px;
+      transform: translateY(-50%);
       font-size: 20px;
       color: var(--text-secondary);
       transition: all var(--transition);
     }
     .generated-card:hover .generated-card-arrow {
       color: var(--accent-color);
-      transform: translateX(3px);
+      transform: translateY(-50%) translateX(3px);
     }
 
     /* --- Empty States --- */
@@ -346,11 +347,11 @@
         const externalBadge = e.isExternal ? `<span class="external-tag">External — ${e.owner}</span>` : '';
         return `
           <a href="${e.url || e.path}" class="generated-card fade-in" target="_blank" rel="noopener">
-            <div style="display:flex;align-items:center;gap:8px;padding-right:28px">
-              <span style="font-size:20px">${icon}</span>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-right:32px">
+              <span style="font-size:20px;flex-shrink:0">${icon}</span>
               <span class="generated-card-name">${e.repo}</span>
-              ${externalBadge}
             </div>
+            ${externalBadge ? '<div>' + externalBadge + '</div>' : ''}
             <div class="generated-card-meta">${e.owner} · ${e.type || 'project'}${date ? ' · ' + date : ''}</div>
             <span class="generated-card-arrow">→</span>
           </a>`;

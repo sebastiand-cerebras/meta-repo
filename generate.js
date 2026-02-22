@@ -406,10 +406,10 @@ async function callCerebras(apiKey, messages) {
         body: JSON.stringify({
           model: MODEL,
           messages,
-          max_tokens: 16384,
-          temperature: 0.7,
+          max_tokens: 40384,
+          temperature: 1.0,
         }),
-        signal: AbortSignal.timeout(120_000), // 2-minute timeout
+        signal: AbortSignal.timeout(300_000), // 5-minute timeout
       });
 
       if (!res.ok) {
