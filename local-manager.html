@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Local Portfolio Manager</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <style>
+    /* Dashboard-specific styles */
+    body { padding: 32px 20px 60px; }
+
+    /* Force light mode initially */
+    html[data-theme="light"] {
+      color-scheme: light;
+    }
+
+    /* --- Hero --- */
+    .hero {
+      text-align: center;
+      padding: 48px 20px 40px;
+      margin-bottom: 40px;
+    }
+    .hero h2 {
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 14px;
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-color) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      font-size: 18px;
+      color: var(--text-secondary);
+      max-width: 560px;
+      margin: 0 auto 28px;
+      line-height: 1.6;
+    }
+
+    /* --- Section Titles --- */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 12px;
+    }
+    .section-title {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.4px;
+    }
+    .section-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 3px;
+    }
+
+    /* --- Auth Status Card --- */
+    .auth-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .auth-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 500;
+    }
+    .auth-status.authenticated { color: var(--success-color); }
+    .auth-status.not-authenticated { color: var(--warning-color); }
+    .auth-icon {
+      font-size: 20px;
+    }
+
+    /* --- Username Bar --- */
+    .username-bar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+    .username-bar input {
+      flex: 1;
+      max-width: 340px;
+    }
+    .repo-count-badge {
+      font-size: 13px;
+      color: var(--text-secondary);
+      background: var(--bg-tertiary);
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+
+    /* --- Filter Bar --- */
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .filter-bar input[type="search"] {
+      flex: 1;
+      min-width: 200px;
+      max-width: 320px;
+    }
+    .filter-bar select {
+      padding: 10px 14px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-size: 14px;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .filter-bar select:focus {
+      outline: none;
+      border-color: var(--accent-color);
+    }
+
+    /* --- Repo Grid --- */
+    .repo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    /* --- Repo Card --- */
+    .repo-card {
+      background: var(--bg-secondary);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      cursor: pointer;
+      transition: all var(--transition);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      user-select: none;
+    }
+    .repo-card:hover {
+      border-color: var(--accent-color);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+    }
+    .repo-card.selected {
+      border-color: var(--accent-color);
+      background: var(--accent-subtle);
+      box-shadow: 0 0 0 1px var(--accent-color), var(--shadow-md);
+    }
+    .repo-card.generated {
+      border-color: var(--success-color);
+    }
+    .repo-card.generated:hover {
+      border-color: var(--success-color);
+    }
+    .repo-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .repo-name {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      color: var(--text-primary);
+      word-break: break-word;
+    }
+    .repo-card.generated .repo-name {
+      color: var(--success-color);
+    }
+    .repo-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .repo-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .lang-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+    .lang-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .stars-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .updated-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-left: auto;
+    }
+    .select-check {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all var(--transition);
+      background: var(--bg-tertiary);
+    }
+    .repo-card.selected .select-check {
+      background: var(--accent-color);
+      border-color: var(--accent-color);
+      color: white;
+    }
+    .repo-card.selected .select-check::after {
+      content: '✓';
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .view-link {
+      font-size: 12px;
+      color: var(--success-color);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      flex-shrink: 0;
+    }
+    .view-link:hover { text-decoration: underline; }
+
+    /* external badge on card */
+    .external-tag {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 10px;
+      background: rgba(255, 149, 0, 0.12);
+      color: var(--warning-color);
+      border: 1px solid rgba(255, 149, 0, 0.25);
+      flex-shrink: 0;
+    }
+
+    /* local badge on card */
+    .local-tag {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 10px;
+      background: rgba(52, 199, 89, 0.12);
+      color: var(--success-color);
+      border: 1px solid rgba(52, 199, 89, 0.25);
+      flex-shrink: 0;
+    }
+
+    /* --- Selection Panel --- */
+    #selectionPanel {
+      position: sticky;
+      bottom: 20px;
+      z-index: 100;
+      margin-top: -8px;
+      margin-bottom: 24px;
+    }
+    .selection-inner {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      padding: 16px 24px;
+      box-shadow: var(--shadow-xl);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      backdrop-filter: blur(10px);
+    }
+    .selection-count {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent-color);
+      white-space: nowrap;
+    }
+    .selection-chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+    .selection-chip {
+      font-size: 12px;
+      padding: 4px 10px;
+      background: var(--accent-subtle);
+      color: var(--accent-color);
+      border-radius: 20px;
+      border: 1px solid rgba(224, 100, 57, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .chip-remove {
+      cursor: pointer;
+      opacity: 0.7;
+      font-size: 14px;
+      line-height: 1;
+    }
+    .chip-remove:hover { opacity: 1; }
+
+    /* --- Generate Command Panel --- */
+    #commandPanel {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 32px;
+      box-shadow: var(--shadow-md);
+    }
+    .command-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .command-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      font-family: "SF Mono", "Fira Code", Consolas, monospace;
+      font-size: 14px;
+      overflow-x: auto;
+    }
+    .command-prompt {
+      color: var(--accent-color);
+      flex-shrink: 0;
+    }
+    .command-text {
+      flex: 1;
+      color: var(--text-primary);
+      word-break: break-all;
+    }
+    .copy-btn {
+      background: none;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 6px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all var(--transition);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .copy-btn:hover {
+      background: var(--accent-color);
+      color: white;
+      border-color: var(--accent-color);
+    }
+    .copy-btn.copied {
+      background: var(--success-color);
+      color: white;
+      border-color: var(--success-color);
+    }
+
+    /* --- External Repo Adder --- */
+    .external-adder {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .external-adder input {
+      flex: 1;
+      min-width: 200px;
+      max-width: 320px;
+    }
+
+    /* --- Empty States --- */
+    .empty-state {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--text-secondary);
+    }
+    .empty-state .empty-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    .empty-state p {
+      font-size: 15px;
+      max-width: 360px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* --- Error Banner --- */
+    #errorBanner {
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    /* --- Loading State --- */
+    .repo-grid.loading {
+      position: relative;
+      min-height: 200px;
+    }
+
+    /* Skeleton cards */
+    .skeleton-card {
+      background: var(--bg-secondary);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .skeleton-line {
+      height: 14px;
+      border-radius: 7px;
+      background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-secondary) 50%, var(--bg-tertiary) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+    .skeleton-line.short { width: 40%; }
+    .skeleton-line.medium { width: 70%; }
+    .skeleton-line.full { width: 100%; }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .hero h2 { font-size: 28px; }
+      .hero p { font-size: 15px; }
+      .username-bar { flex-wrap: wrap; }
+      .selection-inner { padding: 12px 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+      <div class="logo">
+        <img id="logoImg" class="logo-img" src="" alt="" style="display:none" />
+        <div id="logoIcon" class="logo-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+          </svg>
+        </div>
+        <div class="logo-text">
+          <h1 id="siteTitle">Local Portfolio Manager</h1>
+          <p>powered by Cerebras AI</p>
+        </div>
+      </div>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg id="sunIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+        </svg>
+        <svg id="moonIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="display:none">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+        </svg>
+      </button>
+    </header>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero">
+      <h2>Local Portfolio Manager</h2>
+      <p>Browse local and GitHub repositories, select up to 5, and generate beautiful portfolio pages with AI.</p>
+    </section>
+
+    <!-- ===== ERROR BANNER ===== -->
+    <div id="errorBanner" class="alert alert-warning"></div>
+
+    <!-- ===== GITHUB CLI AUTH ===== -->
+    <section style="margin-bottom: 32px">
+      <div class="section-header" style="margin-bottom: 16px">
+        <div>
+          <div class="section-title">GitHub CLI Auth</div>
+          <div class="section-subtitle">Check authentication status</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="checkAuth()">Check Auth</button>
+      </div>
+      <div class="auth-card" id="authCard">
+        <div class="auth-status" id="authStatus">
+          <span class="auth-icon">⚠️</span>
+          <span>Checking authentication...</span>
+        </div>
+        <div style="margin-left: auto; font-size: 13px; color: var(--text-secondary);">
+          Used by: <code style="font-family:monospace; background:var(--bg-tertiary); padding:2px 6px; border-radius:4px;">generate.js</code>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== LOCAL REPOS ===== -->
+    <section id="localSection" style="margin-bottom: 40px">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Local Repositories</div>
+          <div class="section-subtitle">Scan common code directories for git repos</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="scanLocalRepos()">↻ Scan Directories</button>
+      </div>
+      <div class="repo-grid" id="localRepoGrid">
+        <div class="empty-state">
+          <div class="empty-icon">📁</div>
+          <p>Click <strong>Scan Directories</strong> to find git repos in <code style="font-family:monospace">~/code</code>, <code style="font-family:monospace">~/dev</code>, <code style="font-family:monospace">~/projects</code></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== GITHUB REPOS ===== -->
+    <section id="githubSection" style="margin-bottom: 40px">
+      <div class="section-header">
+        <div>
+          <div class="section-title">GitHub Repositories</div>
+          <div class="section-subtitle" id="browserSubtitle">Enter a GitHub username to browse repos</div>
+        </div>
+      </div>
+
+      <!-- Username input -->
+      <div class="username-bar">
+        <input type="text" id="usernameInput" placeholder="GitHub username or owner/repo"
+          onkeydown="if(event.key==='Enter') loadRepos()" />
+        <button class="btn btn-primary" onclick="loadRepos()">
+          <span id="loadBtnText">Load Repos</span>
+          <span id="loadSpinner" class="spinner" style="display:none"></span>
+        </button>
+        <span id="repoCountBadge" class="repo-count-badge" style="display:none"></span>
+      </div>
+
+      <!-- Filter bar -->
+      <div class="filter-bar" id="filterBar" style="display:none">
+        <input type="search" id="searchInput" placeholder="Search repos…" oninput="filterRepos()" />
+        <select id="sortSelect" onchange="filterRepos()">
+          <option value="updated">Most recently updated</option>
+          <option value="stars">Most stars</option>
+          <option value="name">Name A–Z</option>
+        </select>
+        <select id="langFilter" onchange="filterRepos()">
+          <option value="">All languages</option>
+        </select>
+      </div>
+
+      <!-- Repo grid -->
+      <div class="repo-grid" id="githubRepoGrid">
+        <div class="empty-state">
+          <div class="empty-icon">🔍</div>
+          <p>Enter a GitHub username above and click <strong>Load Repos</strong> to browse repositories.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== EXTERNAL REPOS ===== -->
+    <section style="margin-bottom: 40px">
+      <div class="section-header" style="margin-bottom: 16px">
+        <div>
+          <div class="section-title">Add External Repo</div>
+          <div class="section-subtitle">Generate a page for any public GitHub repo</div>
+        </div>
+      </div>
+      <div class="card" style="padding: 20px">
+        <div class="external-adder">
+          <input type="text" id="externalInput" placeholder="owner/repo-name (e.g. vercel/next.js)"
+            onkeydown="if(event.key==='Enter') addExternalRepo()" />
+          <button class="btn btn-secondary" onclick="addExternalRepo()">+ Add to Selection</button>
+        </div>
+        <div id="externalError" style="margin-top:10px; font-size:13px; color:var(--error-color); display:none"></div>
+      </div>
+    </section>
+
+    <!-- ===== SELECTION PANEL (sticky) ===== -->
+    <div id="selectionPanel" style="display:none">
+      <div class="selection-inner">
+        <span class="selection-count" id="selectionCount">0 / 5 selected</span>
+        <div class="selection-chips" id="selectionChips"></div>
+        <button class="btn btn-primary btn-sm" onclick="showCommandPanel()">
+          Generate Pages →
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="clearSelection()">Clear</button>
+      </div>
+    </div>
+
+    <!-- ===== COMMAND PANEL ===== -->
+    <div id="commandPanel" style="display:none">
+      <div class="command-title">
+        <span>🚀</span> Run this command to generate your visual pages
+      </div>
+      <div class="command-box">
+        <span class="command-prompt">$</span>
+        <span class="command-text" id="commandText">node generate.js ...</span>
+        <button class="copy-btn" id="copyBtn" onclick="copyCommand()">Copy</button>
+      </div>
+      <div style="font-size: 13px; color: var(--text-secondary); margin-top: 12px; line-height: 1.6;">
+        Prerequisites: <code style="font-family:monospace">node generate.js</code> requires Node.js ≥18, a <code style="font-family:monospace">.env</code> file with <code style="font-family:monospace">CEREBRAS_API_KEY</code>, and this repo cloned locally.<br>
+        After generation, push to deploy to GitHub Pages.
+      </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+      <p>Local Manager &mdash; <a href="index.html" style="color:var(--accent-color); text-decoration:none">← Back to Portfolio</a> &mdash;
+        Powered by <a href="https://cloud.cerebras.ai" style="color:var(--accent-color); text-decoration:none">Cerebras AI</a>
+      </p>
+    </footer>
+
+  </div><!-- /container -->
+
+  <script>
+    // ============================================================
+    // State
+    // ============================================================
+    let allRepos = [];
+    let filteredRepos = [];
+    let localRepos = [];
+    let selectedRepos = new Set();
+    let externalRepos = [];
+    let generatedSet = new Set();
+
+    // ============================================================
+    // Theme (force light mode initially)
+    // ============================================================
+    function initTheme() {
+      // Default to light, allow toggle
+      const saved = localStorage.getItem('local-manager-theme') || 'light';
+      applyTheme(saved);
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      document.getElementById('sunIcon').style.display  = theme === 'dark' ? 'none' : 'block';
+      document.getElementById('moonIcon').style.display = theme === 'dark' ? 'block' : 'none';
+      tryLoadLogo(theme);
+    }
+
+    function toggleTheme() {
+      const cur = document.documentElement.getAttribute('data-theme');
+      const next = cur === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('local-manager-theme', next);
+      applyTheme(next);
+    }
+
+    // ============================================================
+    // Logo
+    // ============================================================
+    function tryLoadLogo(theme) {
+      const src = theme === 'dark' ? 'assets/logo-dark-mode.png' : 'assets/logo-light-mode.png';
+      const img = document.getElementById('logoImg');
+      const icon = document.getElementById('logoIcon');
+      const testImg = new Image();
+      testImg.onload = () => {
+        img.src = src;
+        img.style.display = 'block';
+        icon.style.display = 'none';
+      };
+      testImg.onerror = () => {
+        img.style.display = 'none';
+        icon.style.display = 'flex';
+      };
+      testImg.src = src;
+    }
+
+    // ============================================================
+    // GitHub CLI Auth Check
+    // ============================================================
+    async function checkAuth() {
+      const statusDiv = document.getElementById('authStatus');
+      statusDiv.innerHTML = '<span class="auth-icon">⏳</span><span>Checking...</span>';
+
+      try {
+        // Show instructions to the user
+        statusDiv.innerHTML = `
+          <span class="auth-icon">💻</span>
+          <div>
+            <div style="font-weight:600;">Check manually:</div>
+            <div style="font-size:13px; color:var(--text-secondary); margin-top:4px;">
+              Run <code style="font-family:monospace; background:var(--bg-tertiary); padding:2px 6px; border-radius:4px;">gh auth status</code> in terminal
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        statusDiv.innerHTML = `
+          <span class="auth-icon">⚠️</span>
+          <span>Unable to check. Run <code style="font-family:monospace">gh auth status</code> manually.</span>
+        `;
+      }
+    }
+
+    // ============================================================
+    // Local Repo Scanning
+    // ============================================================
+    async function scanLocalRepos() {
+      const grid = document.getElementById('localRepoGrid');
+      grid.innerHTML = renderSkeletons(4);
+
+      try {
+        const dirs = [`/Users/${process.env?.USER || localStorage.getItem('local-user') || 'seb'}/code`,
+                     `/Users/${process.env?.USER || localStorage.getItem('local-user') || 'seb'}/dev`,
+                     `/Users/${process.env?.USER || localStorage.getItem('local-user') || 'seb'}/projects`];
+
+        // For browser-based scanning, we need to use File System Access API or fallback
+        // This is a limitation - browser can't scan arbitrary filesystem
+        if ('showDirectoryPicker' in window) {
+          const dirHandle = await window.showDirectoryPicker();
+          localRepos = [];
+          for await (const [name, handle] of dirHandle.entries()) {
+            if (handle.kind === 'directory') {
+              try {
+                const hasGit = await dirHasGit(handle);
+                if (hasGit) {
+                  localRepos.push({ name, type: 'local' });
+                }
+              } catch {}
+            }
+          }
+        } else {
+          // Fallback: show instructions
+          grid.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon">🔒</div>
+              <p>Browser-based scanning requires File System Access API.<br><br>
+              Alternatively, use GitHub repos above or enter external repos manually.<br><br>
+              Or run <code style="font-family:monospace">generate.js</code> locally with full filesystem access.</p>
+            </div>
+          `;
+          return;
+        }
+
+        renderLocalRepos();
+      } catch (err) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">⚠️</div>
+            <p>Scanning failed or was cancelled.<br><br>
+            Try: GitHub repos tab above, or add external repos manually.</p>
+          </div>
+        `;
+      }
+    }
+
+    async function dirHasGit(dirHandle) {
+      try {
+        await dirHandle.getDirectoryEntry('.git');
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    function renderLocalRepos() {
+      const grid = document.getElementById('localRepoGrid');
+      if (!localRepos.length) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <p>No git repositories found in scanned directories.</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = localRepos.map(repo => localRepoCardHTML(repo)).join('');
+    }
+
+    function localRepoCardHTML(repo) {
+      const isSelected = selectedRepos.has(`local:${repo.name}`);
+      const classes = ['repo-card', isSelected ? 'selected' : ''].filter(Boolean).join('');
+
+      return `
+        <div class="${classes}" onclick="toggleLocalRepo('${repo.name}')">
+          <div class="repo-card-top">
+            <div>
+              <div class="repo-name">${escHtml(repo.name)}</div>
+              <div style="font-size:11px;color:var(--text-secondary);margin-top:2px">Local repository</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+              <span class="local-tag">Local</span>
+              <div class="select-check"></div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function toggleLocalRepo(name) {
+      const fullName = `local:${name}`;
+      if (selectedRepos.has(fullName)) {
+        selectedRepos.delete(fullName);
+      } else {
+        if (selectedRepos.size >= 5) {
+          showError('Maximum 5 repos per run. Deselect one first.');
+          return;
+        }
+        selectedRepos.add(fullName);
+      }
+      clearError();
+      updateSelectionUI();
+      renderLocalRepos();
+    }
+
+    // ============================================================
+    // GitHub API
+    // ============================================================
+    async function loadRepos() {
+      const raw = document.getElementById('usernameInput').value.trim();
+      if (!raw) { showError('Enter a GitHub username.'); return; }
+      clearError();
+
+      const username = raw.split('/')[0];
+      localStorage.setItem('githubUsername', username);
+
+      setLoading(true);
+      document.getElementById('githubRepoGrid').innerHTML = renderSkeletons(6);
+      document.getElementById('filterBar').style.display = 'none';
+      document.getElementById('repoCountBadge').style.display = 'none';
+
+      try {
+        const res = await fetch(
+          `https://api.github.com/users/${encodeURIComponent(username)}/repos?sort=updated&per_page=100`
+        );
+        if (res.status === 404) { throw new Error(`User "${username}" not found on GitHub.`); }
+        if (res.status === 403) { throw new Error('GitHub API rate limit hit. Wait a minute and try again.'); }
+        if (!res.ok) { throw new Error(`GitHub API error: ${res.status}`); }
+        allRepos = await res.json();
+        allRepos.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+
+        populateLangFilter(allRepos);
+        filterRepos();
+
+        document.getElementById('repoCountBadge').textContent = `${allRepos.length} repos`;
+        document.getElementById('repoCountBadge').style.display = 'inline-block';
+        document.getElementById('browserSubtitle').textContent = `${allRepos.length} repos for @${username}`;
+        document.getElementById('filterBar').style.display = 'flex';
+      } catch (err) {
+        showError(err.message);
+        document.getElementById('githubRepoGrid').innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><p>${err.message}</p></div>`;
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function populateLangFilter(repos) {
+      const langs = [...new Set(repos.map(r => r.language).filter(Boolean))].sort();
+      const sel = document.getElementById('langFilter');
+      sel.innerHTML = '<option value="">All languages</option>' +
+        langs.map(l => `<option value="${l}">${l}</option>`).join('');
+    }
+
+    function filterRepos() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      const sort = document.getElementById('sortSelect').value;
+      const lang = document.getElementById('langFilter').value;
+
+      filteredRepos = allRepos.filter(r => {
+        if (lang && r.language !== lang) return false;
+        if (q && !r.name.toLowerCase().includes(q) &&
+            !(r.description || '').toLowerCase().includes(q)) return false;
+        return true;
+      });
+
+      if (sort === 'stars') filteredRepos.sort((a, b) => b.stargazers_count - a.stargazers_count);
+      else if (sort === 'name') filteredRepos.sort((a, b) => a.name.localeCompare(b.name));
+      else filteredRepos.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+
+      renderGitHubRepos();
+    }
+
+    // ============================================================
+    // Render GitHub Repo Cards
+    // ============================================================
+    const LANG_COLORS = {
+      JavaScript:'#f7df1e', TypeScript:'#3178c6', Python:'#3572a5', Rust:'#dea584',
+      Go:'#00add8', Ruby:'#701516', Java:'#b07219', 'C++':'#f34b7d', C:'#555555',
+      CSS:'#563d7c', HTML:'#e34c26', Swift:'#fa7343', Kotlin:'#7f52ff', Dart:'#00b4ab',
+      Shell:'#89e051', Vue:'#41b883', Svelte:'#ff3e00', PHP:'#4f5d95', Scala:'#c22d40',
+      R:'#198ce7', MATLAB:'#e16737', Dockerfile:'#384d54', 'Jupyter Notebook':'#da5b0b',
+    };
+
+    function renderGitHubRepos() {
+      const grid = document.getElementById('githubRepoGrid');
+      if (!filteredRepos.length) {
+        grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🔎</div><p>No repos match your search.</p></div>`;
+        return;
+      }
+
+      const allToRender = [
+        ...externalRepos.map(e => ({
+          full_name: e.full_name, name: e.name, owner: { login: e.owner },
+          description: e.description || '', language: null, stargazers_count: 0,
+          updated_at: new Date().toISOString(), _external: true
+        })),
+        ...filteredRepos
+      ];
+
+      grid.innerHTML = allToRender.map(repo => repoCardHTML(repo)).join('');
+    }
+
+    function repoCardHTML(repo) {
+      const isSelected = selectedRepos.has(repo.full_name);
+      const isGenerated = generatedSet.has(repo.full_name);
+      const isExternal = repo._external;
+
+      const langColor = repo.language ? (LANG_COLORS[repo.language] || '#86868b') : null;
+      const updated = timeAgo(repo.updated_at);
+
+      const classes = ['repo-card',
+        isSelected ? 'selected' : '',
+        isGenerated ? 'generated' : ''
+      ].filter(Boolean).join(' ');
+
+      return `
+        <div class="${classes}" onclick="toggleSelect('${repo.full_name}', '${repo.name}', '${(repo.owner?.login || repo.full_name.split('/')[0])}')">
+          <div class="repo-card-top">
+            <div>
+              <div class="repo-name">${escHtml(repo.name)}</div>
+              ${isExternal ? `<div style="font-size:11px;color:var(--text-secondary);margin-top:2px">by ${escHtml(repo.owner?.login || '')}</div>` : ''}
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+              ${isExternal ? `<span class="external-tag">External</span>` : ''}
+              <div class="select-check"></div>
+            </div>
+          </div>
+          ${repo.description ? `<div class="repo-desc">${escHtml(repo.description)}</div>` : '<div class="repo-desc" style="opacity:0.4">No description</div>'}
+          <div class="repo-meta">
+            ${langColor ? `<span class="lang-label"><span class="lang-dot" style="background:${langColor}"></span>${escHtml(repo.language)}</span>` : ''}
+            ${repo.stargazers_count ? `<span class="stars-label">★ ${repo.stargazers_count.toLocaleString()}</span>` : ''}
+            <span class="updated-label">${updated}</span>
+          </div>
+        </div>`;
+    }
+
+    // ============================================================
+    // Selection
+    // ============================================================
+    function toggleSelect(fullName, repoName, owner) {
+      if (selectedRepos.has(fullName)) {
+        selectedRepos.delete(fullName);
+      } else {
+        if (selectedRepos.size >= 5) {
+          showError('Maximum 5 repos per run. Deselect one first.');
+          return;
+        }
+        selectedRepos.add(fullName);
+      }
+      clearError();
+      updateSelectionUI();
+      renderGitHubRepos();
+    }
+
+    function updateSelectionUI() {
+      const panel = document.getElementById('selectionPanel');
+      const count = document.getElementById('selectionCount');
+      const chips = document.getElementById('selectionChips');
+
+      if (selectedRepos.size === 0) {
+        panel.style.display = 'none';
+        document.getElementById('commandPanel').style.display = 'none';
+        return;
+      }
+
+      panel.style.display = 'block';
+      count.textContent = `${selectedRepos.size} / 5 selected`;
+      chips.innerHTML = [...selectedRepos].map(fn => {
+        const name = fn.startsWith('local:') ? fn.replace('local:', '') : fn.split('/')[1] || fn;
+        return `<span class="selection-chip">${escHtml(name)}<span class="chip-remove" onclick="event.stopPropagation();deselect('${fn}')">×</span></span>`;
+      }).join('');
+    }
+
+    function deselect(fullName) {
+      selectedRepos.delete(fullName);
+      updateSelectionUI();
+      if (fullName.startsWith('local:')) {
+        renderLocalRepos();
+      } else {
+        renderGitHubRepos();
+      }
+      clearError();
+      if (selectedRepos.size === 0) {
+        document.getElementById('commandPanel').style.display = 'none';
+      } else {
+        updateCommandPanel();
+      }
+    }
+
+    function clearSelection() {
+      selectedRepos.clear();
+      externalRepos = [];
+      updateSelectionUI();
+      renderGitHubRepos();
+      renderLocalRepos();
+      document.getElementById('commandPanel').style.display = 'none';
+      clearError();
+    }
+
+    // ============================================================
+    // Command Panel
+    // ============================================================
+    function showCommandPanel() {
+      if (!selectedRepos.size) return;
+      updateCommandPanel();
+      document.getElementById('commandPanel').style.display = 'block';
+      document.getElementById('commandPanel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function updateCommandPanel() {
+      const repos = [...selectedRepos]
+        .map(r => r.startsWith('local:') ? r : r)
+        .join(' ');
+      document.getElementById('commandText').textContent = `node generate.js ${repos}`;
+    }
+
+    function copyCommand() {
+      const text = document.getElementById('commandText').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+      });
+    }
+
+    // ============================================================
+    // External Repos
+    // ============================================================
+    function addExternalRepo() {
+      const val = document.getElementById('externalInput').value.trim();
+      const errDiv = document.getElementById('externalError');
+      errDiv.style.display = 'none';
+
+      if (!val) return;
+      if (!val.includes('/') || val.split('/').length !== 2) {
+        errDiv.textContent = 'Format must be owner/repo-name';
+        errDiv.style.display = 'block';
+        return;
+      }
+
+      const [owner, name] = val.split('/');
+      const fullName = `${owner}/${name}`;
+
+      if (selectedRepos.has(fullName)) {
+        errDiv.textContent = 'This repo is already in your selection.';
+        errDiv.style.display = 'block';
+        return;
+      }
+      if (selectedRepos.size >= 5) {
+        errDiv.textContent = 'Maximum 5 repos per run.';
+        errDiv.style.display = 'block';
+        return;
+      }
+
+      externalRepos.push({ full_name: fullName, owner, name, description: 'External repository' });
+      selectedRepos.add(fullName);
+      document.getElementById('externalInput').value = '';
+      updateSelectionUI();
+      renderGitHubRepos();
+    }
+
+    // ============================================================
+    // Load existing generated pages
+    // ============================================================
+    async function loadManifest() {
+      try {
+        const res = await fetch('repos/manifest.json?_=' + Date.now());
+        if (!res.ok) return;
+        const data = await res.json();
+        generatedSet = new Set((data.generated || []).map(e => e.fullName));
+      } catch { }
+    }
+
+    // ============================================================
+    // Helpers
+    // ============================================================
+    function setLoading(on) {
+      document.getElementById('loadBtnText').textContent = on ? 'Loading…' : 'Load Repos';
+      document.getElementById('loadSpinner').style.display = on ? 'inline-block' : 'none';
+      document.querySelector('[onclick="loadRepos()"]').disabled = on;
+    }
+
+    function showError(msg) {
+      const b = document.getElementById('errorBanner');
+      b.textContent = msg;
+      b.style.display = 'block';
+    }
+
+    function clearError() {
+      document.getElementById('errorBanner').style.display = 'none';
+    }
+
+    function renderSkeletons(n) {
+      return Array.from({ length: n }, () => `
+        <div class="skeleton-card">
+          <div class="skeleton-line medium"></div>
+          <div class="skeleton-line full"></div>
+          <div class="skeleton-line short"></div>
+        </div>`).join('');
+    }
+
+    function timeAgo(iso) {
+      const diff = Date.now() - new Date(iso).getTime();
+      const m = Math.floor(diff / 60000);
+      if (m < 1) return 'just now';
+      if (m < 60) return `${m}m ago`;
+      const h = Math.floor(m / 60);
+      if (h < 24) return `${h}h ago`;
+      const d = Math.floor(h / 24);
+      if (d < 30) return `${d}d ago`;
+      const mo = Math.floor(d / 30);
+      if (mo < 12) return `${mo}mo ago`;
+      return `${Math.floor(mo / 12)}y ago`;
+    }
+
+    function escHtml(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // ============================================================
+    // Init
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', async () => {
+      initTheme();
+      await loadManifest();
+
+      // Try to load username from localStorage
+      let username = localStorage.getItem('githubUsername');
+      if (username) {
+        document.getElementById('usernameInput').value = username;
+        await loadRepos();
+      }
+
+      // Check auth on load
+      checkAuth();
+    });
+  </script>
+</body>
+</html>
