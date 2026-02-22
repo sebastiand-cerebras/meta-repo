@@ -99,6 +99,36 @@
       "isExternal": true,
       "type": "ml",
       "generatedAt": "2026-02-22T19:53:40.585Z"
+    },
+    {
+      "owner": "seduerr91",
+      "repo": "nql-to-sql",
+      "fullName": "seduerr91/nql-to-sql",
+      "path": "repos/nql-to-sql/index.html",
+      "url": "repos/nql-to-sql/",
+      "isExternal": true,
+      "type": "generic",
+      "generatedAt": "2026-02-22T19:55:59.365Z"
+    },
+    {
+      "owner": "seduerr91",
+      "repo": "aia",
+      "fullName": "seduerr91/aia",
+      "path": "repos/aia/index.html",
+      "url": "repos/aia/",
+      "isExternal": true,
+      "type": "generic",
+      "generatedAt": "2026-02-22T19:56:17.861Z"
+    },
+    {
+      "owner": "seduerr91",
+      "repo": "datahour_netflix_sql",
+      "fullName": "seduerr91/datahour_netflix_sql",
+      "path": "repos/datahour_netflix_sql/index.html",
+      "url": "repos/datahour_netflix_sql/",
+      "isExternal": true,
+      "type": "ml",
+      "generatedAt": "2026-02-22T19:56:36.277Z"
     }
   ]
 }

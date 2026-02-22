@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversational Analytics | Netflix SQL Explorer</title>
+    <style>
+        :root {
+            --bg-primary:#f5f5f7; --bg-secondary:#ffffff; --bg-tertiary:#f0f0f2; --bg-card:#ffffff;
+            --text-primary:rgb(43,25,16); --text-secondary:#86868b; --border-color:rgba(0,0,0,0.08);
+            --accent-color:rgb(224,100,57); --accent-hover:rgb(200,85,45); --accent-subtle:rgba(224,100,57,0.1);
+            --success-color:#34c759; --warning-color:#ff9500; --error-color:#ff3b30; --info-color:#007aff;
+            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.05);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg:0 8px 32px rgba(0,0,0,0.12);
+            --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-xl:24px;
+        }
+        [data-theme="dark"] {
+            --bg-primary:#000000; --bg-secondary:#1c1c1e; --bg-tertiary:#2c2c2e; --bg-card:#1c1c1e;
+            --text-primary:#f5f5f7; --text-secondary:#86868b; --border-color:rgba(255,255,255,0.1);
+            --accent-color:rgb(224,100,57); --accent-hover:rgb(240,115,70); --accent-subtle:rgba(224,100,57,0.15);
+            --success-color:#30d158; --warning-color:#ff9f0a; --error-color:#ff453a; --info-color:#0a84ff;
+            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.3);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.4),0 2px 4px -1px rgba(0,0,0,0.2);
+            --shadow-lg:0 8px 32px rgba(0,0,0,0.5);
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased; scroll-behavior: smooth;}
+        body{background:var(--bg-primary);color:var(--text-primary);min-height:100vh;transition:background .3s,color .3s; line-height: 1.5;}
+
+        /* Utilities */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .flex-center { display: flex; align-items: center; justify-content: center; }
+        .flex-between { display: flex; align-items: center; justify-content: space-between; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .text-gradient {
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .card { background: var(--bg-card); border-radius: var(--radius-md); padding: 24px; box-shadow: var(--shadow-md); border: 1px solid var(--border-color); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+        .badge { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; gap: 6px; }
+        .badge-warning { background: rgba(255, 149, 0, 0.15); color: var(--warning-color); border: 1px solid rgba(255, 149, 0, 0.3); animation: pulse 2s infinite; }
+        .section-title { font-size: 2rem; margin-bottom: 40px; text-align: center; font-weight: 700; letter-spacing: -0.02em; }
+        .btn { cursor: pointer; background: var(--bg-tertiary); color: var(--text-primary); border: none; padding: 10px 20px; border-radius: var(--radius-sm); font-weight: 600; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn:hover { background: var(--border-color); }
+        
+        /* Navigation */
+        .navbar { height: 70px; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; background: rgba(var(--bg-primary), 0.8); backdrop-filter: blur(10px); }
+        .nav-link { text-decoration: none; color: var(--text-primary); font-weight: 500; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; transition: color 0.2s; }
+        .nav-link:hover { color: var(--accent-color); }
+
+        /* Hero */
+        .hero { position: relative; padding: 100px 0 80px; overflow: hidden; }
+        /* Netflix-like gradient overlay handled in specific background classes */
+        .hero-netflix-bg {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 70% 30%, rgba(229, 9, 20, 0.15), transparent 50%),
+                        linear-gradient(180deg, var(--bg-primary) 0%, rgba(20,20,30,0.02) 100%);
+            z-index: -1;
+        }
+        [data-theme="dark"] .hero-netflix-bg {
+            background: radial-gradient(circle at 70% 30%, rgba(229, 9, 20, 0.25), transparent 60%),
+                        linear-gradient(180deg, #000000 0%, #0e1015 100%);
+        }
+        .hero-content { max-width: 800px; margin: 0 auto; text-align: center; }
+        .hero h1 { font-size: 3.5rem; line-height: 1.1; margin-bottom: 16px; letter-spacing: -0.03em; }
+        .hero p { font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 32px; }
+        
+        /* Typewriter Effect */
+        .typewriter-container { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px; margin: 20px 0; font-family: 'SF Mono', 'Fira Code', monospace; text-align: left; position: relative; }
+        .typewriter-text { color: var(--text-primary); white-space: pre-wrap; }
+        .cursor { display: inline-block; width: 2px; height: 1.2em; background: var(--accent-color); animation: blink 1s infinite; vertical-align: middle; }
+        .query-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 8px; display: block; }
+
+        /* Pipeline Flow */
+        .pipeline-wrapper { display: flex; flex-direction: column; gap: 24px; position: relative; }
+        .pipeline-step { display: flex; align-items: center; gap: 16px; padding: 16px; border-radius: var(--radius-md); background: var(--bg-card); border: 1px solid var(--border-color); position: relative; z-index: 2; transition: all 0.3s; }
+        .pipeline-step:hover { border-color: var(--accent-color); background: var(--bg-secondary); }
+        .step-icon { width: 48px; height: 48px; border-radius: var(--radius-sm); background: var(--accent-subtle); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
+        .step-content h4 { font-size: 1.1rem; margin-bottom: 4px; }
+        .step-content p { font-size: 0.9rem; color: var(--text-secondary); }
+        .arrow-down { text-align: center; color: var(--text-secondary); font-size: 1.2rem; animation: bounce 2s infinite; z-index: 1; }
+        
+        @media (min-width: 768px) {
+            .pipeline-wrapper { flex-direction: row; align-items: stretch; }
+            .arrow-down { display: none; }
+            .pipeline-step { flex: 1; flex-direction: column; text-align: center; height: 100%; justify-content: center; }
+            .pipeline-step::after { content: '→'; position: absolute; right: -20px; top: 50%; transform: translateY(-50%); color: var(--border-color); font-size: 1.5rem; transition: color 0.3s; }
+            .pipeline-step:last-child::after { content: none; }
+            .pipeline-step:hover::after { color: var(--accent-color); }
+            .grid-2 { grid-template-columns: 1fr 1fr; }
+            .hero h1 { font-size: 4.5rem; }
+        }
+
+        /* Stats Tiles */
+        .stat-tile { padding: 32px; border-radius: var(--radius-lg); background: var(--bg-card); text-align: center; border: 1px solid var(--border-color); position: relative; overflow: hidden; }
+        .stat-tile::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; }
+        .stat-purple::before { background: #7b2cbf; }
+        .stat-teal::before { background: #00b4d8; }
+        .stat-green::before { background: var(--success-color); }
+        .stat-value { font-size: 1.5rem; font-weight: 700; margin: 10px 0; color: var(--text-primary); }
+        .stat-label { font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+
+        /* Data Snapshot */
+        .data-table-container { overflow-x: auto; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left; }
+        th { background: var(--bg-tertiary); padding: 12px 16px; color: var(--text-primary); font-weight: 600; border-bottom: 1px solid var(--border-color); }
+        td { padding: 12px 16px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color); }
+        tr:last-child td { border-bottom: none; }
+        .data-badge { background: var(--accent-subtle); color: var(--accent-color); padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; }
+
+        /* Architecture Grid */
+        .bento-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .bento-item { background: var(--bg-card); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color); position: relative; }
+        .bento-item.large { grid-column: span 2; }
+        .file-icon { display: inline-block; width: 32px; height: 32px; margin-bottom: 12px; }
+        .bento-title { font-weight: 600; margin-bottom: 8px; color: var(--text-primary); display: flex; align-items: center; gap: 10px; }
+        .bento-desc { font-size: 0.9rem; color: var(--text-secondary); }
+
+        /* Installation Terminal */
+        .terminal-window { background: #1e1e1e; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); overflow: hidden; font-family: 'SF Mono', monospace; border: 1px solid #333; }
+        .terminal-header { background: #2d2d2d; padding: 10px 16px; display: flex; gap: 8px; border-bottom: 1px solid #333; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: #ff5f56; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green { background: #27c93f; }
+        .terminal-body { padding: 20px; color: #f5f5f7; font-size: 0.9rem; }
+        .cmd-row { margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
+        .prompt { color: var(--success-color); margin-right: 8px; }
+        .command { color: #fff; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; }
+        .comment { color: #6a9955; margin-left: 10px; }
+
+        /* Interactive Demo */
+        .demo-area { text-align: center; margin-top: 60px; }
+        .input-group { position: relative; max-width: 600px; margin: 0 auto; }
+        .fake-input { 
+            width: 100%; padding: 18px 24px; padding-right: 140px; 
+            border-radius: var(--radius-xl); border: 2px solid var(--border-color); 
+            background: var(--bg-secondary); color: var(--text-primary); font-size: 1.1rem;
+            outline: none; transition: border-color 0.3s;
+        }
+        .fake-input:focus { border-color: var(--info-color); }
+        .pulse-btn {
+            position: absolute; right: 8px; top: 8px; bottom: 8px;
+            padding: 0 24px; border-radius: var(--radius-lg);
+            background: var(--info-color); color: white; border: none;
+            font-weight: 600; cursor: pointer;
+            animation: pulse-glow 2s infinite;
+        }
+
+        /* Footer */
+        footer { margin-top: 100px; padding: 40px 0; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-secondary); font-size: 0.9rem; }
+
+        /* Animations */
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 149, 0, 0.4); } 70% { box-shadow: 0 0 0 6px rgba(255, 149, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 149, 0, 0); } }
+        @keyframes pulse-glow { 0% { box-shadow: 0 0 0 0 rgba(10, 132, 255, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(10, 132, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(10, 132, 255, 0); } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-5px);} 60% {transform: translateY(-3px);} }
+
+        /* Icons */
+        .icon-svg { width: 24px; height: 24px; fill: currentColor; }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar flex-between container">
+        <a href="../../index.html" class="nav-link">
+            <svg viewBox="0 0 24 24" class="icon-svg" style="width: 20px;">
+                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+            </svg>
+            Back to Explorer
+        </a>
+        <button id="theme-toggle" class="btn" aria-label="Toggle Theme">
+            <svg class="icon-sun" viewBox="0 0 24 24" style="display: none; width: 20px; fill: var(--text-primary);">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <svg class="icon-moon" viewBox="0 0 24 24" style="width: 20px; fill: var(--text-primary);">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+        </button>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="hero-netflix-bg"></div>
+        <div class="container hero-content">
+            <div class="badge badge-warning" style="margin-bottom: 20px; font-size: 0.9rem; padding: 6px 16px;">
+                <svg viewBox="0 0 24 24" class="icon-svg" style="width: 16px;">
+                    <path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99zM11 16h2v2h-2zm0-6h2v4h-2z"/>
+                </svg>
+                EXTERNAL — seduerr91
+            </div>
+            <h1>Analytics Vidhya Data Hour</h1>
+            <p class="text-gradient" style="font-size: 1.4rem; font-weight: 500;">Unlocking Netflix Insights with Text-to-SQL using LLMs</p>
+            <p style="margin-top: 16px;">Presented by <strong>Seb Duerr</strong> (Generative AI Engineer, Cordial.com)</p>
+            
+            <!-- Typewriter Simulation -->
+            <div class="typewriter-container" style="max-width: 700px; margin: 40px auto;">
+                <span class="query-label">Live Translation (Simulation)</span>
+                <div class="typewriter-content">
+                    <span style="color: var(--text-secondary);">User: </span>
+                    <span id="typewriter-nl" class="typewriter-text"></span><span class="cursor"></span>
+                    <br><br>
+                    <div id="sql-output" style="opacity: 0; transition: opacity 1s; border-left: 3px solid var(--accent-color); padding-left: 12px;">
+                        <span style="color: var(--accent-color);">SQL: </span><span style="color: var(--success-color);">SELECT * FROM movies WHERE release_year > 2019 ORDER BY rating DESC LIMIT 5;</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- System Metrics -->
+    <section class="container" style="margin-top: -40px; position: relative; z-index: 10;">
+        <div class="grid-3">
+            <div class="stat-tile stat-purple">
+                <div class="stat-label">Core Model</div>
+                <div class="stat-value">GPT-4 (OpenAI)</div>
+                <div class="stat-label" style="font-size: 0.75rem; opacity: 0.7;">Natural Language Processing</div>
+            </div>
+            <div class="stat-tile stat-teal">
+                <div class="stat-label">Webinar Date</div>
+                <div class="stat-value">Feb 7, 2024</div>
+                <div class="stat-label" style="font-size: 0.75rem; opacity: 0.7;">8:00 PM IST / 6:30 AM PT</div>
+            </div>
+            <div class="stat-tile stat-green">
+                <div class="stat-label">Pipeline Status</div>
+                <div class="stat-value">Operational</div>
+                <div class="stat-label" style="font-size: 0.75rem; opacity: 0.7;">Makefile Ready</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pipeline Diagram -->
+    <section class="container" style="margin-top: 100px;">
+        <h2 class="section-title">The Text-to-SQL Pipeline</h2>
+        <div class="pipeline-wrapper">
+            <div class="pipeline-step">
+                <div class="step-icon">💬</div>
+                <div class="step-content">
+                    <h4>Natural Language</h4>
+                    <p>User asks a question in plain English.</p>
+                </div>
+            </div>
+            <div class="arrow-down">↓</div>
+            
+            <div class="pipeline-step">
+                <div class="step-icon">🧠</div>
+                <div class="step-content">
+                    <h4>LLM Engine</h4>
+                    <p>GPT-4 interprets intent and context.</p>
+                </div>
+            </div>
+            <div class="arrow-down">↓</div>
+
+            <div class="pipeline-step">
+                <div class="step-icon">📝</div>
+                <div class="step-content">
+                    <h4>SQL Generation</h4>
+                    <p>Text is converted to structured queries.</p>
+                </div>
+            </div>
+            <div class="arrow-down">↓</div>
+
+            <div class="pipeline-step">
+                <div class="step-icon">🗄️</div>
+                <div class="step-content">
+                    <h4>Database Query</h4>
+                    <p>SQLite executes against Netflix data.</p>
+                </div>
+            </div>
+            <div class="arrow-down">↓</div>
+
+            <div class="pipeline-step" style="border-color: var(--accent-subtle);">
+                <div class="step-icon" style="background: var(--success-color); color: white;">📊</div>
+                <div class="step-content">
+                    <h4>Insight Result</h4>
+                    <p>Data returned to the user instantly.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Data Snapshot -->
+    <section class="container" style="margin-top: 100px;">
+        <h2 class="section-title">Data Snapshot</h2>
+        <div class="card">
+            <div style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3 style="font-size: 1.2rem;">Netflix Movie Dataset</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Source: CSV Ingestion via Python Scripts</p>
+                </div>
+                <div class="data-badge">SQLite / data/netflix.db</div>
+            </div>
+            <div class="data-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Show ID</th>
+                            <th>Type</th>
+                            <th>Title</th>
+                            <th>Director</th>
+                            <th>Country</th>
+                            <th>Release Year</th>
+                            <th>Rating</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>s1000</td>
+                            <td><span class="data-badge" style="background:var(--info-color); color:white;">Movie</span></td>
+                            <td>The Dark Knight</td>
+                            <td>Christopher Nolan</td>
+                            <td>United States</td>
+                            <td>2008</td>
+                            <td>PG-13</td>
+                        </tr>
+                        <tr>
+                            <td>s1001</td>
+                            <td><span class="data-badge" style="background:var(--accent-color); color:white;">TV Show</span></td>
+                            <td>Stranger Things</td>
+                            <td>Shawn Levy</td>
+                            <td>United States</td>
+                            <td>2016</td>
+                            <td>TV-14</td>
+                        </tr>
+                        <tr>
+                            <td>s1002</td>
+                            <td><span class="data-badge" style="background:var(--info-color); color:white;">Movie</span></td>
+                            <td>Inception</td>
+                            <td>Christopher Nolan</td>
+                            <td>United States</td>
+                            <td>2010</td>
+                            <td>PG-13</td>
+                        </tr>
+                        <tr>
+                            <td>s1003</td>
+                            <td><span class="data-badge" style="background:var(--info-color); color:white;">Movie</span></td>
+                            <td>Black Mirror: Bandersnatch</td>
+                            <td>David Slade</td>
+                            <td>United Kingdom</td>
+                            <td>2018</td>
+                            <td>TV-MA</td>
+                        </tr>
+                        <tr>
+                            <td>s1004</td>
+                            <td><span class="data-badge" style="background:var(--accent-color); color:white;">TV Show</span></td>
+                            <td>The Crown</td>
+                            <td>Benjamin Caron</td>
+                            <td>United Kingdom</td>
+                            <td>2016</td>
+                            <td>TV-MA</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Grid -->
+    <section class="container" style="margin-top: 100px;">
+        <h2 class="section-title">Architecture & Components</h2>
+        <div class="bento-grid">
+            <div class="bento-item large" style="border-color: var(--accent-color);">
+                <div class="bento-title">
+                    <svg class="file-icon" viewBox="0 0 24 24" fill="var(--accent-color)"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                    main.py (Service Orchestrator)
+                </div>
+                <p class="bento-desc">The heart of the application. Uses FastAPI to serve endpoints. Handles the connection between the OpenAI LLM and the local SQLite database.</p>
+            </div>
+            <div class="bento-item">
+                <div class="bento-title">
+                    <svg class="file-icon" viewBox="0 0 24 24" fill="#7b2cbf"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                    schemas.py
+                </div>
+                <p class="bento-desc">Pydantic models ensuring strict type validation for incoming requests and outgoing SQL results.</p>
+            </div>
+            <div class="bento-item">
+                <div class="bento-title">
+                    <svg class="file-icon" viewBox="0 0 24 24" fill="#00b4d8"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                    queries/
+                </div>
+                <p class="bento-desc">Directory containing SQL templates and raw query logic used for data ingestion.</p>
+            </div>
+            <div class="bento-item">
+                <div class="bento-title">
+                    <svg class="file-icon" viewBox="0 0 24 24" fill="var(--warning-color)"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
+                    Makefile
+                </div>
+                <p class="bento-desc">Automation for installation, data ingestion, running the server, and testing endpoints.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Installation Terminal -->
+    <section class="container" style="margin-top: 100px;">
+        <h2 class="section-title">Quick Start</h2>
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <div class="dot dot-red"></div>
+                <div class="dot dot-yellow"></div>
+                <div class="dot dot-green"></div>
+                <span style="margin-left: 12px; color: #999; font-size: 0.8rem;">zsh — 80x24</span>
+            </div>
+            <div class="terminal-body">
+                <div class="cmd-row">
+                    <span class="prompt">➜</span>
+                    <span class="command">git clone https://github.com/seduerr91/datahour_netflix_sql.git</span>
+                </div>
+                <div class="cmd-row">
+                    <span class="prompt">➜</span>
+                    <span class="command">cd datahour_netflix_sql</span>
+                </div>
+                <div class="cmd-row">
+                    <span class="prompt">➜</span>
+                    <span class="command">make install</span>
+                    <span class="comment"># Installs requirements.txt</span>
+                </div>
+                <div class="cmd-row">
+                    <span class="prompt">➜</span>
+                    <span class="command">make ingest</span>
+                    <span class="comment"># Prepares SQLite DB</span>
+                </div>
+                <div class="cmd-row">
+                    <span class="prompt">➜</span>
+                    <span class="command">make run</span>
+                    <span class="comment"># Starts FastAPI Service</span>
+                </div>
+                <div class="cmd-row" style="margin-top: 16px;">
+                    <span style="color: #fff;">INFO: Uvicorn running on http://127.0.0.1:8000</span>
+                </div>
+            </div>
+        </div>
+        <p style="text-align: center; margin-top: 20px; color: var(--text-secondary);">Don't forget to set your <code>.env</code> file with <code>OPENAI_API_KEY</code> first!</p>
+    </section>
+
+    <!-- Interactive Mockup -->
+    <section class="container demo-area">
+        <h2 class="section-title">Try it yourself</h2>
+        <p style="margin-bottom: 30px; color: var(--text-secondary);">Experience how natural language transforms into actionable SQL queries.</p>
+        
+        <div class="input-group">
+            <input type="text" class="fake-input" value="Show me top 5 movies directed by Christopher Nolan" readonly>
+            <button class="pulse-btn" onclick="runDemo()">Generate SQL</button>
+        </div>
+        <div id="demo-result" style="margin-top: 20px; font-family: monospace; color: var(--success-color); opacity: 0; transition: opacity 0.5s; text-align: left; background: var(--bg-tertiary); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            > Generating SQL...<br>
+            <span style="color: var(--accent-color);">SELECT title, release_year FROM movies WHERE director = 'Christopher Nolan' LIMIT 5;</span>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>Developed for Analytics Vidhya Data Hour.</p>
+            <p style="margin-top: 8px; opacity: 0.6;">&copy; 2024 Seb Duerr. External Repository Showcase.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle Logic
+        const toggleBtn = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        const icons = {
+            sun: document.querySelector('.icon-sun'),
+            moon: document.querySelector('.icon-moon')
+        };
+
+        function updateThemeUI() {
+            const isDark = html.getAttribute('data-theme') === 'dark';
+            icons.sun.style.display = isDark ? 'none' : 'block';
+            icons.moon.style.display = isDark ? 'block' : 'none';
+        }
+
+        toggleBtn.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeUI();
+        });
+
+        // Initialize Theme
+        const savedTheme = localStorage.getItem('theme') || 'dark'; // Default to dark for cinematic feel
+        html.setAttribute('data-theme', savedTheme);
+        updateThemeUI();
+
+        // Typewriter Effect
+        const textToType = "Show me top rated movies released after 2015";
+        const typeWriterElement = document.getElementById('typewriter-nl');
+        const sqlOutput = document.getElementById('sql-output');
+        let i = 0;
+
+        function typeWriter() {
+            if (i < textToType.length) {
+                typeWriterElement.innerHTML += textToType.charAt(i);
+                i++;
+                setTimeout(typeWriter, 50 + Math.random() * 50);
+            } else {
+                // Show SQL output after typing finishes
+                setTimeout(() => {
+                    sqlOutput.style.opacity = 1;
+                }, 500);
+            }
+        }
+
+        // Start typewriter after a short delay
+        setTimeout(typeWriter, 1000);
+
+        // Mock Demo Interaction
+        function runDemo() {
+            const btn = document.querySelector('.pulse-btn');
+            const input = document.querySelector('.fake-input');
+            const result = document.getElementById('demo-result');
+            
+            // Visual feedback
+            input.style.borderColor = 'var(--accent-color)';
+            btn.innerHTML = 'Processing...';
+            btn.style.animation = 'none';
+            
+            result.style.opacity = 0;
+            
+            setTimeout(() => {
+                result.style.opacity = 1;
+                btn.innerHTML = 'Done';
+                btn.style.background = 'var(--success-color)';
+                
+                setTimeout(() => {
+                    btn.innerHTML = 'Generate SQL';
+                    btn.style.background = 'var(--info-color)';
+                    btn.style.animation = 'pulse-glow 2s infinite';
+                    input.style.borderColor = 'var(--border-color)';
+                }, 3000);
+            }, 1200);
+        }
+    </script>
+</body>
+</html>
