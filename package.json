@@ -1,7 +1,7 @@
 {
   "name": "meta-github-pages",
   "version": "1.0.0",
-  "description": "Visual portfolio generator for GitHub repositories powered by Cerebras AI",
+  "description": "Visual repository explorer for GitHub repositories powered by Cerebras AI",
   "type": "module",
   "scripts": {
     "generate": "node generate.js",

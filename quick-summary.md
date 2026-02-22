@@ -3,7 +3,7 @@
 ## Session Overview
 **Date:** February 21, 2026
 **Project:** meta-github-pages
-**Goal:** Transform portfolio manager to use backend server for automatic generation
+**Goal:** Transform repository explorer to use backend server for automatic generation
 
 ## What We Did
 
@@ -14,7 +14,7 @@
 - Handles up to 5 repos per generation
 - Includes manifest reload endpoint
 
-### 2. Simplified Portfolio Manager (`local-manager.html`)
+### 2. Simplified Repository Explorer (`local-manager.html`)
 **Removed:**
 - External repo input section
 - GitHub CLI auth check
@@ -24,7 +24,7 @@
 - Progress modal with streaming log output
 - Automatic backend API calls
 - Real-time generation status
-- "View Your Portfolio" button on completion
+- "View Your Repos" button on completion
 
 ### 3. Updated Dependencies (`package.json`)
 - Added `express` ^4.19.2
@@ -53,7 +53,7 @@
 6. Clicks "Generate Pages"
 7. Backend spawns `generate.js` and streams progress
 8. User watches real-time logs in modal
-9. On completion, clicks "View Your Portfolio"
+9. On completion, clicks "View Your Repos"
 10. Redirected to hosted GitHub Pages site
 
 ## Key Technical Decisions
@@ -83,4 +83,4 @@ npm start
 node server.js
 ```
 
-Then open http://localhost:3000 in browser to use the portfolio manager.
+Then open http://localhost:3000 in browser to use the repository explorer.

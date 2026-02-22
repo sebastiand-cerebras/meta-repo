@@ -470,7 +470,7 @@ Hard rules:
 4. The page must be mobile-responsive.
 5. Make it visually STUNNING — use cards, icons (Unicode or inline SVG), gradients, stat tiles, diagrams.
 6. Do NOT dump the README verbatim — transform and curate the content visually.
-7. Include a "← Back to Portfolio" link at the top linking to ../../index.html.`;
+7. Include a "← Back to Explorer" link at the top linking to ../../index.html.`;
 
   const INITIAL_PROMPT = `Repository context:
 ${context}
@@ -486,7 +486,7 @@ Requirements:
 - Include: what it does, why it matters, how it works, tech stack
 - Make it visually ENGAGING — not a wall of text
 - Include a realistic, working dark/light mode toggle
-- Include a "← Back to Portfolio" link at the top (href="../../index.html")
+- Include a "← Back to Explorer" link at the top (href="../../index.html")
 ${isExternal ? `- Add an "External — ${analysis.owner}" warning badge near the top, styled in warning orange` : ''}
 
 Output only the complete HTML document.`;

@@ -124,7 +124,7 @@ app.get('/api/manifest', (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`\n🚀 Portfolio Manager running at http://localhost:${PORT}`);
+  console.log(`\n🚀 Repository Explorer running at http://localhost:${PORT}`);
   console.log(`📁 Serving from: ${__dirname}`);
   console.log(`\nOpen http://localhost:${PORT}/local-manager.html in your browser\n`);
 });

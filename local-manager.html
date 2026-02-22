@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Portfolio Manager</title>
+  <title>Repository Explorer</title>
   <link rel="stylesheet" href="assets/styles.css" />
   <style>
     body { padding: 32px 20px 60px; }
@@ -413,7 +413,7 @@
       gap: 12px;
       justify-content: flex-end;
     }
-    .view-portfolio-btn {
+    .view-repos-btn {
       display: none;
       background: var(--accent-color);
       color: white;
@@ -423,11 +423,11 @@
       font-weight: 600;
       transition: all var(--transition);
     }
-    .view-portfolio-btn:hover {
+    .view-repos-btn:hover {
       background: var(--accent-hover);
       transform: translateY(-1px);
     }
-    .view-portfolio-btn.visible {
+    .view-repos-btn.visible {
       display: inline-block;
     }
 
@@ -452,7 +452,7 @@
           </svg>
         </div>
         <div class="logo-text">
-          <h1 id="siteTitle">Portfolio Manager</h1>
+          <h1 id="siteTitle">Repository Explorer</h1>
           <p></p>
         </div>
       </div>
@@ -469,8 +469,8 @@
     </header>
 
     <section class="hero">
-      <h2>Portfolio Manager</h2>
-      <p>Browse GitHub repositories, select up to 5, and generate beautiful portfolio pages with AI.</p>
+      <h2>Repository Explorer</h2>
+      <p>Browse GitHub repositories, select up to 5, and generate beautiful repo pages with AI.</p>
     </section>
 
     <div id="errorBanner" class="alert alert-warning"></div>
@@ -525,7 +525,7 @@
     </div>
 
     <footer class="footer">
-      <p>Portfolio Manager &mdash; <a href="index.html" style="color:var(--accent-color); text-decoration:none">← Back to Portfolio</a> &mdash;
+      <p>Repository Explorer &mdash; <a href="index.html" style="color:var(--accent-color); text-decoration:none">← Back to Explorer</a> &mdash;
         Powered by <a href="https://cloud.cerebras.ai" style="color:var(--accent-color); text-decoration:none">Cerebras AI</a>
       </p>
     </footer>
@@ -539,7 +539,7 @@
         <div class="modal-logs" id="modalLogs"></div>
         <div class="modal-footer">
           <button class="btn btn-secondary btn-sm" id="closeModalBtn" onclick="hideModal()" style="display:none">Close</button>
-          <a href="index.html" class="view-portfolio-btn" id="viewPortfolioBtn">View Your Portfolio →</a>
+          <a href="index.html" class="view-repos-btn" id="viewReposBtn">View Your Repos →</a>
         </div>
       </div>
     </div>
@@ -824,7 +824,7 @@
       spinner.textContent = '';
       spinner.style.background = '';
       document.getElementById('modalTitle').textContent = 'Generating pages...';
-      document.getElementById('viewPortfolioBtn').classList.remove('visible');
+      document.getElementById('viewReposBtn').classList.remove('visible');
       document.getElementById('closeModalBtn').style.display = 'none';
     }
 
@@ -846,7 +846,7 @@
       spinner.classList.add('done');
       spinner.textContent = '✓';
       document.getElementById('modalTitle').textContent = 'Generation complete!';
-      document.getElementById('viewPortfolioBtn').classList.add('visible');
+      document.getElementById('viewReposBtn').classList.add('visible');
       document.getElementById('closeModalBtn').style.display = 'inline-block';
 
       generatedSet = new Set([...generatedSet, ...selectedRepos]);

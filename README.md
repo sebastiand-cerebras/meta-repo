@@ -1,20 +1,20 @@
 # Meta GitHub Pages
 
-A visual portfolio generator for GitHub repositories, powered by Cerebras AI. Automatically discover your repos, generate rich, beautiful visual pages, and deploy them as your portfolio site.
+A visual repository explorer for GitHub repositories, powered by Cerebras AI. Automatically discover your repos, generate rich, beautiful visual pages, and deploy them as your explorer site.
 
 ## Architecture
 
 This project consists of two services:
 
 ### 1. Hosted Display (`index.html`)
-A clean, read-only portfolio gallery that showcases your generated pages. This is what visitors see on GitHub Pages.
+A clean, read-only repository explorer that showcases your generated pages. This is what visitors see on GitHub Pages.
 
-- **Purpose**: Display generated portfolio pages to visitors
+- **Purpose**: Display generated repo pages to visitors
 - **Deployment**: Hosted on GitHub Pages
-- **Features**: Clean gallery, "Open Portfolio Manager" button, how-to section
+- **Features**: Clean gallery, "Open Repository Explorer" button, how-to section
 - **No authentication or generation** - just for viewing results
 
-### 2. Portfolio Manager (`local-manager.html`)
+### 2. Repository Explorer (`local-manager.html`)
 A local tool (with backend server) for discovering repositories and generating pages.
 
 - **Purpose**: Browse GitHub repos, select what to generate, auto-generate pages
@@ -33,7 +33,7 @@ A local tool (with backend server) for discovering repositories and generating p
 2. **Browse** - Enter your GitHub username to load your repositories
 3. **Select** - Choose up to 5 repositories by clicking on cards
 4. **Generate** - Click "Generate Pages" and watch the real-time progress
-5. **View** - When complete, click "View Your Portfolio" to see the hosted pages
+5. **View** - When complete, click "View Your Repos" to see the hosted pages
 
 ## Getting Started
 
@@ -74,9 +74,9 @@ http://localhost:3000
 
 ## Usage
 
-### Generating Portfolio Pages
+### Generating Repo Pages
 
-1. **Open Portfolio Manager**
+1. **Open Repository Explorer**
 
    After running `npm start`, open http://localhost:3000 in your browser
 
@@ -100,13 +100,13 @@ http://localhost:3000
      - Calls Cerebras AI to generate visual pages
      - Creates beautiful, interactive showcase pages
 
-5. **View Your Portfolio**
+5. **View Your Repos**
 
-   - When generation completes, click "View Your Portfolio"
+   - When generation completes, click "View Your Repos"
    - This takes you to your hosted GitHub Pages site
    - Your new pages will be visible in the gallery
 
-### Viewing the Portfolio Gallery
+### Viewing the Repository Explorer
 
 The gallery is automatically deployed to GitHub Pages. Visit:
 - **Your site**: `https://sebastiand-cerebras.github.io/meta-repo`
@@ -117,7 +117,7 @@ The gallery is automatically deployed to GitHub Pages. Visit:
 ```
 meta-repo/
 ├── server.js               # Backend server for auto-generation (new)
-├── index.html              # Hosted: Portfolio gallery (read-only showcase)
+├── index.html              # Hosted: Repository explorer (read-only showcase)
 ├── local-manager.html      # Local: Repo browser with auto-generation
 ├── generate.js             # Page generation script (used by server)
 ├── config.js               # Optional branding config

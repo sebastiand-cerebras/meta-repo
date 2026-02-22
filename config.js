@@ -12,7 +12,7 @@
  */
 
 // export default {
-//   brandName: 'My Portfolio',               // Site header title
+//   brandName: 'My Repos',               // Site header title
 //   accentColor: '#E06439',                  // CSS accent color (default: orange)
 //   logoDark: 'assets/logo-dark-mode.png',   // Logo shown in dark mode
 //   logoLight: 'assets/logo-light-mode.png', // Logo shown in light mode

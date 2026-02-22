@@ -1,6 +1,6 @@
 # Meta GitHub Pages — Implementation Spec
 
-A GitHub Pages site that serves as a visual portfolio of your public repositories. It auto-discovers repos, generates rich visual summaries for each using an LLM, and deploys them as subpages — all from one meta-repo.
+A GitHub Pages site that serves as a visual repository explorer of your public repositories. It auto-discovers repos, generates rich visual summaries for each using an LLM, and deploys them as subpages — all from one meta-repo.
 
 ## Design
 
@@ -136,7 +136,7 @@ The generator should **detect the repo type** during analysis (from files, READM
 This repo ships as a **public, whitelabel tool** — no company logos, no branding. Anyone who forks/clones it at a demo or event gets a clean, neutral version they can make their own.
 
 ### Public repo (whitelabel — what attendees get)
-- No logo in the header — just a generic icon (e.g., a grid/portfolio icon) + site title
+- No logo in the header — just a generic icon (e.g., a grid/explorer icon) + site title
 - Neutral accent color (keep the orange from the design system, or let users pick via CSS variable)
 - `cerebras-style-html-raws/` is **gitignored** — never pushed to the public repo
 - README focuses on "how to use this tool for your own repos"
