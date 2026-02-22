@@ -472,76 +472,71 @@ Hard rules:
 6. Do NOT dump the README verbatim — transform and curate the content visually.
 7. Include a "← Back to Explorer" link at the top linking to ../../index.html.`;
 
-  const INITIAL_PROMPT = `Repository context:
+  // --- Step 1: Analysis — plan the page structure and content ---
+  process.stdout.write(`    Step 1/2: Analyzing repo & planning page layout… `);
+
+  const analysisPrompt = `You are planning a beautiful visual showcase page for the GitHub repository ${analysis.owner}/${analysis.repo}.
+
+Repository context:
 ${context}
 
 Visual template for "${analysis.type}" projects:
 ${typeTemplate}
 
-Generate a complete single-file HTML page that visually showcases the ${analysis.owner}/${analysis.repo} repository.
+Create a detailed page plan in JSON format with these fields:
+{
+  "headline": "catchy one-liner about the project",
+  "sections": [
+    { "title": "Section Name", "type": "hero|stats|grid|flow|cards|code|features|cta", "content": "what goes here", "visualNotes": "layout and design ideas" }
+  ],
+  "colorAccents": "suggested accent colors or gradients beyond the base theme",
+  "keyStats": ["stat 1", "stat 2", ...],
+  "diagrams": ["description of any flow/architecture diagrams to include"],
+  "uniqueTouches": ["special interactive or visual elements that make this page stand out"]
+}
+
+Be specific and creative. Think about what makes this repo special and how to showcase it visually.`;
+
+  const planResult = await callCerebras(apiKey, [
+    { role: 'system',  content: 'You are a creative UI/UX strategist. Output only valid JSON — no markdown fences, no explanation.' },
+    { role: 'user',    content: analysisPrompt },
+  ]);
+  log(`${planResult.tps} tok/s`);
+  const pagePlan = planResult.content;
+
+  // --- Step 2: Generate — produce the final HTML in one shot ---
+  process.stdout.write(`    Step 2/2: Generating final HTML page… `);
+
+  const generatePrompt = `Repository context:
+${context}
+
+Visual template for "${analysis.type}" projects:
+${typeTemplate}
+
+Here is a detailed page plan created by a UI strategist:
+${pagePlan}
+
+Now generate a complete single-file HTML page that visually showcases the ${analysis.owner}/${analysis.repo} repository.
 
 Requirements:
-- Follow the visual template above for "${analysis.type}" projects
+- Follow the page plan above — implement every section described
+- Follow the visual template for "${analysis.type}" projects
 - Use the CSS design system variables provided
-- Include: what it does, why it matters, how it works, tech stack
-- Make it visually ENGAGING — not a wall of text
+- Make it visually STUNNING and information-dense — not a wall of text
+- Use cards, grids, stat tiles, inline SVG icons/diagrams, gradients, hover effects
 - Include a realistic, working dark/light mode toggle
 - Include a "← Back to Explorer" link at the top (href="../../index.html")
+- The page should feel like a polished product landing page, not a README dump
 ${isExternal ? `- Add an "External — ${analysis.owner}" warning badge near the top, styled in warning orange` : ''}
 
 Output only the complete HTML document.`;
 
-  const REFINEMENT_LABELS = [
-    'Improving visual hierarchy and layout…',
-    'Enhancing typography and spacing…',
-    'Adding more icons, diagrams, and visual elements…',
-    'Refining color usage and contrast…',
-    'Improving content clarity and copywriting…',
-    'Enhancing cards, stat tiles, and data displays…',
-    'Perfecting dark/light mode consistency…',
-    'Adding interactive flourishes and hover effects…',
-    'Final visual polish and responsiveness…',
-  ];
-
-  // Iteration 1: initial generation
-  process.stdout.write(`    Iteration  1/${iterations}: Generating initial HTML… `);
-  const r1 = await callCerebras(apiKey, [
-    { role: 'system',  content: SYSTEM },
-    { role: 'user',    content: INITIAL_PROMPT },
+  const pageResult = await callCerebras(apiKey, [
+    { role: 'system', content: SYSTEM },
+    { role: 'user',   content: generatePrompt },
   ]);
-  log(`${r1.tps} tok/s`);
-  let html = extractHTML(r1.content);
-
-  // Iterations 2–N: refinement
-  for (let i = 2; i <= iterations; i++) {
-    const label = REFINEMENT_LABELS[i - 2] || 'Refining…';
-    process.stdout.write(`    Iteration ${String(i).padStart(2)}/${iterations}: ${label} `);
-
-    const refinePrompt = `You previously generated this HTML page for the ${analysis.owner}/${analysis.repo} (${analysis.type}) repository.
-
-Current version:
-\`\`\`html
-${html.slice(0, 24000)}
-\`\`\`
-
-This is iteration ${i} of ${iterations}. Make SIGNIFICANT improvements:
-- Fix any layout bugs, broken dark mode, or poor contrast
-- Add richer visual elements: diagrams, flow arrows, stat tiles, progress indicators
-- Improve information density and scannability — use a grid layout where possible
-- Ensure every section matches the "${analysis.type}" visual template
-- Tighten copy: be specific, punchy, and informative
-- Enhance mobile responsiveness
-${isExternal ? `- Keep the "External — ${analysis.owner}" badge prominently visible` : ''}
-
-Output only the improved complete HTML document.`;
-
-    const rN = await callCerebras(apiKey, [
-      { role: 'system', content: SYSTEM },
-      { role: 'user',   content: refinePrompt },
-    ]);
-    log(`${rN.tps} tok/s`);
-    html = extractHTML(rN.content);
-  }
+  log(`${pageResult.tps} tok/s`);
+  const html = extractHTML(pageResult.content);
 
   return html;
 }
