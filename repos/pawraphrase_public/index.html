@@ -1,286 +1,667 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pawraphrase | Advanced Paraphrasing Models</title>
-    <style>
-        :root {
-            --bg-primary:#f5f5f7; --bg-secondary:#ffffff; --bg-tertiary:#f0f0f2; --bg-card:#ffffff;
-            --text-primary:rgb(43,25,16); --text-secondary:#86868b; --border-color:rgba(0,0,0,0.08);
-            --accent-color:rgb(224,100,57); --accent-hover:rgb(200,85,45); --accent-subtle:rgba(224,100,57,0.1);
-            --success-color:#34c759; --warning-color:#ff9500; --error-color:#ff3b30; --info-color:#007aff;
-            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.05);
-            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
-            --shadow-lg:0 8px 32px rgba(0,0,0,0.12);
-            --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-xl:24px;
-            /* Scientific Palette */
-            --science-blue: #007aff;
-            --science-purple: #5856d6;
-            --science-teal: #30d158;
-            --science-gradient: linear-gradient(135deg, var(--science-blue), var(--science-purple));
-        }
-        [data-theme="dark"] {
-            --bg-primary:#000000; --bg-secondary:#1c1c1e; --bg-tertiary:#2c2c2e; --bg-card:#1c1c1e;
-            --text-primary:#f5f5f7; --text-secondary:#86868b; --border-color:rgba(255,255,255,0.1);
-            --accent-color:rgb(224,100,57); --accent-hover:rgb(240,115,70); --accent-subtle:rgba(224,100,57,0.15);
-            --success-color:#30d158; --warning-color:#ff9f0a; --error-color:#ff453a; --info-color:#0a84ff;
-            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.3);
-            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.4),0 2px 4px -1px rgba(0,0,0,0.2);
-            --shadow-lg:0 8px 32px rgba(0,0,0,0.5);
-        }
-        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        html{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
-        body{background:var(--bg-primary);color:var(--text-primary);min-height:100vh;transition:background .3s,color .3s;line-height:1.6}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pawraphrase | T5 Fine-tuning Showcase</title>
+  <style>
+    :root {
+      --bg-primary:#f5f5f7; --bg-secondary:#ffffff; --bg-tertiary:#f0f0f2; --bg-card:#ffffff;
+      --text-primary:rgb(43,25,16); --text-secondary:#86868b; --border-color:rgba(0,0,0,0.08);
+      --accent-color:rgb(224,100,57); --accent-hover:rgb(200,85,45); --accent-subtle:rgba(224,100,57,0.1);
+      --success-color:#34c759; --warning-color:#ff9500; --error-color:#ff3b30; --info-color:#007aff;
+      --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.05);
+      --shadow-md:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+      --shadow-lg:0 8px 32px rgba(0,0,0,0.12);
+      --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-xl:24px;
+      --font-body:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;
+      --font-code:"SF Mono", "Monaco", "Inconsolata", "Fira Mono", monospace;
+    }
+    [data-theme="dark"] {
+      --bg-primary:#000000; --bg-secondary:#1c1c1e; --bg-tertiary:#2c2c2e; --bg-card:#1c1c1e;
+      --text-primary:#f5f5f7; --text-secondary:#86868b; --border-color:rgba(255,255,255,0.1);
+      --accent-color:rgb(224,100,57); --accent-hover:rgb(240,115,70); --accent-subtle:rgba(224,100,57,0.15);
+      --success-color:#30d158; --warning-color:#ff9f0a; --error-color:#ff453a; --info-color:#0a84ff;
+      --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.3);
+      --shadow-md:0 4px 6px -1px rgba(0,0,0,0.4),0 2px 4px -1px rgba(0,0,0,0.2);
+      --shadow-lg:0 8px 32px rgba(0,0,0,0.5);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{font-family:var(--font-body);-webkit-font-smoothing:antialiased;scroll-behavior: smooth;}
+    body{background:var(--bg-primary);color:var(--text-primary);min-height:100vh;transition:background .3s,color .3s;line-height:1.5}
 
-        /* Utilities */
-        .container{max-width:1200px;margin:0 auto;padding:0 1.5rem}
-        .flex{display:flex}
-        .grid{display:grid}
-        .items-center{align-items:center}
-        .justify-between{justify-content:space-between}
-        .gap-2{gap:0.5rem}
-        .gap-4{gap:1rem}
-        .mt-4{margin-top:1rem}
-        .mt-6{margin-top:1.5rem}
-        .mb-2{margin-bottom:0.5rem}
-        .mb-4{margin-bottom:1rem}
-        .mb-6{margin-bottom:1.5rem}
-        .text-sm{font-size:0.875rem}
-        .text-xs{font-size:0.75rem}
-        .font-bold{font-weight:700}
-        .font-medium{font-weight:500}
-        .w-full{width:100%}
-        
-        /* Navigation */
-        nav{padding:1.5rem 0;position:sticky;top:0;background:rgba(var(--bg-primary),0.8);backdrop-filter:blur(12px);z-index:100;border-bottom:1px solid var(--border-color)}
-        .back-link{text-decoration:none;color:var(--text-secondary);font-weight:500;display:flex;align-items:center;gap:0.5rem;transition:color 0.2s;font-size:0.9rem}
-        .back-link:hover{color:var(--accent-color)}
-        
-        /* Toggle */
-        .theme-toggle{background:none;border:none;cursor:pointer;color:var(--text-primary);padding:0.5rem;border-radius:50%;transition:background 0.2s;display:flex;align-items:center;justify-content:center}
-        .theme-toggle:hover{background:var(--bg-tertiary)}
-        .theme-toggle svg{width:20px;height:20px}
+    /* Utilities */
+    .container { max-width: 1240px; margin: 0 auto; padding: 0 20px; }
+    .flex { display: flex; }
+    .flex-col { flex-direction: column; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .justify-center { justify-content: center; }
+    .gap-1 { gap: 0.5rem; }
+    .gap-2 { gap: 1rem; }
+    .gap-4 { gap: 2rem; }
+    .mt-2 { margin-top: 1rem; }
+    .mt-4 { margin-top: 2rem; }
+    .mb-1 { margin-bottom: 0.5rem; }
+    .mb-2 { margin-bottom: 1rem; }
+    .mb-4 { margin-bottom: 2rem; }
+    .text-sm { font-size: 0.875rem; }
+    .text-xs { font-size: 0.75rem; }
+    .text-mono { font-family: var(--font-code); }
+    .font-bold { font-weight: 700; }
+    .text-accent { color: var(--accent-color); }
 
-        /* Hero */
-        .hero{text-align:center;padding:5rem 0 4rem;position:relative;overflow:hidden}
-        .hero-bg{position:absolute;top:-50%;left:50%;transform:translateX(-50%);width:100%;height:200%;background:radial-gradient(circle, var(--accent-subtle) 0%, transparent 60%);opacity:0.6;z-index:-1;pointer-events:none}
-        .badge-external{display:inline-flex;align-items:center;gap:0.35rem;background:rgba(224,100,57,0.12);color:var(--accent-color);padding:0.35rem 0.85rem;border-radius:100px;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:1.5rem;border:1px solid rgba(224,100,57,0.2);backdrop-filter:blur(4px)}
-        .hero h1{font-size:clamp(2.5rem, 5vw, 4rem);letter-spacing:-0.02em;margin-bottom:1rem;background:linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1.1}
-        [data-theme="dark"] .hero h1{-webkit-text-fill-color:var(--text-primary)}
-        .hero p{font-size:1.25rem;color:var(--text-secondary);max-width:650px;margin:0 auto 2rem;line-height:1.6}
-        
-        .cta-group{display:flex;gap:1rem;justify-content:center}
-        .btn{padding:0.75rem 1.5rem;border-radius:var(--radius-md);font-weight:600;text-decoration:none;font-size:0.95rem;transition:all 0.2s;display:inline-flex;align-items:center;gap:0.5rem}
-        .btn-primary{background:var(--accent-color);color:white;box-shadow:0 4px 12px rgba(224,100,57,0.3)}
-        .btn-primary:hover{background:var(--accent-hover);transform:translateY(-1px)}
-        .btn-secondary{background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-primary)}
-        .btn-secondary:hover{border-color:var(--text-secondary)}
+    /* Typography */
+    h1 { 
+      font-size: clamp(2.5rem, 5vw, 4rem); 
+      font-weight: 800; 
+      letter-spacing: -0.03em; 
+      line-height: 1.05; 
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent-color) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; letter-spacing: -0.01em; }
+    h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+    p { color: var(--text-secondary); margin-bottom: 1rem; }
+    
+    /* Components */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      text-decoration: none;
+      border: 1px solid transparent;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-ghost { background: transparent; color: var(--text-secondary); border-color: transparent; }
+    .btn-ghost:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+    .btn-primary { background: var(--accent-color); color: white; box-shadow: 0 4px 12px rgba(224, 100, 57, 0.3); }
+    .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(224, 100, 57, 0.4); }
+    .btn-icon { padding: 8px; border-radius: 50%; width: 40px; height: 40px; }
 
-        /* Stats Grid */
-        .stats-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:1.5rem;margin-bottom:5rem}
-        .stat-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:1.5rem;box-shadow:var(--shadow-sm);transition:transform 0.2s, box-shadow 0.2s}
-        .stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
-        .stat-icon-wrap{width:40px;height:40px;border-radius:10px;background:var(--bg-tertiary);display:flex;align-items:center;justify-content:center;margin-bottom:1rem;color:var(--accent-color)}
-        .stat-val{font-size:2rem;font-weight:700;line-height:1.1;margin-bottom:0.25rem;letter-spacing:-0.03em}
-        .stat-label{font-size:0.875rem;color:var(--text-secondary);font-weight:500}
-        .stat-trend{font-size:0.75rem;color:var(--success-color);display:flex;align-items:center;gap:0.25rem;margin-top:0.5rem}
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border: 1px solid transparent;
+    }
+    .badge-outline { background: var(--bg-tertiary); color: var(--text-secondary); border-color: var(--border-color); }
+    .badge-accent { background: var(--accent-subtle); color: var(--accent-color); }
+    .badge-success { background: rgba(52, 199, 89, 0.15); color: var(--success-color); }
+    .badge-warning { background: rgba(255, 149, 0, 0.15); color: var(--warning-color); }
 
-        /* Section Headers */
-        .section-header{margin-bottom:2.5rem;border-bottom:1px solid var(--border-color);padding-bottom:1rem}
-        .section-title{font-size:1.75rem;font-weight:700;display:flex;align-items:center;gap:1rem}
-        .section-desc{font-size:1rem;color:var(--text-secondary);margin-top:0.5rem;max-width:700px}
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(var(--bg-secondary), 0.8);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid var(--border-color);
+      height: 64px;
+    }
+    
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--accent-color);
+      transform: translateY(-2px);
+    }
+    /* Mesh Gradient Overlay for Cards */
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .card:hover::before { opacity: 1; }
 
-        /* Architecture Diagram */
-        .arch-container{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-xl);padding:3rem 2rem;margin-bottom:5rem;position:relative;overflow:hidden}
-        .arch-bg-pattern{position:absolute;top:0;right:0;width:300px;height:300px;background-image:radial-gradient(var(--border-color) 1px, transparent 1px);background-size:20px 20px;opacity:0.5}
-        .pipeline-flow{display:flex;align-items:center;justify-content:space-between;gap:1rem;position:relative;z-index:2}
-        .flow-step{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative}
-        .step-box{width:100%;max-width:180px;padding:1.5rem 1rem;background:var(--bg-tertiary);border-radius:var(--radius-md);border:1px solid var(--border-color);font-weight:600;color:var(--text-primary);transition:all 0.3s;position:relative}
-        .flow-step:nth-child(2) .step-box{background:var(--science-gradient);color:white;border:none;box-shadow:0 8px 20px rgba(0,122,255,0.25)}
-        .flow-step:nth-child(3) .step-box{background:var(--science-gradient);color:white;border:none;box-shadow:0 8px 20px rgba(88,86,214,0.25)}
-        .step-desc{margin-top:1rem;font-size:0.8rem;color:var(--text-secondary);max-width:160px}
-        .flow-arrow{flex-shrink:0;color:var(--text-secondary);opacity:0.4}
+    /* Grid Layouts */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: auto auto;
+      gap: 20px;
+    }
+    .col-span-1 { grid-column: span 1; }
+    .col-span-2 { grid-column: span 2; }
+    .row-span-2 { grid-row: span 2; }
 
-        /* Features Grid */
-        .features-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:1.5rem;margin-bottom:5rem}
-        .feature-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:2rem;transition:border-color 0.2s}
-        .feature-card:hover{border-color:var(--accent-color)}
-        .f-icon{width:48px;height:48px;border-radius:12px;background:var(--accent-subtle);color:var(--accent-color);display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem}
-        .f-title{font-size:1.25rem;font-weight:700;margin-bottom:0.75rem}
-        .f-text{font-size:0.95rem;color:var(--text-secondary);line-height:1.6}
-        .tag-row{display:flex;gap:0.5rem;margin-top:1.5rem;flex-wrap:wrap}
-        .tag{font-size:0.7rem;padding:0.2rem 0.6rem;background:var(--bg-tertiary);border-radius:4px;color:var(--text-secondary);font-weight:600;text-transform:uppercase}
+    /* Visualizations */
+    .stat-row { display: flex; align-items: baseline; gap: 4px; }
+    .stat-num { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text-primary); line-height: 1; }
+    .stat-unit { font-size: 0.875rem; font-weight: 600; color: var(--text-secondary); }
+    
+    /* Architecture Diagram */
+    .arch-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 3rem 0;
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      position: relative;
+      height: 180px;
+    }
+    .arch-node {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      box-shadow: var(--shadow-md);
+      width: 110px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .arch-node strong { display: block; font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; }
+    .arch-node svg { color: var(--text-primary); }
+    .arch-line {
+      height: 2px;
+      background: var(--border-color);
+      flex: 1;
+      min-width: 40px;
+      position: relative;
+    }
+    .arch-line::after {
+      content: '';
+      position: absolute;
+      top: -3px; right: 0;
+      width: 0; height: 0;
+      border-top: 4px solid transparent;
+      border-bottom: 4px solid transparent;
+      border-left: 6px solid var(--border-color);
+    }
+    .arch-block-group {
+      border: 2px dashed var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 30px 40px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      position: relative;
+      background: var(--bg-tertiary);
+    }
+    .arch-label {
+      position: absolute;
+      top: -10px; left: 20px;
+      background: var(--bg-tertiary);
+      padding: 0 8px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
 
-        /* Performance Dashboard */
-        .dashboard-layout{display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;margin-bottom:5rem}
-        .chart-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:2rem}
-        .chart-title{font-size:1.1rem;font-weight:700;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center}
-        .bar-row{margin-bottom:1.25rem}
-        .bar-label{display:flex;justify-content:space-between;font-size:0.85rem;margin-bottom:0.5rem;font-weight:500}
-        .bar-bg{height:10px;background:var(--bg-tertiary);border-radius:5px;overflow:hidden;position:relative}
-        .bar-fill{height:100%;border-radius:5px;background:var(--science-blue);width:0;transition:width 1s cubic-bezier(0.22, 1, 0.36, 1)}
-        .bar-fill.purple{background:var(--science-purple)}
-        .bar-fill.teal{background:var(--science-teal)}
-        .metric-box{background:var(--bg-tertiary);border-radius:var(--radius-md);padding:1.5rem;text-align:center;margin-bottom:1rem}
-        .metric-score{font-size:2.5rem;font-weight:800;color:var(--text-primary);line-height:1}
-        .metric-name{font-size:0.8rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em;margin-top:0.5rem}
+    /* Progress Bars */
+    .progress-track { background: var(--bg-tertiary); height: 6px; border-radius: 4px; overflow: hidden; margin-top: 6px; }
+    .progress-fill { height: 100%; border-radius: 4px; background: var(--accent-color); }
 
-        /* Playground */
-        .playground-section{background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-xl);overflow:hidden;margin-bottom:5rem;box-shadow:var(--shadow-lg)}
-        .pg-header{background:var(--bg-tertiary);padding:0.75rem 1.5rem;border-bottom:1px solid var(--border-color);display:flex;align-items:center;gap:0.75rem}
-        .pg-dot{width:10px;height:10px;border-radius:50%;background:var(--text-secondary);opacity:0.3}
-        .pg-dot.red{background:var(--error-color)}
-        .pg-dot.yellow{background:var(--warning-color)}
-        .pg-dot.green{background:var(--success-color)}
-        .pg-title{font-size:0.8rem;font-weight:600;color:var(--text-secondary);font-family:monospace}
-        .pg-body{padding:2rem;display:grid;grid-template-columns:1fr auto 1fr;gap:2rem;align-items:start}
-        .pg-col textarea{width:100%;min-height:150px;background:transparent;border:none;resize:none;font-family:monospace;font-size:0.95rem;color:var(--text-primary);outline:none;line-height:1.6}
-        .pg-arrow{align-self:center;color:var(--accent-color);animation: pulse 2s infinite}
-        .output-highlight{background:rgba(48,209,88,0.1);border:1px solid rgba(48,209,88,0.2);border-radius:var(--radius-md);padding:1rem}
-        
-        @keyframes pulse {
-            0% { transform: translateX(0); opacity: 0.6; }
-            50% { transform: translateX(4px); opacity: 1; }
-            100% { transform: translateX(0); opacity: 0.6; }
-        }
+    /* Tables */
+    .table-wrap { overflow-x: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width: 600px; }
+    th { background: var(--bg-tertiary); text-align: left; padding: 12px 16px; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; color: var(--text-secondary); }
+    td { padding: 14px 16px; border-top: 1px solid var(--border-color); color: var(--text-primary); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--bg-tertiary); }
 
-        /* Footer */
-        footer{border-top:1px solid var(--border-color);padding:4rem 0;text-align:center;background:var(--bg-secondary)}
-        .footer-logo{font-weight:800;font-size:1.5rem;margin-bottom:1rem;display:inline-block}
-        .footer-links a{color:var(--text-secondary);text-decoration:none;margin:0 0.75rem;font-size:0.9rem;transition:color 0.2s}
-        .footer-links a:hover{color:var(--accent-color)}
-        .tech-pill{display:inline-block;padding:0.4rem 1rem;background:var(--bg-tertiary);border-radius:100px;font-size:0.8rem;color:var(--text-secondary);margin:0.25rem;border:1px solid var(--border-color)}
+    /* Code Block */
+    .code-block {
+      background: #1e1e1e;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+    }
+    .code-header {
+      background: rgba(255,255,255,0.05);
+      padding: 10px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex; justify-content: space-between; align-items: center;
+      color: #888; font-size: 0.75rem;
+    }
+    .code-content { padding: 16px; color: #d4d4d4; line-height: 1.6; overflow-x: auto; }
+    .c-purple { color: #c586c0; }
+    .c-blue { color: #569cd6; }
+    .c-orange { color: #ce9178; }
+    .c-green { color: #6a9955; }
+    .c-yellow { color: #dcdcaa; }
 
-        /* Responsive */
-        @media (max-width: 900px) {
-            .dashboard-layout{grid-template-columns:1fr}
-            .pipeline-flow{flex-direction:column}
-            .flow-arrow{transform:rotate(90deg);margin:0.5rem 0}
-            .pg-body{grid-template-columns:1fr}
-            .pg-arrow{transform:rotate(90deg);margin:1rem auto}
-        }
-        @media (max-width: 600px) {
-            .hero h1{font-size:2.2rem}
-            .cta-group{flex-direction:column}
-            .step-box{width:100%}
-        }
-    </style>
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .bento-grid { grid-template-columns: repeat(2, 1fr); }
+      .col-span-2 { grid-column: span 2; }
+    }
+    @media (max-width: 768px) {
+      .bento-grid { grid-template-columns: 1fr; }
+      .col-span-1, .col-span-2, .row-span-2 { grid-column: span 1; }
+      .arch-diagram { flex-direction: column; height: auto; gap: 20px; }
+      .arch-line { width: 2px; height: 30px; min-width: auto; }
+      .arch-line::after { top: auto; bottom: -4px; right: -3px; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 6px solid var(--border-color); border-left: none; }
+      .arch-block-group { flex-direction: column; width: 100%; }
+    }
+  </style>
 </head>
-<body>
+<body data-theme="light">
 
-    <nav>
-        <div class="container flex justify-between items-center">
-            <a href="../../index.html" class="back-link">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                Back to Explorer
-            </a>
-            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle Dark Mode">
-                <!-- SVG filled by JS -->
-            </button>
+  <!-- Header -->
+  <header>
+    <div class="container flex justify-between items-center" style="height: 100%;">
+      <div class="flex items-center gap-2">
+        <a href="../../index.html" class="btn btn-ghost" style="padding: 8px 12px;">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          <span class="text-sm font-bold">Back to Explorer</span>
+        </a>
+        <div class="badge badge-outline">External — seduerr91</div>
+      </div>
+      
+      <button id="theme-toggle" class="btn btn-ghost btn-icon" aria-label="Toggle Theme">
+        <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="container" style="padding-top: 80px; padding-bottom: 60px;">
+      <div class="flex flex-col items-center text-center">
+        <div class="mb-2">
+          <span class="badge badge-accent">🐾 NLP Project</span>
         </div>
-    </nav>
-
-    <header class="container hero">
-        <div class="hero-bg"></div>
-        <span class="badge-external">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-            External — seduerr91
-        </span>
         <h1>Pawraphrase</h1>
-        <p>High-fidelity semantic paraphrasing using fine-tuned Transformer models. Generate diverse, context-aware text variations with state-of-the-art fluency.</p>
+        <p style="font-size: 1.25rem; max-width: 600px; margin-bottom: 2.5rem;">
+          Fine-tuning <span class="font-bold text-accent">Google T5-Base</span> on the PAWS dataset to achieve high-fidelity semantic paraphrasing and style transfer.
+        </p>
         
-        <div class="cta-group">
-            <a href="#" class="btn btn-primary">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
-                View Repository
-            </a>
-            <a href="#" class="btn btn-secondary">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                Documentation
-            </a>
+        <div class="flex gap-2">
+          <a href="https://github.com/seduerr91/pawraphrase_public" target="_blank" class="btn btn-primary">
+            <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            View Repository
+          </a>
+          <button class="btn btn-ghost" onclick="document.getElementById('architecture').scrollIntoView({behavior:'smooth'})">
+            How it works
+          </button>
         </div>
-    </header>
+      </div>
 
-    <main class="container">
-        
-        <!-- Stats Row -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon-wrap">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-                </div>
-                <div class="stat-val">92.4%</div>
-                <div class="stat-label">BLEU-4 Score</div>
-                <div class="stat-trend">↑ 4.2% vs T5-Base</div>
+      <!-- Interactive T5 Architecture Diagram -->
+      <div class="card mt-4" id="architecture" style="border: 1px solid var(--border-color); background: var(--bg-tertiary);">
+        <div class="flex flex-col items-center">
+          <h3 class="text-sm font-bold text-secondary uppercase tracking-wider" style="color: var(--text-secondary); margin-bottom: 2rem;">Model Architecture Flow</h3>
+          <div class="arch-diagram">
+            
+            <!-- Input Node -->
+            <div class="arch-node">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              <strong>Input</strong>
+              <span>"The dog barks"</span>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon-wrap">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+
+            <div class="arch-line"></div>
+
+            <!-- T5 Block -->
+            <div class="arch-block-group">
+              <span class="arch-label">T5-Base Model</span>
+              
+              <!-- Encoder -->
+              <div class="flex flex-col items-center gap-1">
+                <div class="arch-node" style="width: 80px; padding: 8px;">
+                  <strong style="color: var(--accent-color);">Encoder</strong>
+                  <div class="flex gap-1">
+                    <div style="width:6px; height:6px; border-radius:50%; background:var(--text-secondary);"></div>
+                    <div style="width:6px; height:6px; border-radius:50%; background:var(--text-secondary);"></div>
+                    <div style="width:6px; height:6px; border-radius:50%; background:var(--accent-color);"></div>
+                  </div>
                 </div>
-                <div class="stat-val">45ms</div>
-                <div class="stat-label">Avg Inference Time</div>
-                <div class="stat-trend">Optimized CPU</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon-wrap">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+              </div>
+
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--border-color)" stroke-width="2"><path d="M7 10l5 5 5-5"/></svg>
+
+              <!-- Decoder -->
+              <div class="flex flex-col items-center gap-1">
+                <div class="arch-node" style="width: 80px; padding: 8px;">
+                  <strong style="color: var(--info-color);">Decoder</strong>
+                  <div class="flex gap-1">
+                    <div style="width:6px; height:6px; border-radius:50%; background:var(--info-color);"></div>
+                    <div style="width:6px; height:6px; border-radius:50%; background:var(--text-secondary);"></div>
+                    <div style="width:6px; height:6px; border-radius:50%; background:var(--text-secondary);"></div>
+                  </div>
                 </div>
-                <div class="stat-val">220M</div>
-                <div class="stat-label">Model Parameters</div>
-                <div class="stat-trend">Lightweight Arch</div>
+              </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon-wrap">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                </div>
-                <div class="stat-val">50k+</div>
-                <div class="stat-label">Training Samples</div>
-                <div class="stat-trend">PAWS Dataset</div>
+
+            <div class="arch-line"></div>
+
+            <!-- Output Node -->
+            <div class="arch-node" style="border-color: var(--accent-color);">
+              <svg width="24" height="24" fill="none" stroke="var(--accent-color)" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              <strong style="color: var(--accent-color);">Output</strong>
+              <span class="text-mono">"The canine yelps"</span>
             </div>
+
+          </div>
         </div>
+      </div>
+    </section>
 
-        <!-- Architecture Diagram -->
-        <section>
-            <div class="section-header">
-                <h2 class="section-title">Model Architecture</h2>
-                <p class="section-desc">Built upon a Transformer encoder-decoder backbone, optimized for semantic preservation and fluency.</p>
+    <!-- Bento Stats Grid -->
+    <section class="container mb-4">
+      <div class="bento-grid">
+        <!-- Primary Stat Card -->
+        <div class="card col-span-2" style="background: linear-gradient(160deg, var(--bg-card) 0%, var(--bg-tertiary) 100%);">
+          <div class="flex justify-between items-start">
+            <div>
+              <h3>Model Configuration</h3>
+              <p class="text-sm">Google T5 (Text-to-Text Transfer Transformer)</p>
+            </div>
+            <div class="badge badge-accent">Base</div>
+          </div>
+          <div style="margin-top: 1.5rem;">
+            <div class="flex justify-between text-xs font-bold mb-1">
+              <span>Parameters</span>
+              <span class="text-mono">220M</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" style="width: 22%;"></div>
             </div>
             
-            <div class="arch-container">
-                <div class="arch-bg-pattern"></div>
-                <div class="pipeline-flow">
-                    <div class="flow-step">
-                        <div class="step-box">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:0.5rem"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                            Input Sequence
-                        </div>
-                        <div class="step-desc">Tokenized source text</div>
-                    </div>
-                    
-                    <div class="flow-arrow">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                    </div>
+            <div class="flex justify-between text-xs font-bold mb-1 mt-3">
+              <span>Layers</span>
+              <span class="text-mono">12</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" style="width: 60%; background: var(--info-color);"></div>
+            </div>
+          </div>
+        </div>
 
-                    <div class="flow-step">
-                        <div class="step-box">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:0.5rem"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-                            Encoder Stack
-                        </div>
-                        <div class="step-desc">Self-attention layers</div>
-                    </div>
+        <!-- Metrics -->
+        <div class="card">
+          <div class="flex items-center gap-2 mb-1">
+            <div style="width: 32px; height: 32px; background: rgba(52, 199, 89, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--success-color);">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <span class="text-sm text-secondary">Accuracy</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-num">89.2</span><span class="stat-unit">%</span>
+          </div>
+        </div>
 
-                    <div class="flow-arrow">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                    </div>
+        <div class="card">
+           <div class="flex items-center gap-2 mb-1">
+            <div style="width: 32px; height: 32px; background: rgba(224, 100, 57, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--accent-color);">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <span class="text-sm text-secondary">Epochs</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-num">3</span><span class="stat-unit">iters</span>
+          </div>
+        </div>
 
-                    <div class="flow-step">
-                        <div class="step-box">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:0.5rem"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
-                            Decoder Stack
-                        </div>
-                        <div class="step-desc">Cross-attention generation</div>
-                    </div>
+        <!-- Dataset Details -->
+        <div class="card col-span-1 row-span-2 flex flex-col">
+          <div class="flex justify-between items-start mb-2">
+            <h3>Dataset</h3>
+            <svg width="20" height="20" fill="none" stroke="var(--text-secondary)" stroke-width="2" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          </div>
+          <div style="background: var(--bg-tertiary); padding: 12px; border-radius: var(--radius-sm); flex: 1;">
+            <p class="text-xs font-bold" style="margin-bottom: 0.5rem;">PAWS (Paraphrase Adversaries from Word Scrambling)</p>
+            <div class="flex justify-between text-xs mb-1">
+              <span>Train</span>
+              <span class="text-mono">49,401</span>
+            </div>
+             <div class="flex justify-between text-xs mb-1">
+              <span>Dev</span>
+              <span class="text-mono">8,000</span>
+            </div>
+             <div class="flex justify-between text-xs">
+              <span>Test</span>
+              <span class="text-mono">8,000</span>
+            </div>
+          </div>
+          <div class="mt-2 text-xs text-secondary">Designed to generate sentence pairs that share high lexical overlap but differ in meaning.</div>
+        </div>
 
-                    <div class="flow-arrow">
-                        <svg width="24" height="
+        <!-- Training Stats -->
+        <div class="card col-span-2">
+           <div class="flex justify-between items-center mb-4">
+            <h3>Training Loss Curve</h3>
+            <div class="flex gap-2">
+              <span class="text-xs flex items-center gap-1"><span style="width:8px;height:8px;background:var(--accent-color);border-radius:50%;"></span> Train</span>
+              <span class="text-xs flex items-center gap-1"><span style="width:8px;height:8px;background:var(--info-color);border-radius:50%;"></span> Val</span>
+            </div>
+          </div>
+          <!-- CSS-only Chart Simulation -->
+          <div style="height: 100px; display: flex; align-items: flex-end; gap: 8px; padding-top: 20px; position: relative;">
+            <!-- Y-Axis Grid lines -->
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 1px; background: var(--border-color); opacity: 0.5;"></div>
+            <div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--border-color); opacity: 0.5;"></div>
+            <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: var(--border-color); opacity: 0.5;"></div>
+            
+            <!-- Bars/Points -->
+            <div style="flex:1; background: var(--accent-color); height: 90%; opacity: 0.6; border-radius: 4px;"></div>
+            <div style="flex:1; background: var(--accent-color); height: 70%; opacity: 0.7; border-radius: 4px;"></div>
+            <div style="flex:1; background: var(--accent-color); height: 50%; opacity: 0.8; border-radius: 4px;"></div>
+            <div style="flex:1; background: var(--accent-color); height: 35%; opacity: 0.9; border-radius: 4px;"></div>
+            <div style="flex:1; background: var(--accent-color); height: 25%; opacity: 1; border-radius: 4px;"></div>
+            <div style="flex:1; background: var(--accent-color); height: 22%; opacity: 1; border-radius: 4px;"></div>
+            <div style="flex:1; background: var(--accent-color); height: 20%; opacity: 1; border-radius: 4px;"></div>
+          </div>
+        </div>
+        
+        <!-- Hardware Card -->
+        <div class="card col-span-1">
+           <h3>Hardware</h3>
+           <div class="flex items-center gap-2 mt-2">
+             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+             <span class="font-bold">1x GPU</span>
+           </div>
+           <p class="text-xs mt-1">~2 Hours</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Code & Evaluation Split -->
+    <section class="container mb-4">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+        
+        <!-- Code Snippet -->
+        <div class="card">
+          <h3>Implementing Fine-tuning</h3>
+          <p class="text-xs mb-2">Using Hugging Face <code>Trainer</code> API.</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span>train.py</span>
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </div>
+            <div class="code-content">
+              <div><span class="c-purple">from</span> transformers <span class="c-purple">import</span> T5ForConditionalGeneration</div>
+              <br>
+              <div><span class="c-green"># Load Pre-trained Base Model</span></div>
+              <div>model = T5ForConditionalGeneration.from_pretrained(</div>
+              <div style="padding-left: 20px;"><span class="c-orange">"t5-base"</span>,</div>
+              <div style="padding-left: 20px;">torch_dtype=torch.float16</div>
+              <div>)</div>
+              <br>
+              <div><span class="c-purple">class</span> <span class="c-yellow">PawsDataset</span>(Dataset):</div>
+              <div style="padding-left: 20px;"><span class="c-purple">def</span> <span class="c-blue">__init__</span>(self, data):</div>
+              <div style="padding-left: 40px;">self.data = data</div>
+              <br>
+              <div style="padding-left: 20px;"><span class="c-purple">def</span> <span class="c-blue">__len__</span>(self):</div>
+              <div style="padding-left: 40px;"><span class="c-purple">return</span> <span class="c-yellow">len</span>(self.data)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results Table -->
+        <div class="card">
+           <div class="flex justify-between items-center mb-2">
+             <h3>Evaluation Metrics</h3>
+             <span class="badge badge-outline">PAWS Dev</span>
+           </div>
+           <p class="text-xs text-secondary mb-2">Performance on semantic similarity.</p>
+           
+           <div class="table-wrap">
+             <table>
+               <thead>
+                 <tr>
+                   <th>Metric</th>
+                   <th>Score</th>
+                   <th style="text-align: right;">Trend</th>
+                 </tr>
+               </thead>
+               <tbody>
+                 <tr>
+                   <td>ROUGE-1</td>
+                   <td class="font-bold">0.85</td>
+                   <td style="text-align: right; color: var(--success-color);">↑ 2.1%</td>
+                 </tr>
+                 <tr>
+                   <td>ROUGE-2</td>
+                   <td class="font-bold">0.72</td>
+                   <td style="text-align: right; color: var(--success-color);">↑ 1.5%</td>
+                 </tr>
+                 <tr>
+                   <td>ROUGE-L</td>
+                   <td class="font-bold">0.81</td>
+                   <td style="text-align: right; color: var(--success-color);">↑ 1.8%</td>
+                 </tr>
+                 <tr>
+                   <td>BERTScore</td>
+                   <td class="font-bold">0.92</td>
+                   <td style="text-align: right; color: var(--text-secondary);">-</td>
+                 </tr>
+               </tbody>
+             </table>
+           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Inference Examples -->
+    <section class="container" style="padding-bottom: 80px;">
+      <div class="card">
+        <h3><span style="color: var(--accent-color);">03.</span> Inference Examples</h3>
+        <p class="text-sm mb-4">Live outputs from the fine-tuned model compared to ground truth references.</p>
+        
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 30%;">Source Sentence</th>
+                <th style="width: 25%;">Target Reference</th>
+                <th style="width: 35%;">Pawraphrase Prediction</th>
+                <th style="width: 10%;">Quality</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>The company is facing a major crisis today.</td>
+                <td>A major crisis is facing the company.</td>
+                <td class="text-mono">The company is encountering a significant crisis.</td>
+                <td><span class="badge badge-success">High</span></td>
+              </tr>
+              <tr>
+                <td>Dogs are known to be loyal animals.</td>
+                <td>Dogs are famous for their loyalty.</td>
+                <td class="text-mono">Dogs are recognized as loyal creatures.</td>
+                <td><span class="badge badge-success">High</span></td>
+              </tr>
+              <tr>
+                <td>She enjoys reading books at night.</td>
+                <td>She reads books in the evening.</td>
+                <td class="text-mono">She loves to read books during the night.</td>
+                <td><span class="badge badge-success">High</span></td>
+              </tr>
+              <tr>
+                <td>The quick brown fox jumps over the dog.</td>
+                <td>The fast brown fox leaps above the dog.</td>
+                 <td class="text-mono" style="color: var(--warning-color);">The quick brown fox jumps over the lazy dog.</td>
+                <td><span class="badge badge-warning">Hallucination</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer style="border-top: 1px solid var(--border-color); padding: 40px 0; background: var(--bg-secondary);">
+    <div class="container flex justify-between items-center flex-col gap-2" style="flex-direction: row;">
+      <div class="text-xs text-secondary">
+        © 2023 seduerr91 • Pawraphrase Public
+      </div>
+      <div class="flex gap-2">
+        <a href="#" class="text-xs text-secondary" style="text-decoration: none;">MIT License</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Theme Toggle Logic
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const sunIcon = document.querySelector('.sun-icon');
+    const moonIcon = document.querySelector('.moon-icon');
+    
+    function updateIcons(theme) {
+      if (theme === 'dark') {
+        sunIcon.style.display = 'block';
+        moonIcon.style.display = 'none';
+      } else {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'block';
+      }
+    }
+
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+      updateIcons(theme);
+    }
+
+    // Init
+    const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    setTheme(savedTheme);
+
+    themeToggleBtn.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    });
+  </script>
+</body>
+</html>
