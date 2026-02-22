@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cerebras × GitHub — Repo Visualization</title>
+  <link rel="stylesheet" href="../assets/styles.css" />
+  <style>
+    html, body { height: 100%; overflow: hidden; }
+    body { background: var(--bg-primary); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif; }
+
+    /* Slide Container */
+    .slides-container {
+      width: 100%;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 48px;
+      opacity: 0;
+      transform: translateX(80px);
+      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+    }
+    .slide.active {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: all;
+    }
+    .slide.prev {
+      opacity: 0;
+      transform: translateX(-80px);
+    }
+
+    /* Progress Bar */
+    .progress-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--bg-tertiary);
+      z-index: 100;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-color), var(--accent-hover));
+      transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Nav */
+    .slide-nav {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      z-index: 100;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 40px;
+      padding: 8px 20px;
+      box-shadow: var(--shadow-lg);
+    }
+    .slide-dots {
+      display: flex;
+      gap: 8px;
+    }
+    .slide-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border-color);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .slide-dot.active {
+      background: var(--accent-color);
+      width: 24px;
+      border-radius: 4px;
+    }
+    .nav-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px 8px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+    .nav-btn:hover {
+      color: var(--accent-color);
+      background: var(--accent-subtle);
+    }
+    .nav-btn:disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+    .nav-btn:disabled:hover {
+      color: var(--text-secondary);
+      background: none;
+    }
+
+    /* Header badge */
+    .slide-header {
+      position: fixed;
+      top: 16px;
+      left: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 100;
+    }
+    .slide-header img {
+      height: 22px;
+      width: auto;
+    }
+
+    /* Theme toggle */
+    .theme-btn {
+      position: fixed;
+      top: 16px;
+      right: 24px;
+      z-index: 100;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+    }
+    .theme-btn:hover {
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+    }
+    .theme-btn svg { width: 18px; height: 18px; }
+
+    /* Slide content styles */
+    .slide-eyebrow {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--accent-color);
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .slide h1 {
+      font-size: 56px;
+      font-weight: 700;
+      letter-spacing: -2px;
+      line-height: 1.1;
+      color: var(--text-primary);
+      text-align: center;
+      max-width: 900px;
+      margin-bottom: 20px;
+    }
+    .slide h2 {
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1.15;
+      color: var(--text-primary);
+      text-align: center;
+      max-width: 800px;
+      margin-bottom: 16px;
+    }
+    .slide p.subtitle {
+      font-size: 20px;
+      color: var(--text-secondary);
+      text-align: center;
+      max-width: 640px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .slide p.body {
+      font-size: 18px;
+      color: var(--text-secondary);
+      text-align: center;
+      max-width: 580px;
+      line-height: 1.7;
+    }
+
+    /* Accent text */
+    .accent { color: var(--accent-color); }
+    .gradient-text {
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-color) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Stat grid */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 32px;
+      max-width: 700px;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      text-align: center;
+    }
+    .stat-num {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--accent-color);
+      margin-bottom: 6px;
+    }
+    .stat-label {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    /* Pain points */
+    .pain-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 28px;
+      max-width: 700px;
+    }
+    .pain-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .pain-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+    .pain-text {
+      font-size: 15px;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+    .pain-text strong { display: block; margin-bottom: 2px; }
+    .pain-text span { color: var(--text-secondary); font-size: 13px; }
+
+    /* Flow diagram */
+    .flow {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-top: 36px;
+      max-width: 800px;
+    }
+    .flow-step {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px 20px;
+      text-align: center;
+      flex: 1;
+      min-width: 140px;
+    }
+    .flow-icon {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    .flow-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .flow-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .flow-arrow {
+      font-size: 24px;
+      color: var(--accent-color);
+      padding: 0 8px;
+      flex-shrink: 0;
+    }
+
+    /* Example cards */
+    .example-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 28px;
+      max-width: 780px;
+    }
+    .example-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      text-align: left;
+    }
+    .example-card .ex-type {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent-color);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .example-card .ex-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .example-card .ex-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Try it section */
+    .try-it {
+      width: 100%;
+      max-width: 640px;
+      margin-top: 24px;
+    }
+    .try-input-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .try-input-row input {
+      flex: 1;
+      padding: 14px 18px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+    .try-input-row input:focus {
+      border-color: var(--accent-color);
+    }
+    .try-input-row input::placeholder {
+      color: var(--text-secondary);
+    }
+    .try-btn {
+      padding: 14px 28px;
+      background: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .try-btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+    .try-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .try-status {
+      text-align: center;
+      font-size: 14px;
+      color: var(--text-secondary);
+      min-height: 24px;
+    }
+    .try-status.success { color: var(--success-color); font-weight: 600; }
+    .try-status.error { color: var(--error-color); }
+
+    /* QR section */
+    .qr-section {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      margin-top: 32px;
+      padding: 24px 32px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+    }
+    .qr-section img {
+      width: 120px;
+      height: 120px;
+      border-radius: 8px;
+    }
+    .qr-text {
+      text-align: left;
+    }
+    .qr-text h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+    .qr-text p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Big number animation */
+    .big-num {
+      font-size: 96px;
+      font-weight: 800;
+      color: var(--accent-color);
+      letter-spacing: -4px;
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+
+    /* Responsive */
+    @media (max-width: 700px) {
+      .slide h1 { font-size: 36px; }
+      .slide h2 { font-size: 28px; }
+      .slide p.subtitle { font-size: 16px; }
+      .stat-grid, .pain-grid, .example-grid { grid-template-columns: 1fr; }
+      .flow { flex-direction: column; }
+      .flow-arrow { transform: rotate(90deg); }
+      .slide { padding: 60px 24px; }
+      .qr-section { flex-direction: column; text-align: center; }
+      .qr-text { text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header Logos -->
+  <div class="slide-header">
+    <img src="../assets/logo-dark-mode.png" alt="Cerebras" id="cerebrasLogo" />
+    <span style="font-size:16px; color:var(--text-secondary); font-weight:300;">&times;</span>
+    <img src="../assets/GitHub_Invertocat_White_Clearspace.svg" alt="GitHub" id="githubLogo" />
+  </div>
+
+  <!-- Theme Toggle -->
+  <button class="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+    <svg id="sunIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="display:none">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+    </svg>
+    <svg id="moonIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+    </svg>
+  </button>
+
+  <!-- Progress Bar -->
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+  <!-- Slides -->
+  <div class="slides-container" id="slidesContainer">
+
+    <!-- SLIDE 1: Title -->
+    <div class="slide active" data-slide="0">
+      <div class="slide-eyebrow">Cerebras × GitHub</div>
+      <h1 class="gradient-text">Understand Any Repo in Seconds</h1>
+      <p class="subtitle">How AI-powered visualization turns complex codebases into instant understanding.</p>
+      <div style="margin-top: 16px; font-size: 14px; color: var(--text-secondary);">
+        Press <kbd style="padding: 3px 8px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 6px; font-size: 12px;">→</kbd> or swipe to navigate
+      </div>
+    </div>
+
+    <!-- SLIDE 2: The Problem -->
+    <div class="slide" data-slide="1">
+      <div class="slide-eyebrow">The Problem</div>
+      <h2>You need to build a feature.<br>Where do you even start?</h2>
+      <p class="body">Before writing a single line of code, you need to understand how others solved it — across multiple repos, languages, and architectures.</p>
+      <div class="pain-grid">
+        <div class="pain-card">
+          <div class="pain-icon">🔍</div>
+          <div class="pain-text">
+            <strong>Repo spelunking</strong>
+            <span>Jumping between files, reading READMEs, scanning code — for hours</span>
+          </div>
+        </div>
+        <div class="pain-card">
+          <div class="pain-icon">🧩</div>
+          <div class="pain-text">
+            <strong>Pattern matching</strong>
+            <span>How did they structure API routes? What ORM patterns work?</span>
+          </div>
+        </div>
+        <div class="pain-card">
+          <div class="pain-icon">⏳</div>
+          <div class="pain-text">
+            <strong>Context switching</strong>
+            <span>5 tabs, 3 repos, 2 docs sites — your brain can't hold it all</span>
+          </div>
+        </div>
+        <div class="pain-card">
+          <div class="pain-icon">📊</div>
+          <div class="pain-text">
+            <strong>No visual overview</strong>
+            <span>GitHub shows files, not architecture. You need the big picture.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: The Example -->
+    <div class="slide" data-slide="2">
+      <div class="slide-eyebrow">Example</div>
+      <h2>"Human Language → SQL"</h2>
+      <p class="subtitle">You want to build a natural language to SQL feature. You need to study how others do it.</p>
+      <div class="example-grid">
+        <div class="example-card">
+          <div class="ex-type">🧪 ML Pipeline</div>
+          <div class="ex-name">text-to-sql</div>
+          <div class="ex-desc">Schema linking, query generation, fine-tuning approaches</div>
+        </div>
+        <div class="example-card">
+          <div class="ex-type">🌐 API Service</div>
+          <div class="ex-name">sql-agent</div>
+          <div class="ex-desc">REST endpoints, LLM orchestration, query validation</div>
+        </div>
+        <div class="example-card">
+          <div class="ex-type">🎨 Frontend</div>
+          <div class="ex-name">query-builder-ui</div>
+          <div class="ex-desc">React components, natural language input, result tables</div>
+        </div>
+      </div>
+      <p class="body" style="margin-top: 24px;">Each repo is a different world. You need <strong style="color:var(--accent-color);">visual summaries</strong>, not file trees.</p>
+    </div>
+
+    <!-- SLIDE 4: The Solution -->
+    <div class="slide" data-slide="3">
+      <div class="slide-eyebrow">The Solution</div>
+      <h2 class="gradient-text">Visualize, Don't Browse</h2>
+      <p class="subtitle">Point at any GitHub repo. Get a beautiful, structured visual page — generated in seconds by Cerebras AI.</p>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-icon">📂</div>
+          <div class="flow-label">Pick a Repo</div>
+          <div class="flow-desc">Any public GitHub repo</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-icon">🔍</div>
+          <div class="flow-label">Analyze</div>
+          <div class="flow-desc">AI plans the page layout</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-icon">✨</div>
+          <div class="flow-label">Generate</div>
+          <div class="flow-desc">Full HTML page in one shot</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-icon">🚀</div>
+          <div class="flow-label">Deploy</div>
+          <div class="flow-desc">Auto-push to GitHub Pages</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: Speed -->
+    <div class="slide" data-slide="4">
+      <div class="slide-eyebrow">Why Cerebras</div>
+      <div class="big-num">800+ tok/s</div>
+      <h2>Fast enough to generate<br>while you watch</h2>
+      <p class="subtitle">Cerebras inference makes it possible to generate entire visual pages — not summaries, not bullet points — full, styled HTML in real time.</p>
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-num">~5s</div>
+          <div class="stat-label">Per page generation</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">30KB</div>
+          <div class="stat-label">Rich HTML output</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">2</div>
+          <div class="stat-label">LLM calls total</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: Live Examples -->
+    <div class="slide" data-slide="5">
+      <div class="slide-eyebrow">Already Generated</div>
+      <h2>See It in Action</h2>
+      <p class="subtitle">These pages were generated from real repos — each one auto-detected and visually templated.</p>
+      <div class="example-grid" id="liveExamples">
+        <div style="color: var(--text-secondary); font-size: 14px; grid-column: 1/-1; text-align: center; padding: 20px;">Loading generated pages...</div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: Try It -->
+    <div class="slide" data-slide="6">
+      <div class="slide-eyebrow">Your Turn</div>
+      <h2>Try It Right Now</h2>
+      <p class="subtitle">Enter any public GitHub repo. We'll generate a visual page live.</p>
+      <div class="try-it">
+        <div class="try-input-row">
+          <input type="text" id="repoInput" placeholder="owner/repo (e.g. fastapi/fastapi)" onkeydown="if(event.key==='Enter') generateLive()" />
+          <button class="try-btn" id="generateBtn" onclick="generateLive()">Generate →</button>
+        </div>
+        <div class="try-status" id="tryStatus"></div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: Get Started -->
+    <div class="slide" data-slide="7">
+      <div class="slide-eyebrow">Get Started</div>
+      <h2>Take It Home</h2>
+      <p class="subtitle">Run this tool locally. Generate visual pages for any repo — yours, your team's, or anyone's.</p>
+      <div class="qr-section">
+        <img src="../assets/qr-repo.svg" alt="Scan to download" />
+        <div class="qr-text">
+          <h3>Scan to Get the Starter Code</h3>
+          <p>Download the repo, add your Cerebras API key, and start generating. Free to use.</p>
+          <a href="https://github.com/sebastiand-cerebras/meta-repo" target="_blank" rel="noopener" style="display: inline-block; margin-top: 10px; color: var(--accent-color); font-weight: 600; font-size: 14px; text-decoration: none;">github.com/sebastiand-cerebras/meta-repo →</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Navigation -->
+  <div class="slide-nav">
+    <button class="nav-btn" id="prevBtn" onclick="go(-1)" disabled>‹</button>
+    <div class="slide-dots" id="slideDots"></div>
+    <button class="nav-btn" id="nextBtn" onclick="go(1)">›</button>
+  </div>
+
+  <script>
+    // ============================================================
+    // Slide Engine
+    // ============================================================
+    let current = 0;
+    const slides = document.querySelectorAll('.slide');
+    const total = slides.length;
+
+    function init() {
+      // Build dots
+      const dotsEl = document.getElementById('slideDots');
+      for (let i = 0; i < total; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'slide-dot' + (i === 0 ? ' active' : '');
+        dot.onclick = () => goTo(i);
+        dotsEl.appendChild(dot);
+      }
+      updateProgress();
+      loadExamples();
+    }
+
+    function goTo(idx) {
+      if (idx < 0 || idx >= total || idx === current) return;
+      const dir = idx > current ? 1 : -1;
+
+      slides[current].classList.remove('active');
+      slides[current].classList.add(dir > 0 ? 'prev' : '');
+      slides[current].classList.remove(dir > 0 ? '' : 'prev');
+
+      // Reset non-active slides
+      setTimeout(() => {
+        slides.forEach((s, i) => {
+          if (i !== idx) {
+            s.classList.remove('active', 'prev');
+            s.style.transform = i < idx ? 'translateX(-80px)' : 'translateX(80px)';
+          }
+        });
+      }, 50);
+
+      current = idx;
+      slides[current].style.transform = '';
+      slides[current].classList.remove('prev');
+      slides[current].classList.add('active');
+
+      updateProgress();
+    }
+
+    function go(dir) { goTo(current + dir); }
+
+    function updateProgress() {
+      document.getElementById('progressFill').style.width = `${((current + 1) / total) * 100}%`;
+      document.getElementById('prevBtn').disabled = current === 0;
+      document.getElementById('nextBtn').disabled = current === total - 1;
+
+      document.querySelectorAll('.slide-dot').forEach((d, i) => {
+        d.classList.toggle('active', i === current);
+      });
+    }
+
+    // Keyboard nav
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(1); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+      if (e.key === 'Home') { e.preventDefault(); goTo(0); }
+      if (e.key === 'End') { e.preventDefault(); goTo(total - 1); }
+    });
+
+    // Touch/swipe
+    let touchStartX = 0;
+    document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+    document.addEventListener('touchend', (e) => {
+      const diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 60) go(diff > 0 ? 1 : -1);
+    });
+
+    // ============================================================
+    // Theme
+    // ============================================================
+    function toggleTheme() {
+      const cur = document.documentElement.getAttribute('data-theme');
+      const next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('slides-theme', next);
+      updateLogos(next);
+    }
+
+    function updateLogos(theme) {
+      document.getElementById('cerebrasLogo').src = theme === 'dark'
+        ? '../assets/logo-dark-mode.png' : '../assets/logo-light-mode.png';
+      document.getElementById('githubLogo').src = theme === 'dark'
+        ? '../assets/GitHub_Invertocat_White_Clearspace.svg' : '../assets/GitHub_Invertocat_Black_Clearspace.svg';
+      document.getElementById('sunIcon').style.display = theme === 'dark' ? 'none' : 'block';
+      document.getElementById('moonIcon').style.display = theme === 'dark' ? 'block' : 'none';
+    }
+
+    // Restore saved theme
+    const savedTheme = localStorage.getItem('slides-theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateLogos(savedTheme);
+
+    // ============================================================
+    // Load live examples from manifest
+    // ============================================================
+    async function loadExamples() {
+      try {
+        const res = await fetch('../repos/manifest.json?_=' + Date.now());
+        if (!res.ok) return;
+        const data = await res.json();
+        const entries = (data.generated || []).slice(0, 6);
+        const grid = document.getElementById('liveExamples');
+        const TYPE_ICONS = { ml:'🧪', api:'🌐', cli:'💻', frontend:'🎨', library:'📦', infra:'☁️', monorepo:'🗂️', generic:'📄' };
+
+        if (!entries.length) {
+          grid.innerHTML = '<div style="color: var(--text-secondary); grid-column: 1/-1; text-align: center; padding: 20px;">No pages generated yet. Try the next slide!</div>';
+          return;
+        }
+
+        grid.innerHTML = entries.map(e => `
+          <a href="../${e.path || `repos/${e.repo}/`}" target="_blank" rel="noopener" class="example-card" style="text-decoration:none; cursor:pointer; transition: all 0.2s ease;">
+            <div class="ex-type">${TYPE_ICONS[e.type] || '📄'} ${e.type || 'project'}</div>
+            <div class="ex-name">${e.repo}</div>
+            <div class="ex-desc">${e.owner} · Click to view →</div>
+          </a>`).join('');
+      } catch {
+        document.getElementById('liveExamples').innerHTML = '<div style="color:var(--text-secondary);grid-column:1/-1;text-align:center">Could not load examples</div>';
+      }
+    }
+
+    // ============================================================
+    // Live generation (connects to local server)
+    // ============================================================
+    async function generateLive() {
+      const input = document.getElementById('repoInput');
+      const repo = input.value.trim();
+      const status = document.getElementById('tryStatus');
+      const btn = document.getElementById('generateBtn');
+
+      if (!repo || !repo.includes('/')) {
+        status.className = 'try-status error';
+        status.textContent = 'Enter a valid owner/repo (e.g. fastapi/fastapi)';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Generating…';
+      status.className = 'try-status';
+      status.textContent = 'Starting generation…';
+
+      try {
+        const startRes = await fetch('http://localhost:3200/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ repos: [repo] })
+        });
+
+        if (!startRes.ok) {
+          const err = await startRes.json().catch(() => ({}));
+          throw new Error(err.error || `Server error ${startRes.status}`);
+        }
+
+        const { jobId } = await startRes.json();
+        status.textContent = 'Analyzing repository…';
+
+        // Poll
+        let logIdx = 0;
+        while (true) {
+          await new Promise(r => setTimeout(r, 2000));
+          const poll = await fetch(`http://localhost:3200/api/jobs/${jobId}?since=${logIdx}`);
+          const job = await poll.json();
+
+          // Show latest meaningful log
+          for (const entry of job.logs) {
+            if (entry.message.includes('Step 1')) status.textContent = '🔍 Analyzing repository…';
+            else if (entry.message.includes('Step 2')) status.textContent = '✨ Generating visual page…';
+            else if (entry.message.includes('Committing')) status.textContent = '🚀 Pushing to GitHub…';
+            else if (entry.message.includes('Written')) {
+              const m = entry.message.match(/Written:.*\((.+)\)/);
+              status.textContent = `📄 Page generated${m ? ' — ' + m[1] : ''}`;
+            }
+          }
+          logIdx = job.totalLogs;
+
+          if (job.status === 'success') {
+            status.className = 'try-status success';
+            status.textContent = '✅ Done! Page generated and deployed. Check the examples slide!';
+            loadExamples();
+            break;
+          } else if (job.status === 'error') {
+            throw new Error('Generation failed — check server logs');
+          }
+        }
+      } catch (err) {
+        status.className = 'try-status error';
+        status.textContent = `❌ ${err.message}. Is the local server running on port 3200?`;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Generate →';
+      }
+    }
+
+    // ============================================================
+    // Init
+    // ============================================================
+    init();
+  </script>
+</body>
+</html>
