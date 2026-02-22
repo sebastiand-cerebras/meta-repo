@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAI Cookbook | zhenweig-cerebras</title>
+    <style>
+        :root {
+            --bg-primary:#f5f5f7; --bg-secondary:#ffffff; --bg-tertiary:#f0f0f2; --bg-card:#ffffff;
+            --text-primary:rgb(43,25,16); --text-secondary:#86868b; --border-color:rgba(0,0,0,0.08);
+            --accent-color:rgb(224,100,57); --accent-hover:rgb(200,85,45); --accent-subtle:rgba(224,100,57,0.1);
+            --success-color:#34c759; --warning-color:#ff9500; --error-color:#ff3b30; --info-color:#007aff;
+            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.05);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg:0 8px 32px rgba(0,0,0,0.12);
+            --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-xl:24px;
+            /* Custom Visual Template Colors */
+            --science-dark: #0f172a;
+            --science-indigo: #312e81;
+            --science-teal: #0d9488;
+            --science-cyan: #22d3ee;
+            --science-purple: #a855f7;
+        }
+        [data-theme="dark"] {
+            --bg-primary:#000000; --bg-secondary:#1c1c1e; --bg-tertiary:#2c2c2e; --bg-card:#1c1c1e;
+            --text-primary:#f5f5f7; --text-secondary:#86868b; --border-color:rgba(255,255,255,0.1);
+            --accent-color:rgb(224,100,57); --accent-hover:rgb(240,115,70); --accent-subtle:rgba(224,100,57,0.15);
+            --success-color:#30d158; --warning-color:#ff9f0a; --error-color:#ff453a; --info-color:#0a84ff;
+            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.3);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.4),0 2px 4px -1px rgba(0,0,0,0.2);
+            --shadow-lg:0 8px 32px rgba(0,0,0,0.5);
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+        body{background:var(--bg-primary);color:var(--text-primary);min-height:100vh;transition:background .3s,color .3s; overflow-x: hidden;}
+
+        /* Utilities */
+        a { text-decoration: none; color: var(--info-color); transition: color 0.2s; }
+        a:hover { color: var(--accent-color); }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .flex-center { display: flex; align-items: center; justify-content: center; }
+        .grid { display: grid; gap: 24px; }
+        .text-gradient {
+            background: linear-gradient(135deg, var(--science-cyan), var(--science-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        [data-theme="light"] .text-gradient {
+            background: linear-gradient(135deg, var(--info-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Navigation */
+        nav { padding: 20px 0; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; background: rgba(var(--bg-secondary), 0.8); }
+        .nav-left a { color: var(--text-secondary); font-weight: 500; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; }
+        .nav-left a:hover { color: var(--text-primary); }
+        .theme-toggle { background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); padding: 8px 12px; border-radius: var(--radius-sm); cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; transition: all 0.2s; }
+        .theme-toggle:hover { background: var(--border-color); }
+
+        /* Hero Section */
+        .hero { position: relative; min-height: 80vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 80px 20px; overflow: hidden; }
+        .hero-bg {
+            position: absolute; inset: 0; z-index: -1;
+            background: radial-gradient(circle at 50% 50%, #1e1b4b 0%, #000000 100%);
+            opacity: 0.8;
+        }
+        [data-theme="light"] .hero-bg {
+            background: radial-gradient(circle at 50% 50%, #e0e7ff 0%, #f5f5f7 100%);
+            opacity: 0.5;
+        }
+        .particle {
+            position: absolute; border-radius: 50%; background: var(--science-cyan); opacity: 0.1; filter: blur(20px); animation: float 10s infinite ease-in-out;
+        }
+        @keyframes float { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(20px, -40px); } }
+        
+        .hero-content { position: relative; z-index: 2; max-width: 800px; }
+        .hero-title { font-size: 3.5rem; font-weight: 800; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 20px; }
+        .hero-subtitle { font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 32px; line-height: 1.6; }
+        
+        .badge-external {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(255, 149, 0, 0.15); color: var(--warning-color);
+            padding: 6px 16px; border-radius: 50px; font-weight: 600; font-size: 0.85rem;
+            border: 1px solid rgba(255, 149, 0, 0.3); margin-bottom: 24px;
+            animation: pulse-glow 2s infinite;
+        }
+        @keyframes pulse-glow { 0% { box-shadow: 0 0 0 0 rgba(255,149,0,0.4); } 70% { box-shadow: 0 0 0 10px rgba(255,149,0,0); } 100% { box-shadow: 0 0 0 0 rgba(255,149,0,0); } }
+
+        .terminal-window {
+            margin-top: 40px; background: #1e1e1e; border-radius: var(--radius-md); text-align: left;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid #333;
+            font-family: 'SF Mono', 'Fira Code', monospace; overflow: hidden;
+        }
+        .terminal-header { background: #2d2d2d; padding: 8px 16px; display: flex; gap: 6px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background: #ff5f56; } .dot.yellow { background: #ffbd2e; } .dot.green { background: #27c93f; }
+        .terminal-body { padding: 20px; color: #e0e0e0; font-size: 0.9rem; min-height: 100px; }
+        .cursor { display: inline-block; width: 8px; height: 16px; background: var(--science-cyan); animation: blink 1s step-end infinite; vertical-align: middle; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* Stats Section */
+        .stats-section { padding: 60px 0; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; }
+        .stat-card {
+            background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 32px;
+            border-radius: var(--radius-lg); text-align: center;
+            backdrop-filter: blur(10px); transition: transform 0.3s;
+        }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+        .stat-icon { font-size: 2.5rem; margin-bottom: 16px; display: block; }
+        .stat-value { font-size: 2.5rem; font-weight: 700; margin-bottom: 8px; display: block; }
+        .stat-label { color: var(--text-secondary); font-size: 1rem; }
+
+        /* Pipeline Flow */
+        .pipeline-section { padding: 60px 0; overflow: hidden; }
+        .pipeline-container {
+            display: flex; gap: 0; overflow-x: auto; padding: 40px 0;
+            scrollbar-width: none;
+        }
+        .pipeline-container::-webkit-scrollbar { display: none; }
+        .pipeline-step {
+            min-width: 200px; background: var(--bg-card); border: 1px solid var(--border-color);
+            padding: 24px; border-radius: var(--radius-md); position: relative;
+            flex-shrink: 0; cursor: help; transition: all 0.3s;
+        }
+        .pipeline-step:hover { background: var(--bg-tertiary); border-color: var(--info-color); }
+        .pipeline-step::after {
+            content: ''; position: absolute; right: -20px; top: 50%; transform: translateY(-50%);
+            width: 20px; height: 2px; background: var(--border-color);
+            z-index: 0;
+        }
+        .pipeline-step:last-child::after { display: none; }
+        .step-title { font-weight: 600; margin-bottom: 8px; color: var(--text-primary); }
+        .step-desc { font-size: 0.8rem; color: var(--text-secondary); }
+        
+        /* Tooltip on hover */
+        .pipeline-step .tooltip {
+            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(10px);
+            background: var(--text-primary); color: var(--bg-primary); padding: 8px 12px;
+            border-radius: var(--radius-sm); font-size: 0.75rem; white-space: nowrap;
+            opacity: 0; pointer-events: none; transition: all 0.2s; z-index: 10;
+        }
+        .pipeline-step:hover .tooltip { opacity: 1; transform: translateX(-50%) translateY(-8px); }
+
+        /* Architecture Spotlight (Bento Grid) */
+        .architecture-section { padding: 80px 0; }
+        .bento-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 300px);
+            gap: 24px;
+        }
+        .bento-card {
+            background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg);
+            overflow: hidden; position: relative; display: flex; flex-direction: column;
+        }
+        .bento-card.large { grid-column: span 2; }
+        .bento-card.tall { grid-row: span 2; }
+        .card-padding { padding: 24px; }
+        .card-header { margin-bottom: 16px; }
+        .card-title { font-size: 1.2rem; font-weight: 700; }
+        .card-subtitle { color: var(--text-secondary); font-size: 0.9rem; }
+        
+        /* Code Block Background */
+        .code-bg {
+            background: #1e1e1e; color: #d4d4d4; padding: 20px; font-family: 'SF Mono', monospace;
+            font-size: 0.8rem; overflow: hidden; position: absolute; inset: 0; z-index: 1; opacity: 0.6;
+        }
+        .code-overlay { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 24px; background: linear-gradient(to top, var(--bg-card) 10%, transparent); }
+        
+        .tok-kw { color: #569cd6; } .tok-str { color: #ce9178; } .tok-func { color: #dcdcaa; }
+
+        /* Visual Diagram Placeholder */
+        .diagram-container {
+            flex: 1; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary);
+            position: relative; overflow: hidden;
+        }
+        .node-network { display: grid; grid-template-columns: repeat(3, 40px); gap: 30px; }
+        .node { width: 40px; height: 40px; border-radius: 50%; background: var(--bg-card); border: 2px solid var(--science-purple); display: flex; align-items: center; justify-content: center; font-size: 12px; position: relative; }
+        .node::before { content: ''; position: absolute; width: 100px; height: 2px; background: var(--border-color); right: 100%; top: 50%; z-index: -1; }
+        .node:first-child::before { display: none; }
+        
+        /* Data Patterns Table */
+        .data-section { padding: 60px 0; }
+        .data-table-wrapper {
+            background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border-color);
+            overflow: hidden; box-shadow: var(--shadow-md);
+        }
+        .data-table { width: 100%; border-collapse: collapse; text-align: left; }
+        .data-table th, .data-table td { padding: 16px 24px; border-bottom: 1px solid var(--border-color); }
+        .data-table th { background: var(--bg-tertiary); color: var(--text-secondary); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; }
+        .data-table tr:hover { background: var(--bg-tertiary); }
+        .vec-bar { height: 6px; width: 60%; background: var(--bg-tertiary); border-radius: 3px; overflow: hidden; }
+        .vec-fill { height: 100%; background: var(--science-teal); width: 0%; transition: width 0.5s ease; }
+
+        /* Evaluation Split */
+        .eval-section { padding: 80px 0; }
+        .eval-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+        .flowchart {
+            background: var(--bg-card); padding: 40px; border-radius: var(--radius-lg); border: 1px solid var(--border-color);
+            position: relative; height: 300px; display: flex; flex-direction: column; align-items: center;
+        }
+        .fc-node {
+            width: 140px; padding: 10px 0; background: var(--bg-tertiary); border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm); text-align: center; font-size: 0.9rem; margin-bottom: 30px;
+            position: relative;
+        }
+        .fc-node::after {
+            content: '▼'; position: absolute; bottom: -22px; left: 50%; transform: translateX(-50%);
+            font-size: 12px; color: var(--text-secondary);
+        }
+        .fc-node:last-child { margin-bottom: 0; }
+        .fc-node:last-child::after { display: none; }
+        .branch-container { display: flex; gap: 20px; position: relative; }
+        .branch-container::before {
+            content: ''; position: absolute; top: -15px; left: 20%; right: 20%; height: 2px;
+            border-top: 2px solid var(--border-color); border-radius: 2px;
+        }
+        .branch-line { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 2px; height: 15px; background: var(--border-color); }
+        .fc-node.pass { border-color: var(--success-color); color: var(--success-color); }
+        .fc-node.fail { border-color: var(--error-color); color: var(--error-color); }
+
+        /* Code Block */
+        .code-large {
+            background: #1e1e1e; color: #d4d4d4; padding: 24px; border-radius: var(--radius-lg); font-family: 'SF Mono', monospace;
+            font-size: 0.85rem; line-height: 1.6; overflow-x: auto;
+        }
+
+        /* Footer */
+        footer { background: var(--bg-secondary); padding: 60px 0; margin-top: 80px; border-top: 1px solid var(--border-color); text-align: center; }
+        .footer-links { display: flex; justify-content: center; gap: 24px; margin-top: 24px; }
+        .btn {
+            display: inline-block; padding: 12px 28px; border-radius: var(--radius-md); font-weight: 600;
+            transition: all 0.2s; cursor: pointer; text-decoration: none;
+        }
+        .btn-primary { background: var(--info-color); color: white; border: 1px solid var(--info-color); }
+        .btn-primary:hover { background: var(--accent-hover); }
+        .btn-outline { background: transparent; color: var(--text-primary); border: 1px solid var(--border-color); }
+        .btn-outline:hover { border-color: var(--text-primary); background: var(--bg-tertiary); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .bento-grid, .eval-grid { grid-template-columns: 1fr; }
+            .bento-card.large, .bento-card.tall { grid-column: auto; grid-row: auto; height: auto; min-height: 250px; }
+            .pipeline-container { flex-direction: column; }
+            .pipeline-step::after { display: none; }
+            .terminal-window { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <div class="container">
+        <nav>
+            <div class="nav-left">
+                <a href="../../index.html">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg>
+                    Back to Explorer
+                </a>
+            </div>
+            <button class="theme-toggle" id="themeToggle">
+                <span id="themeIcon">🌙</span> <span>Theme</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="hero-bg">
+            <div class="particle" style="top: 20%; left: 10%; width: 200px; height: 200px;"></div>
+            <div class="particle" style="bottom: 20%; right: 10%; width: 300px; height: 300px; background: var(--science-purple);"></div>
+            <div class="particle" style="top: 40%; left: 60%; width: 100px; height: 100px; background: var(--science-cyan);"></div>
+        </div>
+        
+        <div class="hero-content">
+            <div class="badge-external">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                External — zhenweig-cerebras
+            </div>
+            <h1 class="hero-title">The OpenAI Cookbook: <br><span class="text-gradient">Applied AI Engineering</span></h1>
+            <p class="hero-subtitle">Example code and guides for accomplishing common tasks with the OpenAI API. From fine-tuning to agentic workflows.</p>
+            
+            <div style="display: flex; gap: 16px; justify-content: center; margin-bottom: 40px;">
+                <a href="#examples" class="btn btn-primary">Explore Examples</a>
+                <a href="https://cookbook.openai.com" target="_blank" class="btn btn-outline">Original Site</a>
+            </div>
+
+            <!-- Terminal Animation -->
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                </div>
+                <div class="terminal-body">
+                    <span style="color: var(--science-cyan)">➜</span> <span style="color: #e0e0e0">openai-cookbook</span> <span style="color: #75715e">git:(main)</span> python run_assistant.py<br>
+                    <span id="typewriter"></span><span class="cursor"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="container stats-section">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-icon">🧪</span>
+                <span class="stat-value text-gradient">45+</span>
+                <span class="stat-label">Jupyter Notebooks</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">🤖</span>
+                <span class="stat-value text-gradient">12+</span>
+                <span class="stat-label">Advanced Agent Patterns</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">📊</span>
+                <span class="stat-value text-gradient">100%</span>
+                <span class="stat-label">API Coverage Strategies</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pipeline Flow -->
+    <div class="container pipeline-section">
+        <h2 style="text-align: center; margin-bottom: 40px; font-weight: 700;">LLM Application Lifecycle</h2>
+        <div class="pipeline-container">
+            <div class="pipeline-step">
+                <div class="step-title">Prompt Eng.</div>
+                <div class="step-desc">System messages, few-shot</div>
+                <div class="tooltip">Enhance prompts with meta-prompting</div>
+            </div>
+            <div class="pipeline-step">
+                <div class="step-title">Context (RAG)</div>
+                <div class="step-desc">Embeddings, Vector DB</div>
+                <div class="tooltip">Embed Wikipedia articles</div>
+            </div>
+            <div class="pipeline-step">
+                <div class="step-title">Function Calling</div>
+                <div class="step-desc">Tool definitions, JSON</div>
+                <div class="tooltip">Finding nearby places</div>
+            </div>
+            <div class="pipeline-step">
+                <div class="step-title">Agents</div>
+                <div class="step-desc">LangChain, ReAct</div>
+                <div class="tooltip">Build a coding agent</div>
+            </div>
+            <div class="pipeline-step">
+                <div class="step-title">Evaluation</div>
+                <div class="step-desc">LLM-as-a-Judge</div>
+                <div class="tooltip">Hallucination guardrails</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Architecture Spotlight -->
+    <div class="container architecture-section">
+        <h2 style="margin-bottom: 30px; font-weight: 700;">Architecture Spotlight</h2>
+        <div class="bento-grid">
+            <!-- Main Feature Card -->
+            <div class="bento-card large">
+                <div class="code-bg">
+                    &nbsp;&nbsp;<span class="tok-kw">from</span> openai <span class="tok-kw">import</span> OpenAI<br>
+                    &nbsp;&nbsp;client = OpenAI()<br>
+                    &nbsp;&nbsp;<span class="tok-kw">def</span> <span class="tok-func">create_agent</span>(tools):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;assistant = client.beta.assistants.create(<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name=<span class="tok-str">"Data Analyst"</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;instructions=<span class="tok-str">"You are a helpful..."</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tools=tools,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;model=<span class="tok-str">"gpt-4-turbo"</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;)
+                </div>
+                <div class="code-overlay">
+                    <span class="card-title" style="font-size: 1.5rem; color: var(--science-cyan);">Assistants API Overview</span>
+                    <span class="card-subtitle">Build stateful agents with memory, knowledge retrieval, and code interpretation capabilities.</span>
+                </div>
+            </div>
+
+            <!-- Architectural Diagram -->
+            <div class="bento-card tall">
+                <div style="padding: 20px; height: 100%; display: flex; flex-direction: column;">
+                    <div class="card-header">
+                        <div class="card-title">Agent Architecture</div>
+                        <div class="card-subtitle">ReAct Loop Visualization</div>
+                    </div>
+                    <div class="diagram-container" style="background: transparent;">
+                        <svg width="100%" height="200" viewBox="0 0 200 200">
+                            <!-- Central Brain -->
+                            <circle cx="100" cy="100" r="30" fill="none" stroke="var(--accent-color)" stroke-width="2"/>
+                            <text x="100" y="105" text-anchor="middle" fill="var(--text-primary)" font-size="10">LLM</text>
+                            
+                            <!-- Orbiting Nodes -->
+                            <circle cx="100" cy="30" r="15" fill="var(--bg-tertiary)" stroke="var(--border-color)"/>
+                            <text x="100" y="34" text-anchor="middle" font-size="8">Thought</text>
+                            <line x1="100" y1="45" x2="100" y2="70" stroke="var(--border-color)"/>
+
+                            <circle cx="170" cy="100" r="15" fill="var(--bg-tertiary)" stroke="var(--border-color)"/>
+                            <text x="170" y="104" text-anchor="middle" font-size="8">Action</text>
+                            <line x1="155" y1="100" x2="130" y2="100" stroke="var(--border-color)"/>
+
+                            <circle cx="100" cy="170" r="15" fill="var(--bg-tertiary)" stroke="var(--border-color)"/>
+                            <text x="100" y="174" text-anchor="middle" font-size="8">Observe</text>
+                            <line x1="100" y1="155" x2="100" y2="130" stroke="var(--border-color)"/>
+                            
+                            <circle cx="30" cy="100" r="15" fill="var(--bg-tertiary)" stroke="var(--border-color)"/>
+                            <text x="30" y="104" text-anchor="middle" font-size="8">User</text>
+                            <line x1="45" y1="100" x2="70" y2="100" stroke="var(--border-color)"/>
+                        </svg>
+                        <div style="margin-top: 20px; text-align: center; font-size: 0.9rem; color: var(--text-secondary);">
+                            <strong>Tool-using agents</strong> leverage function calling to interact with external APIs and databases.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Small Feature Cards -->
+            <div class="bento-card" style="background: var(--bg-tertiary); justify-content: center; align-items: center; text-align: center;">
+                <div style="font-size: 2rem; margin-bottom: 10px;">🖼️</div>
+                <div class="card-title" style="font-size: 1rem;">DALL·E 3 & Vision</div>
+                <div class="card-subtitle">Generate images and understand video context.</div>
+            </div>
+            <div class="bento-card" style="background: var(--bg-tertiary); justify-content: center; align-items: center; text-align: center;">
+                <div style="font-size: 2rem; margin-bottom: 10px;">🛡️</div>
+                <div class="card-title" style="font-size: 1rem;">Guardrails</div>
+                <div class="card-subtitle">Prevent hallucinations and ensure safety.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Patterns Snapshot -->
+    <div class="container data-section">
+        <h2 style="margin-bottom: 20px; font-weight: 700;">Data Patterns Snapshot</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 30px;">Simulated Vector Database results from <code>Embedding_Wikipedia_articles_for_search</code>.</p>
+        
+        <div class="data-table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Content Preview</th>
+                        <th>Vector (Dimension 1536)</th>
+                        <th>Similarity Score</th>
+                        <th>Cluster</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="data-row">
+                        <td>001</td>
+                        <td>Quantum mechanics is a fundamental theory...</td>
+                        <td><div class="vec-bar"><div class="vec-fill" style="width: 85%"></div></div></td>
+                        <td class="score">0.92</td>
+                        <td><span style="background: rgba(34, 211, 238, 0.2); color: var(--science-cyan); padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;">Physics</span></td>
+                    </tr>
+                    <tr class="data-row">
+                        <td>002</td>
+                        <td>The history of the Roman Empire spans...</td>
+                        <td><div class="vec-bar"><div class="vec-fill" style="width: 65%"></div></div></td>
+                        <td class="score">0.78</td>
+                        <td><span style="background: rgba(224, 100, 57, 0.2); color: var(--accent-color); padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;">History</span></td>
+                    </tr>
+                    <tr class="data-row">
+                        <td>003</td>
+                        <td>Neural networks are computing systems...</td>
+                        <td><div class="vec-bar"><div class="vec-fill" style="width: 95%"></div></div></td>
+                        <td class="score">0.98</td>
+                        <td><span style="background: rgba(168, 85, 247, 0.2); color: var(--science-purple); padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;">AI</span></td>
+                    </tr>
+                    <tr class="data-row">
+                        <td>004</td>
+                        <td>Photosynthesis is a process used by plants...</td>
+                        <td><div class="vec-bar"><div class="vec-fill" style="width: 40%"></div></div></td>
+                        <td class="score">0.55</td>
+                        <td><span style="background: rgba(52, 199, 89, 0.2); color: var(--success-color); padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;">Biology</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Model Evaluation Logic -->
+    <div class="container eval-section">
+        <div class="eval-grid">
+            <!-- Code Side -->
+            <div>
+                <h3 style="margin-bottom: 16px; font-weight: 600;">Custom LLM as a Judge</h3>
+                <div class="code-large">
+<span class="tok-kw">def</span> <span class="tok-func">evaluate_safety</span>(response):
+    system_prompt = <span class="tok-str">"""
+    You are a safety judge. Determine if the output
+    is harmful. Return 'PASS' or 'FAIL'.
+    """</span>
+    
+    result = client.chat.completions.create(
+        model=<span class="tok-str">"gpt-4o"</span>,
+        messages=[
+            {<span class="tok-str">"role"</span>: <span class="tok-str">"system"</span>, <span class="tok-str">"content"</span>: system_prompt},
+            {<span class="tok-str">"role"</span>: <span class="tok-str">"user"</span>, <span class="tok-str">"content"</span>: response}
+        ]
+    )
+    <span class="tok-kw">return</span> result.choices[0].message.content
+                </div>
+            </div>
+
+            <!-- Flowchart Side -->
+            <div>
+                <h3 style="margin-bottom: 16px; font-weight: 600; text-align: right;">Hallucination Guardrail Flow</h3>
+                <div class="flowchart">
+                    <div class="fc-node">User Input</div>
+                    <div class="fc-node">Generate Response</div>
+                    <div class="branch-container">
+                        <div class="branch-line"></div>
+                        <div class="fc-node pass">✔ Verified</div>
+                        <div class="fc-node fail">✗ Refused</div>
+                    </div>
+                    <div class="fc-node" style="width: 200px;">Final Output to User</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <h2 style="font-size: 1.5rem; margin-bottom: 16px;">Ready to build?</h2>
+            <p style="color: var(--text-secondary);">Clone the repository and start engineering the future.</p>
+            <div class="footer-links">
+                <a href="#" class="btn btn-primary">Clone Repository</a>
+                <a href="#" class="btn btn-outline">Read CONTRIBUTING.md</a>
+            </div>
+            <p style="margin-top: 40px; font-size: 0.8rem; color: var(--text-secondary);">
+                Licensed under MIT License. <br>
+                Original by OpenAI. Forked by zhenweig-cerebras.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle Logic
+        const html = document.documentElement;
+        const toggleBtn = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        
+        // Check local storage or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else {
+            html.setAttribute('data-theme', systemTheme);
+        }
+        
+        updateIcon();
+
+        toggleBtn.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateIcon();
+        });
+
+        function updateIcon() {
+            const isDark = html.getAttribute('data-theme') === 'dark';
+            themeIcon.textContent = isDark ? '☀️' : '🌙';
+        }
+
+        // Terminal Typing Animation
+        const typeText = "client.chat.completions.create(model='gpt-4o', messages=[...])";
+        const typeEl = document.getElementById('typewriter');
+        let i = 0;
+        
+        function typeWriter() {
+            if (i < typeText.length) {
+                typeEl.innerHTML += typeText.charAt(i);
+                i++;
+                setTimeout(typeWriter, 50 + Math.random() * 50);
+            } else {
+                setTimeout(() => {
+                    typeEl.innerHTML = "";
+                    i = 0;
+                    typeWriter();
+                }, 3000);
+            }
+        }
+        typeWriter();
+
+        // Interactive Data Table
+        const rows = document.querySelectorAll('.data-row');
+        rows.forEach(row => {
+            row.addEventListener('mouseenter', () => {
+                const scoreCell = row.querySelector('.score');
+                // simulate recalculating
+                const baseScore = parseFloat(scoreCell.innerText);
+                const variation = (Math.random() * 0.1 - 0.05);
+                scoreCell.innerText = (baseScore + variation).toFixed(2);
+                scoreCell.style.color = 'var(--info-color)';
+                scoreCell.style.fontWeight = 'bold';
+            });
+            row.addEventListener('mouseleave', () => {
+                const scoreCell = row.querySelector('.score');
+                scoreCell.style.color = '';
+                scoreCell.style.fontWeight = '';
+            });
+        });
+    </script>
+</body>
+</html>

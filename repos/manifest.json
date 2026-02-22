@@ -89,6 +89,16 @@
       "isExternal": true,
       "type": "api",
       "generatedAt": "2026-02-22T19:08:27.622Z"
+    },
+    {
+      "owner": "zhenweig-cerebras",
+      "repo": "openai-cookbook",
+      "fullName": "zhenweig-cerebras/openai-cookbook",
+      "path": "repos/openai-cookbook/index.html",
+      "url": "repos/openai-cookbook/",
+      "isExternal": true,
+      "type": "ml",
+      "generatedAt": "2026-02-22T19:53:40.585Z"
     }
   ]
 }
