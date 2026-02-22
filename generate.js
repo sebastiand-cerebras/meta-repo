@@ -583,6 +583,37 @@ function gitExec(cmd) {
   return execSync(cmd, { cwd: __dirname, stdio: ['pipe', 'pipe', 'pipe'] }).toString().trim();
 }
 
+/** Ensure GitHub Pages is enabled (deploy from main branch, root /) */
+function ensureGitHubPages() {
+  try {
+    const origin = execSync('git remote get-url origin', { cwd: __dirname, stdio: ['pipe', 'pipe', 'pipe'] })
+      .toString().trim();
+    const m = origin.match(/github\.com[:/]([^/]+)\/([^/.]+)/);
+    if (!m) return;
+    const owner = m[1];
+    const repo = m[2];
+
+    // Check if Pages is already enabled
+    try {
+      execSync(`gh api repos/${owner}/${repo}/pages`, { stdio: ['pipe', 'pipe', 'pipe'] });
+      // Already enabled, nothing to do
+    } catch {
+      // Not enabled — create it
+      log('📄 Enabling GitHub Pages…');
+      execSync(`gh api repos/${owner}/${repo}/pages -X POST --input - <<< '{"build_type":"legacy","source":{"branch":"main","path":"/"}}'`, {
+        cwd: __dirname, stdio: ['pipe', 'pipe', 'pipe'], shell: true
+      });
+      // Set homepage URL
+      execSync(`gh repo edit ${owner}/${repo} --homepage "https://${owner}.github.io/${repo}"`, {
+        cwd: __dirname, stdio: ['pipe', 'pipe', 'pipe']
+      });
+      log(`✅ GitHub Pages enabled at https://${owner}.github.io/${repo}`);
+    }
+  } catch (err) {
+    log(`⚠️  Could not auto-enable GitHub Pages: ${err.message}`);
+  }
+}
+
 // ============================================================
 // Logging
 // ============================================================
@@ -737,6 +768,7 @@ async function main() {
       gitExec(`git commit -m "Generate pages for ${names}"`);
       gitExec('git push');
       log('✅ Pushed!');
+      ensureGitHubPages();
       log('\n🎉 Your pages are live! Refresh index.html to see them.');
       for (const g of generated) {
         log(`   → repos/${g.repo}/`);

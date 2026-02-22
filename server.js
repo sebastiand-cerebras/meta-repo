@@ -1,15 +1,11 @@
 #!/usr/bin/env node
 /**
- * server.js — Local development server for meta-github-pages
+ * server.js — Local generation server
  *
- * Serves local-manager.html and provides backend API for auto-generation
+ * Usage: npm start → http://localhost:3200
  *
- * Usage:
- *   npm start
- *   or
- *   node server.js
- *
- * Then open: http://localhost:3000/local-manager.html
+ * Architecture: generation runs as a background job (not tied to any HTTP
+ * connection). The client polls GET /api/jobs/:id for progress.
  */
 
 import express from 'express';
@@ -18,31 +14,30 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import cors from 'cors';
 import fs from 'fs';
+import crypto from 'crypto';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = 3000;
+const PORT = 3200;
+
+// In-memory job store
+const jobs = new Map();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
-// GET / — serve local manager directly as the default page
+// GET / — serve the manager UI directly
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'local-manager.html'));
-});
-
-// GET /local-manager — serve without .html extension
-app.get('/local-manager', (req, res) => {
   res.sendFile(path.join(__dirname, 'local-manager.html'));
 });
 
 // Static files — AFTER custom routes so / serves local-manager, not index.html
 app.use(express.static(__dirname));
 
-// POST /api/generate — runs generate.js and streams output
+// POST /api/generate — start generation as background job, return job ID
 app.post('/api/generate', (req, res) => {
   const { repos } = req.body;
 
@@ -54,57 +49,71 @@ app.post('/api/generate', (req, res) => {
     return res.status(400).json({ error: 'Maximum 5 repos per generation' });
   }
 
-  // Set up SSE headers
-  res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
-  res.setHeader('Connection', 'keep-alive');
+  const jobId = crypto.randomUUID();
+  const job = {
+    id: jobId,
+    status: 'running',    // running | success | error
+    logs: [],
+    startedAt: Date.now(),
+  };
+  jobs.set(jobId, job);
 
-  // Send initial event
-  res.write(`data: ${JSON.stringify({ type: 'start', message: 'Starting generation...' })}\n\n`);
-
-  // Spawn generate.js as child process
+  // Spawn generate.js — runs in background, NOT tied to this request
   const args = [path.join(__dirname, 'generate.js'), ...repos];
   const child = spawn(process.execPath, args, {
     cwd: __dirname,
-    env: { ...process.env, NO_PUSH: '1' } // Don't auto-push
+    env: { ...process.env }
   });
 
-  let output = '';
-  let errorOutput = '';
-
   child.stdout.on('data', (data) => {
-    output += data.toString();
-    const lines = data.toString().split('\n').filter(line => line.trim());
-    lines.forEach(line => {
-      res.write(`data: ${JSON.stringify({ type: 'stdout', message: line })}\n\n`);
-    });
+    const lines = data.toString().split('\n').filter(l => l.trim());
+    lines.forEach(line => job.logs.push({ type: 'stdout', message: line, ts: Date.now() }));
   });
 
   child.stderr.on('data', (data) => {
-    errorOutput += data.toString();
-    const lines = data.toString().split('\n').filter(line => line.trim());
-    lines.forEach(line => {
-      res.write(`data: ${JSON.stringify({ type: 'stderr', message: line })}\n\n`);
-    });
+    const lines = data.toString().split('\n').filter(l => l.trim());
+    lines.forEach(line => job.logs.push({ type: 'stderr', message: line, ts: Date.now() }));
   });
 
-  child.on('close', (code) => {
+  child.on('close', (code, signal) => {
     if (code === 0) {
-      res.write(`data: ${JSON.stringify({ type: 'success', message: 'Generation completed successfully!' })}\n\n`);
+      job.status = 'success';
+      job.logs.push({ type: 'success', message: 'Generation completed successfully!', ts: Date.now() });
     } else {
-      res.write(`data: ${JSON.stringify({ type: 'error', message: `Generation failed with exit code ${code}`, error: errorOutput })}\n\n`);
+      job.status = 'error';
+      job.logs.push({ type: 'error', message: `Generation failed (exit code ${code}, signal ${signal})`, ts: Date.now() });
     }
-    res.end();
+    job.finishedAt = Date.now();
+    // Clean up old jobs after 30 minutes
+    setTimeout(() => jobs.delete(jobId), 30 * 60 * 1000);
   });
 
   child.on('error', (err) => {
-    res.write(`data: ${JSON.stringify({ type: 'error', message: `Failed to start generation: ${err.message}` })}\n\n`);
-    res.end();
+    job.status = 'error';
+    job.logs.push({ type: 'error', message: `Failed to start: ${err.message}`, ts: Date.now() });
+    job.finishedAt = Date.now();
   });
 
-  // Close connection if client disconnects
-  req.on('close', () => {
-    child.kill();
+  // Return immediately with job ID
+  res.json({ jobId });
+});
+
+// GET /api/jobs/:id — poll job status and logs
+app.get('/api/jobs/:id', (req, res) => {
+  const job = jobs.get(req.params.id);
+  if (!job) {
+    return res.status(404).json({ error: 'Job not found' });
+  }
+
+  // Support ?since=<index> to get only new log lines
+  const since = parseInt(req.query.since) || 0;
+  res.json({
+    id: job.id,
+    status: job.status,
+    logs: job.logs.slice(since),
+    totalLogs: job.logs.length,
+    startedAt: job.startedAt,
+    finishedAt: job.finishedAt || null,
   });
 });
 
@@ -126,8 +135,7 @@ app.get('/api/manifest', (req, res) => {
 // Start server
 app.listen(PORT, () => {
   console.log(`\n🚀 Repository Explorer running at http://localhost:${PORT}`);
-  console.log(`📁 Serving from: ${__dirname}`);
-  console.log(`\nOpen http://localhost:${PORT}/local-manager.html in your browser\n`);
+  console.log(`📁 Serving from: ${__dirname}\n`);
 });
 
 // Handle graceful shutdown
