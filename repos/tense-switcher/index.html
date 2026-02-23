@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tense Switcher | Repository Showcase</title>
+    <style>
+        :root {
+            --bg-primary:#f5f5f7; --bg-secondary:#ffffff; --bg-tertiary:#f0f0f2; --bg-card:#ffffff;
+            --text-primary:rgb(43,25,16); --text-secondary:#86868b; --border-color:rgba(0,0,0,0.08);
+            --accent-color:rgb(224,100,57); --accent-hover:rgb(200,85,45); --accent-subtle:rgba(224,100,57,0.1);
+            --success-color:#34c759; --warning-color:#ff9500; --error-color:#ff3b30; --info-color:#007aff;
+            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.05);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg:0 8px 32px rgba(0,0,0,0.12);
+            --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-xl:24px;
+        }
+        [data-theme="dark"] {
+            --bg-primary:#000000; --bg-secondary:#1c1c1e; --bg-tertiary:#2c2c2e; --bg-card:#1c1c1e;
+            --text-primary:#f5f5f7; --text-secondary:#86868b; --border-color:rgba(255,255,255,0.1);
+            --accent-color:rgb(224,100,57); --accent-hover:rgb(240,115,70); --accent-subtle:rgba(224,100,57,0.15);
+            --success-color:#30d158; --warning-color:#ff9f0a; --error-color:#ff453a; --info-color:#0a84ff;
+            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.3);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.4),0 2px 4px -1px rgba(0,0,0,0.2);
+            --shadow-lg:0 8px 32px rgba(0,0,0,0.5);
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+        body{background:var(--bg-primary);color:var(--text-primary);min-height:100vh;transition:background .3s,color .3s;line-height:1.5}
+
+        /* Layout Utilities */
+        .container{max-width:1200px;margin:0 auto;padding:0 20px}
+        .section{padding:80px 0;position:relative}
+        .section-constrained{max-width:800px;margin:0 auto}
+        .flex{display:flex;align-items:center}
+        .flex-col{flex-direction:column}
+        .justify-between{justify-content:space-between}
+        .justify-center{justify-content:center}
+        .gap-2{gap:0.5rem}.gap-4{gap:1rem}.gap-8{gap:2rem}
+        .grid{display:grid;gap:2rem}
+        .grid-2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+        .grid-3{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+        .grid-4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+        .text-center{text-align:center}
+        .mt-4{margin-top:1rem}.mt-8{margin-top:2rem}.mb-4{margin-bottom:1rem}
+
+        /* Animations & Transitions */
+        .reveal{opacity:0;transform:translateY(20px);transition:all 0.8s cubic-bezier(0.2,0.8,0.2,1)}
+        .reveal.visible{opacity:1;transform:translateY(0)}
+        
+        /* Components */
+        .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:var(--radius-md);text-decoration:none;font-weight:600;transition:all 0.2s;border:none;cursor:pointer;font-size:0.95rem}
+        .btn-primary{background:var(--accent-color);color:white;box-shadow:0 4px 14px 0 rgba(224,100,57,0.39)}
+        .btn-primary:hover{background:var(--accent-hover);transform:scale(1.02);box-shadow:0 6px 20px 0 rgba(224,100,57,0.5)}
+        .btn-ghost{background:transparent;color:var(--text-secondary);border:1px solid var(--border-color)}
+        .btn-ghost:hover{border-color:var(--accent-color);color:var(--accent-color)}
+
+        .card{background:var(--bg-card);border-radius:var(--radius-lg);padding:24px;border:1px solid var(--border-color);box-shadow:var(--shadow-md);transition:transform 0.3s, box-shadow 0.3s}
+        .card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+        .glass{background:rgba(255,255,255,0.05);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.1)}
+        [data-theme="light"] .glass{background:rgba(255,255,255,0.7);border:1px solid rgba(0,0,0,0.05)}
+
+        .badge{display:inline-flex;align-items:center;padding:4px 12px;border-radius:99px;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em}
+        .badge-warn{background:var(--warning-color);color:white}
+        .badge-tech{background:var(--bg-tertiary);color:var(--text-secondary);border:1px solid var(--border-color)}
+        
+        /* Header */
+        header{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 0;transition:background 0.3s, backdrop-filter 0.3s}
+        header.scrolled{background:rgba(255,255,255,0.8);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border-color)}
+        [data-theme="dark"] header.scrolled{background:rgba(28,28,30,0.8);border-bottom:1px solid rgba(255,255,255,0.1)}
+
+        /* Hero */
+        .hero{min-height:90vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+        .hero-bg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100%;height:100%;z-index:-1;opacity:0.6}
+        .glow{position:absolute;width:600px;height:600px;background:var(--accent-color);filter:blur(150px);border-radius:50%;opacity:0.2}
+        .glow-1{top:-20%;left:20%}.glow-2{bottom:10%;right:10%;background:var(--info-color)}
+        .hero-title{font-size:clamp(2.5rem,6vw,4.5rem);font-weight:800;line-height:1.1;margin-bottom:1rem;letter-spacing:-0.02em}
+        .gradient-text{background:linear-gradient(135deg, var(--text-primary) 30%, var(--accent-color) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .hero-subtitle{font-size:1.25rem;color:var(--text-secondary);max-width:600px;margin-bottom:2rem}
+
+        /* Stats */
+        .stat-value{font-size:2.5rem;font-weight:800;color:var(--text-primary);display:block}
+        .stat-label{font-size:0.875rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em;margin-top:4px}
+
+        /* Architecture Diagram */
+        .arch-diagram{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:1rem;margin:4rem 0}
+        .arch-node{background:var(--bg-card);border:1px solid var(--border-color);padding:1.5rem;border-radius:var(--radius-md);width:160px;text-align:center;position:relative;box-shadow:var(--shadow-md);z-index:2;transition:transform 0.3s}
+        .arch-node:hover{transform:scale(1.05);border-color:var(--accent-color)}
+        .arch-icon{font-size:2rem;margin-bottom:0.5rem;display:block}
+        .arch-title{font-weight:600;font-size:0.9rem;display:block;margin-bottom:4px}
+        .arch-desc{font-size:0.75rem;color:var(--text-secondary)}
+        .arch-arrow{flex-grow:1;height:2px;background:var(--border-color);position:relative;min-width:40px;max-width:80px}
+        .arch-arrow::after{content:'';position:absolute;right:0;top:-4px;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid var(--border-color)}
+        [data-theme="dark"] .arch-arrow::after{border-left-color:var(--text-secondary)}
+        .arch-label{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:0.7rem;color:var(--text-secondary);background:var(--bg-primary);padding:0 4px;white-space:nowrap}
+
+        /* Code Block */
+        .code-block{background:#0d1117;border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-lg);text-align:left}
+        .code-header{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;background:rgba(255,255,255,0.05);border-bottom:1px solid rgba(255,255,255,0.1)}
+        .filename{font-family:monospace;color:#8b949e;font-size:0.85rem}
+        pre{padding:16px;overflow-x:auto;color:#e6edf3;font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;font-size:0.9rem}
+        code .kwd{color:#ff7b72}code .str{color:#a5d6ff}code .key{color:#79c0ff}code .num{color:#79c0ff}code .com{color:#8b949e}
+
+        /* Flow Table */
+        .resource-table{width:100%;border-collapse:separate;border-spacing:0}
+        .resource-table th{text-align:left;padding:12px 16px;color:var(--text-secondary);font-size:0.8rem;text-transform:uppercase;border-bottom:1px solid var(--border-color)}
+        .resource-table td{padding:16px;border-bottom:1px solid var(--border-color);color:var(--text-primary)}
+        .resource-table tr:last-child td{border-bottom:none}
+
+        /* Footer */
+        footer{border-top:1px solid var(--border-color);padding:40px 0;color:var(--text-secondary);font-size:0.9rem}
+        
+        /* Toggle Switch */
+        .theme-toggle{background:none;border:none;cursor:pointer;color:var(--text-primary);padding:8px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background 0.2s}
+        .theme-toggle:hover{background:var(--bg-tertiary)}
+
+        /* Icons */
+        .icon-svg{width:20px;height:20px;fill:currentColor}
+
+        /* Specific colors for architecture */
+        .type-compute .arch-icon{color:var(--success-color)}
+        .type-orchestration .arch-icon{color:var(--info-color)}
+        .type-logic .arch-icon{color:var(--accent-color)}
+    </style>
+</head>
+<body>
+    <header id="header">
+        <div class="container flex justify-between">
+            <div class="flex gap-4">
+                <a href="../../index.html" class="btn btn-ghost" style="padding: 6px 12px; font-size: 0.85rem;">
+                    ← Back to Explorer
+                </a>
+            </div>
+            <button class="theme-toggle" id="themeBtn" aria-label="Toggle Theme">
+                <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm0-2V4a8 8 0 1 1 0 16z"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-bg">
+            <div class="glow glow-1"></div>
+            <div class="glow glow-2"></div>
+        </div>
+        
+        <div class="container text-center">
+            <div class="reveal">
+                <span class="badge badge-warn mb-4">External — seduerr91</span>
+                <h1 class="hero-title">
+                    Tense Switcher
+                    <br>
+                    <span class="gradient-text">Microservice Architecture</span>
+                </h1>
+                <p class="hero-subtitle mx-auto">
+                    A scalable FastAPI infrastructure packaging NLP logic (Spacy/Pattern) to automatically convert English text between Future, Past, and Present tenses.
+                </p>
+                <div class="flex justify-center gap-4 mt-8">
+                    <a href="https://github.com/seduerr91/tense-switcher" target="_blank" class="btn btn-primary">
+                        <svg class="icon-svg" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                        View Source
+                    </a>
+                </div>
+                
+                <div class="flex justify-center gap-2 mt-8 flex-wrap">
+                    <span class="badge badge-tech">Python</span>
+                    <span class="badge badge-tech">FastAPI</span>
+                    <span class="badge badge-tech">Spacy</span>
+                    <span class="badge badge-tech">Docker</span>
+                    <span class="badge badge-tech">Gunicorn</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="grid grid-4 text-center reveal">
+                <div class="card" style="padding: 20px;">
+                    <span class="stat-value" data-target="3">0</span>
+                    <span class="stat-label">Tenses Supported</span>
+                </div>
+                <div class="card" style="padding: 20px;">
+                    <span class="stat-value" data-target="1">0</span>
+                    <span class="stat-label">Docker Image</span>
+                </div>
+                <div class="card" style="padding: 20px;">
+                    <span class="stat-value">100%</span>
+                    <span class="stat-label">Python Stack</span>
+                </div>
+                <div class="card" style="padding: 20px;">
+                    <span class="stat-value">∞</span>
+                    <span class="stat-label">Input Length</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-constrained text-center mb-8 reveal">
+                <h2 style="font-size: 2rem; margin-bottom: 1rem;">Infrastructure Architecture</h2>
+                <p style="color: var(--text-secondary);">Request flow orchestrated through containerized microservices.</p>
+            </div>
+
+            <!-- Visual Architecture Diagram -->
+            <div class="arch-diagram reveal">
+                <!-- Node 1: Client -->
+                <div class="arch-node type-compute">
+                    <span class="arch-icon">💻</span>
+                    <span class="arch-title">Client</span>
+                    <span class="arch-desc">JSON Payload</span>
+                </div>
+
+                <div class="arch-arrow">
+                    <span class="arch-label">POST /</span>
+                </div>
+
+                <!-- Node 2: API Server -->
+                <div class="arch-node type-orchestration">
+                    <span class="arch-icon">⚡</span>
+                    <span class="arch-title">FastAPI / Gunicorn</span>
+                    <span class="arch-desc">Knative Service</span>
+                </div>
+
+                <div class="arch-arrow">
+                    <span class="arch-label">Process</span>
+                </div>
+
+                <!-- Node 3: Logic Layer -->
+                <div class="arch-node type-logic">
+                    <span class="arch-icon">🧠</span>
+                    <span class="arch-title">NLP Engine</span>
+                    <span class="arch-desc">Spacy + Pattern</span>
+                </div>
+
+                <div class="arch-arrow">
+                    <span class="arch-label">Transform</span>
+                </div>
+
+                <!-- Node 4: Response -->
+                <div class="arch-node type-compute">
+                    <span class="arch-icon">📄</span>
+                    <span class="arch-title">Response</span>
+                    <span class="arch-desc">Tense Shifted</span>
+                </div>
+            </div>
+
+            <div class="mt-8 reveal">
+                <h3 style="margin-bottom: 1rem; font-size: 1.25rem;">Resource Stack</h3>
+                <div class="card" style="padding: 0; overflow: hidden;">
+                    <table class="resource-table">
+                        <thead>
+                            <tr>
+                                <th>Component</th>
+                                <th>Technology</th>
+                                <th>Role</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Web Server</strong></td>
+                                <td><span class="badge badge-tech">Gunicorn</span> + <span class="badge badge-tech">Uvicorn</span></td>
+                                <td>Process management & ASGI handling</td>
+                            </tr>
+                            <tr>
+                                <td><strong>API Framework</strong></td>
+                                <td><span class="badge badge-tech">FastAPI</span></td>
+                                <td>Endpoint definition & validation</td>
+                            </tr>
+                            <tr>
+                                <td><strong>NLP Core</strong></td>
+                                <td><span class="badge badge-tech">Spacy</span> / <span class="badge badge-tech">Pattern</span></td>
+                                <td>Syntactic parsing & verb conjugation</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Runtime</strong></td>
+                                <td><span class="badge badge-tech">Python 3.9</span> (Docker)</td>
+                                <td>Isolated execution environment</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" style="background: var(--bg-tertiary);">
+        <div class="container grid grid-2">
+            <div class="reveal">
+                <h2 style="font-size: 2rem; margin-bottom: 1.5rem;">Payload Workflow</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                    The system accepts raw text and a target tense configuration. The processing pipeline parses the sentence structure, identifies verbs, and applies grammatical morphological changes.
+                </p>
+                
+                <div class="card glass mb-4">
+                    <h4 style="margin-bottom: 8px; font-size: 1rem;">Input Specification</h4>
+                    <ul style="list-style: none; color: var(--text-secondary); font-size: 0.9rem;">
+                        <li class="mb-4"><strong style="color: var(--text-primary)">input:</strong> The English sentence string.</li>
+                        <li class="mb-4"><strong style="color: var(--text-primary)">tense:</strong> Target mode ("past", "present", "future").</li>
+                        <li><strong style="color: var(--text-primary)">output:</strong> String (placeholder).</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="reveal">
+                <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Sample Transformation</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="filename">sample_request.json</span>
+                        <span style="font-size: 0.75rem; color: #8b949e;">JSON</span>
+                    </div>
+<pre><code><span class="key">"input"</span>: <span class="str">"The sun is shining."</span>,
+<span class="key">"tense"</span>: <span class="str">"past"</span>,
+<span class="key">"output"</span>: <span class="str">"string"</span>
+
+<span class="com">// Response Payload</span>
+{
+  <span class="key">"output"</span>: <span class="str">"The sun was shining."</span>
+}</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container section-constrained">
+            <h2 class="text-center mb-8 reveal" style="font-size: 2rem;">Deployment Pipeline</h2>
+            
+            <div class="card glass reveal">
+                <div style="display: flex; flex-direction: column; gap: 1rem; position: relative;">
+                    <!-- Fake pipeline line -->
+                    <div style="position: absolute; left: 24px; top: 20px; bottom: 20px; width: 2px; background: var(--border-color);"></div>
+
+                    <!-- Step 1 -->
+                    <div class="flex gap-4" style="position: relative; z-index: 10;">
+                        <div style="width: 48px; height: 48px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: var(--shadow-sm); flex-shrink: 0;">🐳</div>
+                        <div>
+                            <h4 style="font-weight: 600;">Container Build</h4>
+                            <p style="font-size: 0.9rem; color: var(--text-secondary);">Python 3.9 base image installs `requirements.txt` and sets up `start_env.sh`.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="flex gap-4" style="position: relative; z-index: 10;">
+                        <div style="width: 48px; height: 48px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: var(--shadow-sm); flex-shrink: 0;">⚙️</div>
+                        <div>
+                            <h4 style="font-weight: 600;">Worker Initialization</h4>
+                            <p style="font-size: 0.9rem; color: var(--text-secondary);">Gunicorn boots with 1 worker and 1 thread, utilizing the Uvicorn worker class.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="flex gap-4" style="position: relative; z-index: 10;">
+                        <div style="width: 48px; height: 48px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: var(--shadow-sm); flex-shrink: 0;">🌐</div>
+                        <div>
+                            <h4 style="font-weight: 600;">Serve</h4>
+                            <p style="font-size: 0.9rem; color: var(--text-secondary);">Listens on $PORT (standard for Knative/Cloud Run) with a 290s timeout.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="text-center">
+        <div class="container">
+            <div class="flex justify-center gap-4 mb-4">
+                <a href="https://github.com/seduerr91/tense-switcher" class="btn btn-ghost" target="_blank">View on GitHub</a>
+                <a href="../../index.html" class="btn btn-ghost">← Back to Explorer</a>
+            </div>
+            <p>Generated by Cerebras • Repository by seduerr91</p>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle Logic
+        const themeBtn = document.getElementById('themeBtn');
+        const html = document.documentElement;
+        
+        // Check local storage or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+            html.setAttribute('data-theme', 'dark');
+            updateIcon(true);
+        }
+
+        themeBtn.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            if (currentTheme === 'dark') {
+                html.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+                updateIcon(false);
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                updateIcon(true);
+            }
+        });
+
+        function updateIcon(isDark) {
+            themeBtn.innerHTML = isDark 
+                ? '<svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z" /></svg>'
+                : '<svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm0-2V4a8 8 0 1 1 0 16z"/></svg>';
+        }
+
+        // Intersection Observer for Animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    
+                    // Check for animated counters
+                    const counters = entry.target.querySelectorAll('.stat-value');
+                    counters.forEach(counter => {
+                        const target = parseInt(counter.getAttribute('data-target'));
+                        if (target && !counter.classList.contains('counted')) {
+                            animateCounter(counter, target);
+                            counter.classList.add('counted');
+                        }
+                    });
+                    
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        function animateCounter(el, target) {
+            let start = 0;
+            const duration = 1500;
+            const startTime = performance.now();
+
+            function step(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Ease out quart
+                const ease = 1 - Math.pow(1 - progress, 4);
+                
+                const current = Math.floor(ease * target);
+                el.textContent = current;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                } else {
+                    el.textContent = target;
+                }
+            }
+            requestAnimationFrame(step);
+        }
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>
