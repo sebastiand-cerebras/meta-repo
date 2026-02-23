@@ -159,6 +159,16 @@
       "isExternal": true,
       "type": "generic",
       "generatedAt": "2026-02-23T02:16:17.974Z"
+    },
+    {
+      "owner": "seduerr91",
+      "repo": "OpenBBTerminal",
+      "fullName": "seduerr91/OpenBBTerminal",
+      "path": "repos/OpenBBTerminal/index.html",
+      "url": "repos/OpenBBTerminal/",
+      "isExternal": true,
+      "type": "ml",
+      "generatedAt": "2026-02-23T02:26:39.731Z"
     }
   ]
 }

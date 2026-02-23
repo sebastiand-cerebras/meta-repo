@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenBBTerminal - seduerr91</title>
+    <style>
+        :root {
+            --bg-primary:#f5f5f7; --bg-secondary:#ffffff; --bg-tertiary:#f0f0f2; --bg-card:#ffffff;
+            --text-primary:rgb(43,25,16); --text-secondary:#86868b; --border-color:rgba(0,0,0,0.08);
+            --accent-color:rgb(224,100,57); --accent-hover:rgb(200,85,45); --accent-subtle:rgba(224,100,57,0.1);
+            --success-color:#34c759; --warning-color:#ff9500; --error-color:#ff3b30; --info-color:#007aff;
+            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.05);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg:0 8px 32px rgba(0,0,0,0.12);
+            --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-xl:24px;
+        }
+        [data-theme="dark"] {
+            --bg-primary:#000000; --bg-secondary:#1c1c1e; --bg-tertiary:#2c2c2e; --bg-card:#1c1c1e;
+            --text-primary:#f5f5f7; --text-secondary:#86868b; --border-color:rgba(255,255,255,0.1);
+            --accent-color:rgb(224,100,57); --accent-hover:rgb(240,115,70); --accent-subtle:rgba(224,100,57,0.15);
+            --success-color:#30d158; --warning-color:#ff9f0a; --error-color:#ff453a; --info-color:#0a84ff;
+            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.3);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.4),0 2px 4px -1px rgba(0,0,0,0.2);
+            --shadow-lg:0 8px 32px rgba(0,0,0,0.5);
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+        body{background:var(--bg-primary);color:var(--text-primary);min-height:100vh;transition:background .3s ease,color .3s ease;line-height:1.6;overflow-x:hidden}
+        
+        /* Utilities */
+        .container{max-width:1200px;margin:0 auto;padding:0 24px}
+        .fade-in-section{opacity:0;transform:translateY(30px);transition:opacity 0.8s ease-out,transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);will-change:opacity,transform}
+        .fade-in-section.visible{opacity:1;transform:translateY(0)}
+        .text-gradient{background:linear-gradient(135deg,var(--accent-color),#ff6b6b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-fill-color:transparent}
+        .flex-center{display:flex;align-items:center;justify-content:center}
+        .grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px} 
+        .grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}
+        .grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
+
+        /* Nav */
+        nav{position:fixed;top:0;width:100%;z-index:100;background:rgba(var(--bg-secondary),0.8);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border-color)}
+        .nav-inner{height:64px;display:flex;align-items:center;justify-content:space-between}
+        .nav-links a{color:var(--text-secondary);text-decoration:none;font-size:14px;margin-left:24px;font-weight:500;transition:color .2s}
+        .nav-links a:hover{color:var(--accent-color)}
+        .back-link{font-size:13px;font-weight:600;color:var(--text-secondary);text-decoration:none;display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--bg-tertiary);border-radius:20px;transition:all .2s}
+        .back-link:hover{background:var(--border-color);color:var(--text-primary)}
+
+        /* Buttons */
+        .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:var(--radius-sm);font-weight:600;text-decoration:none;transition:transform .2s,box-shadow .2s,background .2s;font-size:14px;cursor:pointer;border:none}
+        .btn-primary{background:var(--accent-color);color:white}
+        .btn-primary:hover{background:var(--accent-hover);transform:translateY(-2px);box-shadow:0 4px 12px rgba(224,100,57,0.3)}
+        .btn-ghost{background:transparent;color:var(--text-primary);border:1px solid var(--border-color)}
+        .btn-ghost:hover{background:var(--bg-tertiary);border-color:var(--text-secondary)}
+
+        /* Hero */
+        .hero{position:relative;padding:160px 0 100px;overflow:hidden}
+        .hero::before{content:'';position:absolute;top:-50%;left:50%;transform:translateX(-50%);width:800px;height:800px;background:radial-gradient(circle,rgba(224,100,57,0.15) 0%,rgba(0,0,0,0) 70%);z-index:-1;pointer-events:none}
+        [data-theme="dark"] .hero::before{background:radial-gradient(circle,rgba(224,100,57,0.25) 0%,rgba(0,0,0,0) 70%)}
+        .hero h1{font-size:4rem;font-weight:800;line-height:1.1;letter-spacing:-0.03em;margin-bottom:24px}
+        .hero p{font-size:1.25rem;color:var(--text-secondary);max-width:600px;margin-bottom:32px}
+        .hero-badge{display:inline-flex;align-items:center;padding:6px 12px;background:rgba(224,100,57,0.1);color:var(--accent-color);border-radius:20px;font-size:13px;font-weight:600;margin-bottom:24px;border:1px solid var(--accent-subtle)}
+        .external-badge{background:rgba(255,149,0,0.15);color:var(--warning-color);border-color:rgba(255,149,0,0.2);margin-left:12px}
+        
+        /* Stats */
+        .stats-section{padding:60px 0}
+        .stat-card{background:var(--bg-card);padding:24px;border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);border:1px solid var(--border-color);text-align:center;transition:transform .3s,box-shadow .3s}
+        .stat-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-md)}
+        .stat-value{font-size:2.5rem;font-weight:800;color:var(--text-primary);margin-bottom:4px;font-feature-settings:"tnum"}
+        .stat-label{font-size:0.875rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em;font-weight:500}
+
+        /* Pipeline Diagram */
+        .pipeline-section{padding:80px 0;background:var(--bg-secondary);overflow:hidden}
+        .section-header{text-align:center;margin-bottom:60px}
+        .section-header h2{font-size:2.5rem;font-weight:700;margin-bottom:16px;letter-spacing:-0.02em}
+        .section-header p{color:var(--text-secondary);font-size:1.1rem}
+        
+        .pipeline-flow{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:16px;position:relative}
+        .pipeline-node{position:relative;background:var(--bg-card);border:1px solid var(--border-color);padding:24px;border-radius:var(--radius-md);width:180px;text-align:center;box-shadow:var(--shadow-md);transition:transform .2s;z-index:2}
+        .pipeline-node:hover{transform:scale(1.05);border-color:var(--accent-color)}
+        .pipeline-node svg{width:48px;height:48px;margin-bottom:12px;color:var(--accent-color)}
+        .pipeline-node h4{font-size:1rem;font-weight:600}
+        .pipeline-arrow{color:var(--text-secondary);font-size:24px;display:flex;align-items:center;justify-content:center;width:40px}
+        .pipeline-line{height:2px;background:var(--border-color);flex-grow:1;max-width:80px}
+        
+        /* Features Grid */
+        .features-section{padding:100px 0}
+        .feature-card{background:var(--bg-card);padding:32px;border-radius:var(--radius-lg);border:1px solid var(--border-color);transition:all .3s ease;display:flex;flex-direction:column;height:100%}
+        .feature-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--accent-subtle)}
+        .feature-icon{width:56px;height:56px;background:var(--bg-tertiary);border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;color:var(--text-primary)}
+        .feature-card h3{font-size:1.25rem;font-weight:700;margin-bottom:12px}
+        .feature-card p{color:var(--text-secondary);font-size:0.95rem;line-height:1.6;flex-grow:1}
+        
+        /* Terminal Mockup */
+        .terminal-mockup{margin-top:80px;border-radius:var(--radius-xl);overflow:hidden;border:1px solid var(--border-color);box-shadow:var(--shadow-lg);max-width:900px;margin-left:auto;margin-right:auto;background:#0d1117}
+        .terminal-header{background:#161b22;padding:12px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,0.1)}
+        .dot{width:12px;height:12px;border-radius:50%}
+        .dot.r{background:#ff5f56}.dot.y{background:#ffbd2e}.dot.g{background:#27c93f}
+        .filename{margin-left:12px;font-family:monospace;font-size:13px;color:#8b949e}
+        .terminal-body{padding:24px;font-family:'SF Mono',Fira Code,monospace;font-size:13px;line-height:1.8;color:#c9d1d9}
+        .command-line{display:flex}
+        .prompt{color:#58a6ff;margin-right:8px;font-weight:700}
+        .cmd{color:#e6edf3}
+        .output{color:#8b949e;margin-top:8px;margin-bottom:16px;display:block;white-space:pre-wrap}
+        .keyword{color:#ff7b72}.string{color:#a5d6ff}.func{color:#d2a8ff}.comment{color:#8b949e;font-style:italic}
+
+        /* Tech Stack */
+        .tech-section{padding:60px 0 100px;background:var(--bg-secondary)}
+        .badge-pill{display:inline-block;padding:6px 14px;background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:100px;font-size:13px;font-weight:500;color:var(--text-primary);margin:4px;transition:all .2s}
+        .badge-pill:hover{border-color:var(--accent-color);color:var(--accent-color);transform:scale(1.05)}
+
+        /* Footer */
+        footer{padding:60px 0;border-top:1px solid var(--border-color);text-align:center;color:var(--text-secondary)}
+        .footer-links{margin-bottom:24px}
+        .footer-links a{color:var(--text-primary);text-decoration:none;margin:0 16px;font-weight:500;transition:color .2s}
+        .footer-links a:hover{color:var(--accent-color)}
+        .footer-tagline{font-size:0.85rem;opacity:0.7}
+
+        /* SVG Icons */
+        svg{display:block}
+        .theme-toggle{background:none;border:none;cursor:pointer;color:var(--text-primary);padding:8px;border-radius:50%;transition:background .2s}
+        .theme-toggle:hover{background:var(--bg-tertiary)}
+
+        @media (max-width:768px) {
+            .hero h1{font-size:2.5rem}
+            .pipeline-flow{flex-direction:column;align-items:flex-start;padding-left:20px}
+            .pipeline-arrow{transform:rotate(90deg);margin:10px 0}
+            .pipeline-line{display:none}
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container nav-inner">
+            <div style="display:flex;align-items:center;gap:16px;">
+                <a href="../../index.html" class="back-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Back to Explorer
+                </a>
+            </div>
+            <div class="nav-links" style="display:flex;align-items:center;">
+                <a href="https://github.com/seduerr91/OpenBBTerminal" target="_blank">GitHub</a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Dark Mode">
+                    <svg id="sunIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                    <svg id="moonIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero container">
+            <div class="fade-in-section">
+                <div style="margin-bottom:24px;">
+                    <span class="hero-badge">
+                        <svg style="width:14px;height:14px;margin-right:6px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle></svg>
+                        v1.5.0 Stable
+                    </span>
+                    <span class="hero-badge external-badge">
+                        <svg style="width:14px;height:14px;margin-right:6px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                        External — seduerr91
+                    </span>
+                </div>
+                <h1>OpenBB <span class="text-gradient">Terminal</span></h1>
+                <p>Investment research for everyone. An open-source financial terminal powered by Python, connecting you to the data you need without the institutional cost.</p>
+                <div style="display:flex;gap:16px;flex-wrap:wrap;">
+                    <a href="https://github.com/seduerr91/OpenBBTerminal" class="btn btn-primary">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                        View Repository
+                    </a>
+                    <a href="https://openbb-finance.github.io/OpenBBTerminal/" class="btn btn-ghost">Documentation</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats-section container fade-in-section">
+            <div class="grid-3">
+                <div class="stat-card">
+                    <div class="stat-value" data-target="150">150+</div>
+                    <div class="stat-label">Data Providers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" data-target="8">8</div>
+                    <div class="stat-label">Major Modules</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" data-target="500">500+</div>
+                    <div class="stat-label">Analysis Commands</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="pipeline-section">
+            <div class="container">
+                <div class="section-header fade-in-section">
+                    <h2>Research Pipeline</h2>
+                    <p>From raw market data to actionable insights in seconds.</p>
+                </div>
+                <div class="pipeline-flow fade-in-section">
+                    <div class="pipeline-node">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+                        <h4>Data Sources</h4>
+                    </div>
+                    <div class="pipeline-line"></div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-node">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+                        <h4>Pandas Processing</h4>
+                    </div>
+                    <div class="pipeline-line"></div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-node">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                        <h4>Analysis & ML</h4>
+                    </div>
+                    <div class="pipeline-line"></div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-node">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                        <h4> Visualization</h4>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-section container">
+            <div class="section-header fade-in-section">
+                <h2>Comprehensive Toolkit</h2>
+                <p>Designed for the modern data-driven investor.</p>
+            </div>
+            <div class="grid-3">
+                <div class="feature-card fade-in-section">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="M18.7 8l-5.1 5.2-2.8-5.1L5.3 15"></path></svg>
+                    </div>
+                    <h3>Stocks & ETFs</h3>
+                    <p>Perform fundamental, technical, and sentiment analysis on thousands of equities and ETFs from global exchanges.</p>
+                </div>
+                <div class="feature-card fade-in-section">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path><path d="M12 18V6"></path></svg>
+                    </div>
+                    <h3>Cryptocurrency</h3>
+                    <p>Dive into on-chain metrics, DeFi protocols, NFT collections, and digital asset price action.</p>
+                </div>
+                <div class="feature-card fade-in-section">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"></path><path d="M8.5 8.5v.01"></path><path d="M16 15.5v.01"></path><path d="M12 12v.01"></path><path d="M11 17v.01"></path><path d="M7 14v.01"></path></svg>
+                    </div>
+                    <h3>Economy</h3>
+                    <p>Access macroeconomic indicators, FRED data, and global economic reports to understand the big picture.</p>
+                </div>
+                <div class="feature-card fade-in-section">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+                    </div>
+                    <h3>Machine Learning</h3>
+                    <p>Train custom prediction models, use pre-configured classifiers, and apply econometrics to your data.</p>
+                </div>
+                <div class="feature-card fade-in-section">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                    </div>
+                    <h3>Portfolio</h3>
+                    <p>Import holdings, analyze allocation, optimize weights, and track performance against benchmarks.</p>
+                </div>
+                <div class="feature-card fade-in-section">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                    </div>
+                    <h3>Alternative Data</h3>
+                    <p>Go beyond price data. Analyze Google Trends, Reddit sentiment, government contracts, and more.</p>
+                </div>
+            </div>
+
+            <!-- Terminal Demo -->
+            <div class="fade-in-section">
+                <div class="terminal-mockup">
+                    <div class="terminal-header">
+                        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+                        <div class="filename">openbb</div>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="command-line">
+                            <span class="prompt">OpenBB></span>
+                            <span class="cmd">stocks/load ticker:APL country:USA</span>
+                        </div>
+                        <span class="output">Successfully loaded data for Apple Inc. (AAPL)</span>
+                        
+                        <div class="command-line">
+                            <span class="prompt">OpenBB/stocks/USA></span>
+                            <span class="cmd">ta macd</span>
+                        </div>
+                        <span class="output">Calculating MACD (12, 26, 9)...</span>
+                        <span class="output">Generating Plotly chart... <span class="success-color">Done</span></span>
+
+                        <div class="command-line">
+                            <span class="prompt">OpenBB/stocks/USA></span>
+                            <span class="cmd">fa valuation</span>
+                        </div>
+                        <span class="output">
+---------------------------------------------------------------------------
+Metric              Value            
+---------------------------------------------------------------------------
+P/E Ratio           24.5x            
+PEG Ratio           1.34             
+Price to Book       38.2x            
+EV/EBITDA           18.9x            
+---------------------------------------------------------------------------
+                        </span>
+                        <div class="command-line">
+                            <span class="prompt">OpenBB/stocks/USA></span>
+                            <span class="cmd" style="animation:blink 1s infinite">_</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="tech-section container fade-in-section">
+            <div class="section-header">
+                <h2>Powered By</h2>
+            </div>
+            <div class="flex-center" style="flex-wrap:wrap;">
+                <span class="badge-pill">Python 3.8+</span>
+                <span class="badge-pill">Pandas</span>
+                <span class="badge-pill">NumPy</span>
+                <span class="badge-pill">Plotly</span>
+                <span class="badge-pill">Matplotlib</span>
+                <span class="badge-pill">Jupyter</span>
+                <span class="badge-pill">YFinance</span>
+                <span class="badge-pill">Statsmodels</span>
+                <span class="badge-pill">Scikit-learn</span>
+                <span class="badge-pill">PyTorch (Optional)</span>
+                <span class="badge-pill">FastAPI</span>
+                <span class="badge-pill">Docker</span>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="https://github.com/seduerr91/OpenBBTerminal">Repository</a>
+                <a href="https://github.com/seduerr91/OpenBBTerminal/issues">Report Bug</a>
+                <a href="https://github.com/seduerr91/OpenBBTerminal/blob/master/CONTRIBUTING.md">Contribute</a>
+            </div>
+            <div class="footer-tagline">
+                <a href="../../index.html" style="color:inherit;text-decoration:none;">← Back to Explorer</a><br>
+                Generated by Cerebras
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle Logic
+        const html = document.documentElement;
+        const themeToggle = document.getElementById('themeToggle');
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+        
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        html.setAttribute('data-theme', savedTheme);
+        updateIcons(savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateIcons(newTheme);
+        });
+
+        function updateIcons(theme) {
+            if (theme === 'dark') {
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+            } else {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+            }
+        }
+
+        // Scroll Animations (Intersection Observer)
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    // Stop observing once visible
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in-section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // Animated Counters for Stat Tiles
+        const statObserver = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const counter = entry.target.querySelector('.stat-value');
+                    if (counter && counter.innerText.includes('+')) return; // Skip if already handled
+                    
+                    const target = parseInt(counter.getAttribute('data-target'));
+                    if (!isNaN(target) && !counter.innerText.includes('+')) {
+                        let count = 0;
+                        const duration = 2000;
+                        const increment = target / (duration / 16);
+                        
+                        const updateCount = () => {
+                            count += increment;
+                            if (count < target) {
+                                counter.innerText = Math.ceil(count) + "+";
+                                requestAnimationFrame(updateCount);
+                            } else {
+                                counter.innerText = target + "+";
+                            }
+                        };
+                        updateCount();
+                    }
+                    obs.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('.stat-card').forEach(card => {
+            statObserver.observe(card);
+        });
+
+        // Add CSS animation for cursor blink
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
