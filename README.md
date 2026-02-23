@@ -20,6 +20,43 @@ Each generated page includes dark/light mode, stat tiles, architecture diagrams,
 
 ## Quick Start
 
+### Option 1: Using Just (Recommended)
+
+[`just`](https://github.com/casey/just) is a command runner that simplifies setup and common tasks.
+
+```bash
+# 0. Install just (if not already installed)
+brew install just
+
+# 1. Clone the repo
+gh repo clone sebastiand-cerebras/meta-repo
+cd meta-repo
+
+# 2. Run full setup (checks prerequisites, installs deps, creates .env)
+just init
+
+# 3. Edit .env and add your API key
+# Then authenticate with GitHub CLI
+gh auth login
+
+# 4. Start the local manager
+just start
+# → Open http://localhost:3200
+```
+
+**Common commands:**
+```bash
+just start              # Start local manager
+just generate owner/repo1 owner/repo2  # Generate pages
+just delete repo-name   # Delete a generated page
+just regen-all          # Regenerate all pages
+just clean              # Remove cached clones (tmp/)
+just list               # List all generated pages
+just --list             # Show all available commands
+```
+
+### Option 2: Manual Setup
+
 ```bash
 # 1. Clone and install
 gh repo clone sebastiand-cerebras/meta-repo
@@ -28,6 +65,7 @@ npm install
 
 # 2. Configure
 echo "CEREBRAS_API_KEY=your-key" > .env
+gh auth login
 
 # 3. Start the local manager
 node server.js
@@ -38,7 +76,7 @@ node server.js
 
 ### Local Manager (GUI)
 
-Start the server with `node server.js`, open `http://localhost:3200`, then:
+Start the server (`just start` or `node server.js`), open `http://localhost:3200`, then:
 
 - Enter a GitHub username to browse their public repos
 - Select up to 5 repositories
@@ -47,24 +85,28 @@ Start the server with `node server.js`, open `http://localhost:3200`, then:
 
 ### Command Line
 
+**Using `just`:**
 ```bash
-# Generate pages for specific repos
-node generate.js owner/repo1 owner/repo2
+just generate owner/repo1 owner/repo2  # Generate pages
+just generate-local owner/repo1        # Generate without pushing
+just regen-all                         # Regenerate all pages
+just delete repo-name                  # Delete a page + update manifest
+just clean                             # Remove cached clones (tmp/)
+```
 
-# Skip git push (local-only)
-node generate.js --no-push owner/repo1
-
-# Reuse existing clones (faster)
-node generate.js --no-clone owner/repo1
-
-# Regenerate all existing pages
-./regen-all.sh
+**Manual:**
+```bash
+node generate.js owner/repo1 owner/repo2   # Generate pages
+node generate.js --no-push owner/repo1     # Generate without pushing
+node generate.js --no-clone owner/repo1    # Reuse existing clones
+./regen-all.sh                             # Regenerate all pages
 ```
 
 ## Project Structure
 
 ```
 meta-repo/
+├── justfile               # Task runner (just <command>)
 ├── server.js              # Express server (port 3200) — API + local manager
 ├── generate.js            # CLI generation script — clone, analyze, LLM call, write, push
 ├── local-manager.html     # Local manager UI (repo browser + generation)
@@ -135,15 +177,25 @@ export default {
 
 The generator clones repositories to `tmp/repos/` during generation (reused with `--no-clone`). Over time this can consume substantial disk space.
 
+**Using `just`:**
 ```bash
-# Remove all cached clones
-rm -rf tmp/
+just disk    # Check disk usage
+just clean   # Remove all cached clones
+```
 
-# Check disk usage before cleaning
-du -sh tmp/
+**Manual:**
+```bash
+du -sh tmp/  # Check disk usage
+rm -rf tmp/  # Remove all cached clones
 ```
 
 The `tmp/` directory is gitignored and safe to delete — it will be recreated as needed.
+
+**To remove a generated page:**
+```bash
+just delete repo-name
+# Then commit: git add repos/ && git commit -m "Remove page" && git push
+```
 
 ## License
 
