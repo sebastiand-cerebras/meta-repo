@@ -10,5 +10,9 @@ cerebras-style-html-raws/
 # OS
 .DS_Store
 
+# Personal photos (use GitHub avatar URLs instead)
+assets/seb.png
+assets/zhenwei.png
+
 # Node
 node_modules/

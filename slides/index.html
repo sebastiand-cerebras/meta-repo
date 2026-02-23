@@ -420,6 +420,86 @@
       line-height: 1.5;
     }
 
+    /* Speaker avatars */
+    .speakers {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      margin-top: 28px;
+    }
+    .speaker {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .speaker img {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: 2px solid var(--accent-color);
+      object-fit: cover;
+    }
+    .speaker-info {
+      text-align: left;
+    }
+    .speaker-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .speaker-role {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* Thank you slide */
+    .thankyou-layout {
+      display: flex;
+      align-items: center;
+      gap: 48px;
+      width: 100%;
+      max-width: 900px;
+    }
+    .thankyou-left {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .thankyou-left img {
+      width: 100%;
+      max-width: 380px;
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+    }
+    .thankyou-right {
+      flex: 1;
+      text-align: center;
+    }
+    .thankyou-right h2 {
+      font-size: 56px;
+      margin-bottom: 28px;
+    }
+    .thankyou-socials {
+      margin-top: 24px;
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.8;
+    }
+    .thankyou-socials a {
+      color: var(--accent-color);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .thankyou-socials a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 700px) {
+      .thankyou-layout { flex-direction: column; gap: 24px; }
+      .speakers { flex-direction: column; gap: 16px; }
+    }
+
     /* Big number animation */
     .big-num {
       font-size: 96px;
@@ -476,6 +556,22 @@
       <div class="slide-eyebrow">Cerebras × GitHub</div>
       <h1 class="gradient-text">Understand Any Repo in Seconds</h1>
       <p class="subtitle">How AI-powered visualization turns complex codebases into instant understanding.</p>
+      <div class="speakers">
+        <div class="speaker">
+          <img src="https://github.com/sebastiand-cerebras.png" alt="Seb Duerr" />
+          <div class="speaker-info">
+            <div class="speaker-name">Seb Duerr</div>
+            <div class="speaker-role">Cerebras</div>
+          </div>
+        </div>
+        <div class="speaker">
+          <img src="https://github.com/zhenweig-cerebras.png" alt="Zhenwei Gao" />
+          <div class="speaker-info">
+            <div class="speaker-name">Zhenwei Gao</div>
+            <div class="speaker-role">Cerebras</div>
+          </div>
+        </div>
+      </div>
       <div style="margin-top: 16px; font-size: 14px; color: var(--text-secondary);">
         Press <kbd style="padding: 3px 8px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 6px; font-size: 12px;">→</kbd> or swipe to navigate
       </div>
@@ -626,12 +722,64 @@
       <div class="slide-eyebrow">Get Started</div>
       <h2>Take It Home</h2>
       <p class="subtitle">Run this tool locally. Generate visual pages for any repo — yours, your team's, or anyone's.</p>
-      <div class="qr-section">
-        <img src="../assets/qr-repo.svg" alt="Scan to download" />
-        <div class="qr-text">
-          <h3>Scan to Get the Starter Code</h3>
-          <p>Download the repo, add your Cerebras API key, and start generating. Free to use.</p>
-          <a href="https://github.com/sebastiand-cerebras/meta-repo" target="_blank" rel="noopener" style="display: inline-block; margin-top: 10px; color: var(--accent-color); font-weight: 600; font-size: 14px; text-decoration: none;">github.com/sebastiand-cerebras/meta-repo →</a>
+      <div style="display: flex; flex-direction: column; gap: 16px; max-width: 640px; width: 100%;">
+        <div class="qr-section">
+          <img src="../assets/qr-repo.svg" alt="Scan to download" />
+          <div class="qr-text">
+            <h3>Scan to Get the Starter Code</h3>
+            <p>Download the repo, add your Cerebras API key, and start generating. Free to use.</p>
+            <a href="https://github.com/sebastiand-cerebras/meta-repo" target="_blank" rel="noopener" style="display: inline-block; margin-top: 10px; color: var(--accent-color); font-weight: 600; font-size: 14px; text-decoration: none;">github.com/sebastiand-cerebras/meta-repo →</a>
+          </div>
+        </div>
+        <div class="qr-section">
+          <div style="width: 120px; height: 120px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 8px; font-size: 48px;">⚡</div>
+          <div class="qr-text">
+            <h3>Build Fast with cerebras-cli</h3>
+            <p>Scaffold, develop, and iterate on full-stack apps at lightning speed — powered by Cerebras inference.</p>
+            <a href="https://www.npmjs.com/package/cerebras-cli" target="_blank" rel="noopener" style="display: inline-block; margin-top: 10px; color: var(--accent-color); font-weight: 600; font-size: 14px; text-decoration: none;">npm install -g cerebras-cli →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: Thank You -->
+    <div class="slide" data-slide="8">
+      <div class="thankyou-layout">
+        <div class="thankyou-left">
+          <div style="background: linear-gradient(135deg, #e0e5ec 0%, #d0d8e8 100%); border-radius: var(--radius-xl); padding: 32px; display:flex; align-items:center; justify-content:center; width:100%; max-width:380px; aspect-ratio:4/5;">
+            <div style="background: white; border-radius: 16px; padding: 16px 20px; box-shadow: 0 4px 24px rgba(0,0,0,0.1); max-width: 280px;">
+              <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                <div style="width:32px; height:32px; border-radius:8px; background:var(--accent-color); display:flex; align-items:center; justify-content:center; font-size:16px;">📂</div>
+                <span style="font-size:13px; color:#888; font-weight:600;">Repo Visualizer</span>
+              </div>
+              <p style="font-size:14px; color:#333; margin:0; line-height:1.5;">Point me at any repo and I'll create a beautiful visual page for you!</p>
+            </div>
+          </div>
+        </div>
+        <div class="thankyou-right">
+          <h2 class="gradient-text">Thank you!</h2>
+          <div class="speakers" style="justify-content:center;">
+            <div class="speaker">
+              <img src="https://github.com/sebastiand-cerebras.png" alt="Seb Duerr" />
+              <div class="speaker-info">
+                <div class="speaker-name">Seb Duerr</div>
+                <div class="speaker-role">Cerebras</div>
+              </div>
+            </div>
+            <div class="speaker">
+              <img src="https://github.com/zhenweig-cerebras.png" alt="Zhenwei Gao" />
+              <div class="speaker-info">
+                <div class="speaker-name">Zhenwei Gao</div>
+                <div class="speaker-role">Cerebras</div>
+              </div>
+            </div>
+          </div>
+          <div class="thankyou-socials">
+            <strong style="color:var(--text-primary); display:block; margin-bottom:8px;">Connect with us on Twitter/LinkedIn:</strong>
+            <a href="https://twitter.com/duerr_seb" target="_blank">@duerr_seb</a><br>
+            <a href="https://twitter.com/zhennydez" target="_blank">@zhennydez</a><br>
+            <a href="https://linkedin.com/in/sebduerr" target="_blank">linkedin.com/in/sebduerr</a>
+          </div>
         </div>
       </div>
     </div>
@@ -860,7 +1008,7 @@
 
   <!-- Footer -->
   <div style="position:fixed; bottom:8px; right:24px; z-index:50; font-size:12px; color:var(--text-secondary); opacity:0.5;">
-    Made w/ &lt;3 by <a href="https://cerebras.ai" style="color:var(--accent-color); text-decoration:none">Cerebras</a> &amp; <a href="https://github.com/sebastiand-cerebras/meta-repo" style="color:var(--accent-color); text-decoration:none">cerebras-cli</a>
+    Made w/ &lt;3 by <a href="https://cerebras.ai" style="color:var(--accent-color); text-decoration:none">Cerebras</a> &amp; <a href="https://www.npmjs.com/package/cerebras-cli" style="color:var(--accent-color); text-decoration:none">cerebras-cli</a>
   </div>
 </body>
 </html>
