@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Better Notes | seduerr91</title>
+    <style>
+        :root {
+            --bg-primary:#f5f5f7; --bg-secondary:#ffffff; --bg-tertiary:#f0f0f2; --bg-card:#ffffff;
+            --text-primary:rgb(43,25,16); --text-secondary:#86868b; --border-color:rgba(0,0,0,0.08);
+            --accent-color:rgb(224,100,57); --accent-hover:rgb(200,85,45); --accent-subtle:rgba(224,100,57,0.1);
+            --success-color:#34c759; --warning-color:#ff9500; --error-color:#ff3b30; --info-color:#007aff;
+            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.05);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg:0 8px 32px rgba(0,0,0,0.12);
+            --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-xl:24px;
+            --code-bg:#0d1117; --code-text:#c9d1d9;
+        }
+        [data-theme="dark"] {
+            --bg-primary:#000000; --bg-secondary:#1c1c1e; --bg-tertiary:#2c2c2e; --bg-card:#1c1c1e;
+            --text-primary:#f5f5f7; --text-secondary:#86868b; --border-color:rgba(255,255,255,0.1);
+            --accent-color:rgb(224,100,57); --accent-hover:rgb(240,115,70); --accent-subtle:rgba(224,100,57,0.15);
+            --success-color:#30d158; --warning-color:#ff9f0a; --error-color:#ff453a; --info-color:#0a84ff;
+            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.3);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.4),0 2px 4px -1px rgba(0,0,0,0.2);
+            --shadow-lg:0 8px 32px rgba(0,0,0,0.5);
+            --code-bg:#161b22; --code-text:#c9d1d9;
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+        body{background:var(--bg-primary);color:var(--text-primary);min-height:100vh;transition:background .3s,color .3s;line-height:1.5; overflow-x: hidden;}
+        a{text-decoration:none;color:inherit;transition:color 0.2s;}
+        ul{list-style:none;}
+        
+        /* Utilities */
+        .container{max-width:1000px;margin:0 auto;padding:0 24px;}
+        .flex{display:flex;align-items:center;}
+        .flex-col{flex-direction:column;}
+        .justify-between{justify-content:space-between;}
+        .justify-center{justify-content:center;}
+        .gap-2{gap:0.5rem}.gap-4{gap:1rem}.gap-6{gap:1.5rem}.gap-8{gap:2rem}
+        .grid{display:grid;gap:24px;}
+        .grid-2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr));}
+        .grid-3{grid-template-columns:repeat(auto-fit,minmax(250px,1fr));}
+        .text-center{text-align:center;}
+        .mt-4{margin-top:1rem}.mt-8{margin-top:2rem}.mb-4{margin-bottom:1rem}.mb-8{margin-bottom:2rem}
+        .w-full{width:100%}
+        
+        /* Typography */
+        h1,h2,h3{line-height:1.1;font-weight:700;letter-spacing:-0.02em}
+        h1{font-size:3rem;background:linear-gradient(135deg,var(--text-primary) 30%,var(--accent-color));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        h2{font-size:2rem;margin-bottom:1.5rem}
+        h3{font-size:1.25rem;margin-bottom:0.5rem}
+        p{color:var(--text-secondary);margin-bottom:1rem}
+        .text-sm{font-size:0.875rem}.text-xs{font-size:0.75rem}
+        .font-bold{font-weight:700}
+
+        /* Components */
+        .glass{background:rgba(255,255,255,0.05);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border-color)}
+        .card{background:var(--bg-card);border-radius:var(--radius-lg);padding:24px;border:1px solid var(--border-color);box-shadow:var(--shadow-md);transition:transform 0.3s ease, box-shadow 0.3s ease}
+        .card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+        
+        /* Badge & Buttons */
+        .badge{display:inline-flex;align-items:center;padding:4px 12px;border-radius:999px;font-size:0.75rem;font-weight:600;}
+        .badge-warning{background:rgba(255,149,0,0.15);color:var(--warning-color);border:1px solid rgba(255,149,0,0.3)}
+        .badge-tech{background:var(--bg-tertiary);color:var(--text-primary);border:1px solid var(--border-color)}
+        .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:var(--radius-md);font-weight:600;cursor:pointer;transition:all 0.2s;border:none;font-size:0.9rem}
+        .btn-primary{background:var(--accent-color);color:white}
+        .btn-primary:hover{background:var(--accent-hover);transform:scale(1.02)}
+        .btn-ghost{background:transparent;color:var(--text-secondary);padding:8px}
+        .btn-ghost:hover{background:var(--bg-tertiary);color:var(--text-primary)}
+
+        /* Hero */
+        .hero{position:relative;min-height:80vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;overflow:hidden;padding:40px 0}
+        .hero::before{content:'';position:absolute;top:-20%;left:50%;transform:translateX(-50%);width:800px;height:600px;background:radial-gradient(circle,rgba(224,100,57,0.15) 0%,rgba(0,0,0,0) 70%);z-index:-1;filter:blur(60px)}
+        
+        /* Stat Tiles */
+        .stat-card{text-align:center;padding:32px 16px;background:var(--bg-secondary);border-radius:var(--radius-lg);border:1px solid var(--border-color)}
+        .stat-value{font-size:2.5rem;font-weight:800;color:var(--text-primary);display:block;line-height:1;margin-bottom:4px}
+        .stat-label{font-size:0.85rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em;font-weight:600}
+
+        /* Flow Diagram */
+        .flow-container{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:16px;padding:24px;background:var(--bg-secondary);border-radius:var(--radius-lg);border:1px solid var(--border-color)}
+        .flow-node{padding:12px 20px;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-sm);font-weight:600;font-size:0.9rem;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow-sm)}
+        .flow-arrow{color:var(--text-secondary);opacity:0.5}
+
+        /* Code Block */
+        .code-block{background:var(--code-bg);border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);box-shadow:var(--shadow-lg);text-align:left;margin-top:1rem}
+        .code-header{background:rgba(255,255,255,0.05);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,0.1)}
+        .code-filename{font-family:monospace;font-size:0.8rem;color:var(--text-secondary)}
+        .code-content{padding:20px;font-family:'SF Mono',Menlo,monospace;font-size:0.85rem;color:var(--code-text);overflow-x:auto}
+        .token-kw{color:#ff7b72}.token-func{color:#d2a8ff}.token-str{color:#a5d6ff}.token-tag{color:#7ee787}
+
+        /* Scroll Animations */
+        .reveal{opacity:0;transform:translateY(30px);transition:all 0.8s cubic-bezier(0.5,0,0,1)}
+        .reveal.visible{opacity:1;transform:translateY(0)}
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            h1{font-size:2.2rem}
+            .grid-2, .grid-3{grid-template-columns:1fr}
+            .flow-container{flex-direction:column}
+            .flow-arrow{transform:rotate(90deg)}
+        }
+
+        /* Icons */
+        .icon{width:20px;height:20px;fill:currentColor}
+        .icon-lg{width:32px;height:32px}
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="glass sticky-top" style="position:sticky;top:0;z-index:100;padding:16px 0;">
+        <div class="container flex justify-between">
+            <a href="../../index.html" class="flex gap-2" style="color:var(--text-secondary);">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                <span class="text-sm font-bold">Back to Explorer</span>
+            </a>
+            <button id="theme-toggle" class="btn btn-ghost" aria-label="Toggle Theme">
+                <!-- Icon injected by JS -->
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="container">
+            <div class="badge badge-warning mb-4">
+                <svg class="icon" style="margin-right:6px" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                External — seduerr91
+            </div>
+            <h1 class="mb-4">Better Notes</h1>
+            <p style="font-size:1.25rem;max-width:600px;margin:0 auto 2rem;">A sleek, React-powered note-taking application built with TypeScript, featuring Markdown support, advanced state management, and a stunning dark mode.</p>
+            
+            <div class="flex gap-4 justify-center" style="flex-wrap: wrap;">
+                <a href="#" class="btn btn-primary">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    View Source
+                </a>
+                <a href="#" class="btn" style="background:var(--bg-secondary);border:1px solid var(--border-color)">
+                    Live Demo
+                </a>
+            </div>
+            
+            <!-- Mock UI Card -->
+            <div class="glass mt-8" style="margin-top:60px;padding:10px;border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);max-width:800px;width:100%;transform:perspective(1000px) rotateX(2deg); transition: transform 0.5s;">
+                <div style="background:var(--bg-card);border-radius:var(--radius-lg);padding:24px;min-height:200px;text-align:left;">
+                    <div class="flex justify-between mb-4" style="border-bottom:1px solid var(--border-color);padding-bottom:12px;">
+                        <div class="flex gap-2">
+                            <div style="width:12px;height:12px;border-radius:50%;background:#ff5f56"></div>
+                            <div style="width:12px;height:12px;border-radius:50%;background:#ffbd2e"></div>
+                            <div style="width:12px;height:12px;border-radius:50%;background:#27c93f"></div>
+                        </div>
+                        <span class="text-sm" style="font-family:monospace;color:var(--text-secondary)">App.tsx</span>
+                    </div>
+                    <div class="flex gap-4" style="height:140px">
+                        <div style="width:120px;background:var(--bg-tertiary);border-radius:var(--radius-sm);"></div>
+                        <div style="flex:1;background:var(--bg-tertiary);border-radius:var(--radius-sm);display:flex;flex-direction:column;gap:8px;padding:12px;">
+                            <div class="flex justify-between" style="width:60%;height:16px;background:rgba(128,128,128,0.2);border-radius:4px;"></div>
+                            <div class="flex justify-between" style="width:90%;height:8px;background:rgba(128,128,128,0.1);border-radius:4px;"></div>
+                            <div class="flex justify-between" style="width:80%;height:8px;background:rgba(128,128,128,0.1);border-radius:4px;"></div>
+                            <div style="margin-top:auto;align-self:flex-end;width:80px;height:32px;background:var(--accent-color);border-radius:6px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Stats Section -->
+    <section class="container" style="margin-top:-40px;position:relative;z-index:10;">
+        <div class="grid grid-3">
+            <div class="stat-card glass reveal">
+                <span class="stat-value" data-target="30">0</span>
+                <span class="stat-label">Dependencies</span>
+            </div>
+            <div class="stat-card glass reveal">
+                <span class="stat-value" data-target="100">0</span>
+                <span class="stat-label">TypeScript</span>
+            </div>
+            <div class="stat-card glass reveal">
+                <span class="stat-value" data-target="18">0</span>
+                <span class="stat-label">React Version</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Flow -->
+    <section class="container mt-8">
+        <div class="reveal">
+            <h2 class="text-center">Application Flow</h2>
+            <div class="flow-container">
+                <div class="flow-node">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    User
+                </div>
+                <svg class="icon flow-arrow" viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                <div class="flow-node">Login</div>
+                <svg class="icon flow-arrow" viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                <div class="flow-node" style="border-color:var(--accent-color);color:var(--accent-color)">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                    Private Route
+                </div>
+                <svg class="icon flow-arrow" viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                <div class="flex gap-2">
+                    <div class="flow-node">Dashboard</div>
+                    <div class="flow-node">Notes</div>
+                    <div class="flow-node">Settings</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Features Grid -->
+    <section class="container mt-8 mb-8">
+        <h2 class="reveal">Key Capabilities</h2>
+        <div class="grid grid-3">
+            <article class="card reveal">
+                <div style="width:48px;height:48px;background:var(--accent-subtle);color:var(--accent-color);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+                    <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                </div>
+                <h3>Markdown Support</h3>
+                <p>Full rendering capabilities via React Markdown and GitHub Flavored Markdown (GFM) for rich text formatting.</p>
+            </article>
+            <article class="card reveal">
+                <div style="width:48px;height:48px;background:var(--info-color);color:white;opacity:0.8;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+                    <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
+                </div>
+                <h3>Smart State</h3>
+                <p>Utilizes Zustand for lightweight, performant global state management, handling notes, collections, and user auth effortlessly.</p>
+            </article>
+            <article class="card reveal">
+                <div style="width:48px;height:48px;background:var(--success-color);color:white;opacity:0.8;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+                    <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                </div>
+                <h3>Type Safety</h3>
+                <p>Written entirely in TypeScript. Ensure robust data structures with Zod schemas for validation and clean type definitions.</p>
+            </article>
+        </div>
+    </section>
+
+    <!-- Tech Stack & Code -->
+    <section class="container mb-8">
+        <div class="card reveal" style="overflow:hidden;">
+            <div class="flex flex-col" style="gap:24px;">
+                <div>
+                    <h3 style="margin-bottom:16px;">Technology Stack</h3>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                        <span class="badge badge-tech">React 18</span>
+                        <span class="badge badge-tech">TypeScript</span>
+                        <span class="badge badge-tech">Tailwind CSS</span>
+                        <span class="badge badge-tech">Zustand</span>
+                        <span class="badge badge-tech">React Router v6</span>
+                        <span class="badge badge-tech">React Hook Form</span>
+                        <span class="badge badge-tech">Zod</span>
+                        <span class="badge badge-tech">Day.js</span>
+                        <span class="badge badge-tech">SWR</span>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3>Core Routing Logic</h3>
+                    <p class="text-sm">The application uses React Router v6 to handle protected routes and nested views for notes and collections.</p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-filename">src/App.tsx</span>
+                            <svg class="icon" style="color:var(--text-secondary);cursor:pointer" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                        </div>
+                        <div class="code-content">
+<pre><code><span class="token-kw">import</span> { <span class="token-func">Routes</span>, <span class="token-func">Route</span> } <span class="token-kw">from</span> <span class="token-str">"react-router-dom"</span>;
+<span class="token-kw">import</span> { <span class="token-func">Toaster</span> } <span class="token-kw">from</span> <span class="token-str">"react-hot-toast"</span>;
+
+<span class="token-kw">function</span> <span class="token-func">App</span>() {
+  <span class="token-kw">return</span> (
+    <span class="token-tag">&lt;ErrorBoundary&gt;</span>
+      <span class="token-tag">&lt;AuthProvider&gt;</span>
+        <span class="token-tag">&lt;Routes&gt;</span>
+          <span class="token-tag">&lt;Route</span> <span class="token-str">element</span>=<span class="token-tag">{&lt;PrivateRoute</span> <span class="token-tag">/&gt;}</span><span class="token-tag">&gt;</span>
+            <span class="token-tag">&lt;Route</span> <span class="token-str">index</span> <span class="token-str">element</span>=<span class="token-tag">{&lt;Notes</span> <span class="token-tag">/&gt;}</span> <span class="token-tag">/&gt;</span>
+            <span class="token-tag">&lt;Route</span> <span class="token-str">path</span>=<span class="token-str">"collections/:id"</span> <span class="token-str">element</span>=<span class="token-tag">{&lt;Collection</span> <span class="token-tag">/&gt;}</span> <span class="token-tag">/&gt;</span>
+            <span class="token-tag">&lt;Route</span> <span class="token-str">path</span>=<span class="token-str">"notes/new"</span> <span class="token-str">element</span>=<span class="token-tag">{&lt;NewNote</span> <span class="token-tag">/&gt;}</span> <span class="token-tag">/&gt;</span>
+          <span class="token-tag">&lt;/Route&gt;</span>
+        <span class="token-tag">&lt;/Routes&gt;</span>
+      <span class="token-tag">&lt;/AuthProvider&gt;</span>
+    <span class="token-tag">&lt;/ErrorBoundary&gt;</span>
+  );
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="container text-center mb-8">
+        <div style="padding:24px 0;border-top:1px solid var(--border-color);">
+            <p class="text-sm">
+                View repository on <a href="#" style="color:var(--accent-color);text-decoration:underline;">GitHub</a>
+            </p>
+            <p class="text-xs" style="color:var(--text-secondary);margin-top:8px;">
+                Generated by <span style="font-weight:600;">Cerebras</span> • <a href="../../index.html">Back to Explorer</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle Logic
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const htmlElement = document.documentElement;
+        
+        const sunIcon = `<svg class="icon" viewBox="0 0 24 24"><path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/></svg>`;
+        const moonIcon = `<svg class="icon" viewBox="0 0 24 24"><path d="M10 2c-1.82 0-3.53.5-5 1.35C7.99 5.08 10 8.3 10 12s-2.01 6.92-5 8.65C6.47 21.5 8.18 22 10 22c5.52 0 10-4.48 10-10S15.52 2 10 2z"/></svg>`;
+
+        const setTheme = (theme) => {
+            if (theme === 'dark') {
+                htmlElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                themeToggleBtn.innerHTML = sunIcon;
+            } else {
+                htmlElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+                themeToggleBtn.innerHTML = moonIcon;
+            }
+        };
+
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        setTheme(savedTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        });
+
+        // Scroll Reveal Animation
+        const observerOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target); // Run once
+                    // Trigger counter if it's a stat card
+                    const counter = entry.target.querySelector('.stat-value');
+                    if (counter) animateCounter(counter);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Counter Animation
+        function animateCounter(el) {
+            const target = parseInt(el.getAttribute('data-target'));
+            let start = 0;
+            const duration = 1500;
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Ease out quart
+                const ease = 1 - Math.pow(1 - progress, 4);
+                
+                const currentVal = Math.floor(ease * target);
+                el.innerText = currentVal + (target === 18 ? '.0' : '+'); // specific formatting
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    el.innerText = target + (target === 18 ? '.0' : '+');
+                }
+            }
+            requestAnimationFrame(update);
+        }
+    </script>
+</body>
+</html>
