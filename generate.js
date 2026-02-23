@@ -472,40 +472,8 @@ Hard rules:
 6. Do NOT dump the README verbatim — transform and curate the content visually.
 7. Include a "← Back to Explorer" link at the top linking to ../../index.html.`;
 
-  // --- Step 1: Analysis — plan the page structure and content ---
-  process.stdout.write(`    Step 1/2: Analyzing repo & planning page layout… `);
-
-  const analysisPrompt = `You are planning a beautiful visual showcase page for the GitHub repository ${analysis.owner}/${analysis.repo}.
-
-Repository context:
-${context}
-
-Visual template for "${analysis.type}" projects:
-${typeTemplate}
-
-Create a detailed page plan in JSON format with these fields:
-{
-  "headline": "catchy one-liner about the project",
-  "sections": [
-    { "title": "Section Name", "type": "hero|stats|grid|flow|cards|code|features|cta", "content": "what goes here", "visualNotes": "layout and design ideas" }
-  ],
-  "colorAccents": "suggested accent colors or gradients beyond the base theme",
-  "keyStats": ["stat 1", "stat 2", ...],
-  "diagrams": ["description of any flow/architecture diagrams to include"],
-  "uniqueTouches": ["special interactive or visual elements that make this page stand out"]
-}
-
-Be specific and creative. Think about what makes this repo special and how to showcase it visually.`;
-
-  const planResult = await callCerebras(apiKey, [
-    { role: 'system',  content: 'You are a creative UI/UX strategist. Output only valid JSON — no markdown fences, no explanation.' },
-    { role: 'user',    content: analysisPrompt },
-  ]);
-  log(`${planResult.tps} tok/s`);
-  const pagePlan = planResult.content;
-
-  // --- Step 2: Generate — produce the final HTML in one shot ---
-  process.stdout.write(`    Step 2/2: Generating final HTML page… `);
+  // --- Single LLM call: generate the full HTML page ---
+  process.stdout.write(`    Step 1/1: Generating visual page… `);
 
   const generatePrompt = `Repository context:
 ${context}
@@ -513,14 +481,13 @@ ${context}
 Visual template for "${analysis.type}" projects:
 ${typeTemplate}
 
-Here is a detailed page plan created by a UI strategist:
-${pagePlan}
+Generate a complete single-file HTML page that visually showcases the ${analysis.owner}/${analysis.repo} repository.
 
-Now generate a complete single-file HTML page that visually showcases the ${analysis.owner}/${analysis.repo} repository.
+First think about: what makes this repo special? What are the key stats, architecture patterns, and features worth highlighting? What sections (hero, stats, grid, flow diagram, cards, code snippets, CTA) would make this page stunning?
+
+Then generate the full HTML implementing your plan.
 
 Requirements:
-- Follow the page plan above — implement every section described
-- Follow the visual template for "${analysis.type}" projects
 - Use the CSS design system variables provided
 - Make it visually STUNNING and information-dense — not a wall of text
 - Use cards, grids, stat tiles, inline SVG icons/diagrams, gradients, hover effects
@@ -711,7 +678,7 @@ async function main() {
     log(`  🏷  Detected type: ${analysis.type}`);
 
     // --- Generate ---
-    log(`  ✨ Generating visual page (${iterations} iterations)…`);
+    log(`  ✨ Generating visual page…`);
     let html;
     try {
       html = await generatePage(apiKey, analysis, isExternal, iterations);

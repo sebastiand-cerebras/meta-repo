@@ -652,15 +652,9 @@
         </div>
         <div class="flow-arrow">→</div>
         <div class="flow-step">
-          <div class="flow-icon">🔍</div>
-          <div class="flow-label">Analyze</div>
-          <div class="flow-desc">AI plans the page layout</div>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">
           <div class="flow-icon">✨</div>
           <div class="flow-label">Generate</div>
-          <div class="flow-desc">Full HTML page in one shot</div>
+          <div class="flow-desc">One LLM call → full HTML</div>
         </div>
         <div class="flow-arrow">→</div>
         <div class="flow-step">
@@ -687,8 +681,8 @@
           <div class="stat-label">Rich HTML output</div>
         </div>
         <div class="stat-card">
-          <div class="stat-num">2</div>
-          <div class="stat-label">LLM calls total</div>
+          <div class="stat-num">1</div>
+          <div class="stat-label">LLM call total</div>
         </div>
       </div>
     </div>
@@ -732,7 +726,7 @@
           </div>
         </div>
         <div class="qr-section">
-          <div style="width: 120px; height: 120px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 8px; font-size: 48px;">⚡</div>
+          <img src="../assets/cerebras-cli.png" alt="cerebras-cli" style="width: 120px; height: 120px; flex-shrink: 0; border-radius: 8px; object-fit: contain; background: var(--bg-tertiary);" />
           <div class="qr-text">
             <h3>Build Fast with cerebras-cli</h3>
             <p>Scaffold, develop, and iterate on full-stack apps at lightning speed — powered by Cerebras inference.</p>
@@ -972,8 +966,7 @@
 
           // Show latest meaningful log
           for (const entry of job.logs) {
-            if (entry.message.includes('Step 1')) status.textContent = '🔍 Analyzing repository…';
-            else if (entry.message.includes('Step 2')) status.textContent = '✨ Generating visual page…';
+            if (entry.message.includes('Step 1')) status.textContent = '✨ Generating visual page…';
             else if (entry.message.includes('Committing')) status.textContent = '🚀 Pushing to GitHub…';
             else if (entry.message.includes('Written')) {
               const m = entry.message.match(/Written:.*\((.+)\)/);

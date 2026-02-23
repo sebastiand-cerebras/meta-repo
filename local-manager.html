@@ -435,90 +435,138 @@
       gap: 0;
       align-items: center;
       margin-bottom: 20px;
-      padding: 16px 20px;
-      background: var(--bg-secondary);
+      padding: 20px 24px;
+      background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
       border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-lg);
       overflow-x: auto;
+      position: relative;
+    }
+    .iteration-tracker::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(90deg, transparent 0%, rgba(224, 100, 57, 0.03) 50%, transparent 100%);
+      animation: tracker-shimmer 3s ease-in-out infinite;
+    }
+    @keyframes tracker-shimmer {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 1; }
     }
     .iter-step {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
-      min-width: 70px;
+      gap: 8px;
+      min-width: 80px;
       flex: 1;
       position: relative;
+      z-index: 1;
     }
     .iter-dot {
-      width: 28px;
-      height: 28px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       border: 2px solid var(--border-color);
       background: var(--bg-primary);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 600;
       color: var(--text-secondary);
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
       z-index: 1;
     }
     .iter-step.active .iter-dot {
       border-color: var(--accent-color);
       background: var(--accent-color);
       color: white;
-      box-shadow: 0 0 0 4px rgba(224, 100, 57, 0.2);
-      animation: pulse-dot 2s ease-in-out infinite;
+      box-shadow: 0 0 0 4px rgba(224, 100, 57, 0.2), 0 0 20px rgba(224, 100, 57, 0.3);
+      animation: pulse-dot 1.5s ease-in-out infinite;
+      transform: scale(1.15);
     }
     .iter-step.completed .iter-dot {
       border-color: var(--success-color);
       background: var(--success-color);
       color: white;
-      box-shadow: none;
-      animation: none;
+      box-shadow: 0 0 12px rgba(52, 199, 89, 0.3);
+      animation: complete-pop 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
     @keyframes pulse-dot {
-      0%, 100% { box-shadow: 0 0 0 4px rgba(224, 100, 57, 0.2); }
-      50%      { box-shadow: 0 0 0 8px rgba(224, 100, 57, 0.1); }
+      0%, 100% { box-shadow: 0 0 0 4px rgba(224, 100, 57, 0.2), 0 0 20px rgba(224, 100, 57, 0.3); }
+      50%      { box-shadow: 0 0 0 8px rgba(224, 100, 57, 0.1), 0 0 30px rgba(224, 100, 57, 0.15); }
+    }
+    @keyframes complete-pop {
+      0%   { transform: scale(1.15); }
+      50%  { transform: scale(1.3); }
+      100% { transform: scale(1); }
     }
     .iter-label {
-      font-size: 10px;
+      font-size: 11px;
       color: var(--text-secondary);
       text-align: center;
       line-height: 1.3;
-      max-width: 80px;
-      transition: color 0.3s ease;
+      max-width: 90px;
+      transition: all 0.4s ease;
+      font-weight: 500;
     }
     .iter-step.active .iter-label {
       color: var(--accent-color);
-      font-weight: 600;
+      font-weight: 700;
+      transform: translateY(2px);
     }
     .iter-step.completed .iter-label {
       color: var(--success-color);
     }
     .iter-connector {
       flex: 0 0 auto;
-      width: 24px;
-      height: 2px;
+      width: 32px;
+      height: 3px;
       background: var(--border-color);
-      transition: background 0.4s ease;
-      margin-top: -18px;
+      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      margin-top: -22px;
+      border-radius: 2px;
+      position: relative;
+      overflow: hidden;
+    }
+    .iter-connector.filling::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--accent-color);
+      animation: connector-fill 1.5s ease-in-out forwards;
+      border-radius: 2px;
+    }
+    @keyframes connector-fill {
+      from { transform: scaleX(0); transform-origin: left; }
+      to   { transform: scaleX(1); transform-origin: left; }
     }
     .iter-connector.filled {
       background: var(--success-color);
+      box-shadow: 0 0 8px rgba(52, 199, 89, 0.2);
     }
     .iter-speed {
-      font-size: 9px;
-      color: var(--text-secondary);
+      font-size: 10px;
+      color: var(--accent-color);
       font-family: "SF Mono", monospace;
+      font-weight: 600;
       opacity: 0;
-      transition: opacity 0.3s ease;
+      transition: all 0.4s ease;
+      transform: translateY(-4px);
     }
     .iter-step.completed .iter-speed,
     .iter-step.active .iter-speed {
       opacity: 1;
+      transform: translateY(0);
+    }
+    .iter-step.active .iter-speed {
+      animation: speed-pulse 2s ease-in-out infinite;
+    }
+    @keyframes speed-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
     }
 
     /* Log area */
@@ -548,6 +596,48 @@
     .log-line.info { color: var(--text-secondary); font-style: italic; }
     .log-line.success { color: var(--success-color); font-weight: 600; }
     .log-line.error { color: var(--error-color); font-weight: 600; }
+
+    /* Particle effects */
+    .gen-particles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      border-radius: var(--radius-md);
+      z-index: 1;
+    }
+    .gen-particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--accent-color);
+      opacity: 0;
+      animation: particle-float 3s ease-in-out infinite;
+    }
+    @keyframes particle-float {
+      0%   { opacity: 0; transform: translateY(100%) scale(0); }
+      20%  { opacity: 0.8; }
+      80%  { opacity: 0.4; }
+      100% { opacity: 0; transform: translateY(-20px) scale(1.5); }
+    }
+
+    /* Speed counter */
+    .speed-counter {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      font-family: "SF Mono", monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent-color);
+      z-index: 2;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      text-shadow: 0 0 12px rgba(224, 100, 57, 0.4);
+    }
+    .speed-counter.visible { opacity: 1; }
+
     .modal-footer {
       margin-top: 20px;
       display: flex;
@@ -676,7 +766,10 @@
           </div>
         </div>
         <div class="iteration-tracker" id="iterationTracker" style="display:none"></div>
-        <div class="modal-logs" id="modalLogs"></div>
+        <div style="position:relative;">
+          <div class="gen-particles" id="genParticles"></div>
+          <div class="modal-logs" id="modalLogs"></div>
+        </div>
         <div class="modal-footer">
           <button class="btn btn-secondary btn-sm" id="closeModalBtn" onclick="hideModal()" style="display:none">Close</button>
           <a href="https://sebastiand-cerebras.github.io/meta-repo" class="view-repos-btn" id="viewReposBtn">View Hosted Pages &rarr;</a>
@@ -956,6 +1049,43 @@
       iterSteps = [];
       iterTotal = 0;
       currentIter = 0;
+      // Init particles
+      const particleContainer = document.getElementById('genParticles');
+      particleContainer.innerHTML = '';
+      // Remove old speed counter if any
+      document.querySelectorAll('.speed-counter').forEach(el => el.remove());
+    }
+
+    let particleInterval = null;
+    function startParticles() {
+      stopParticles();
+      const container = document.getElementById('genParticles');
+      particleInterval = setInterval(() => {
+        const p = document.createElement('div');
+        p.className = 'gen-particle';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.bottom = '0';
+        p.style.animationDuration = (2 + Math.random() * 2) + 's';
+        p.style.animationDelay = Math.random() * 0.5 + 's';
+        p.style.width = p.style.height = (2 + Math.random() * 3) + 'px';
+        const colors = ['var(--accent-color)', 'rgba(224,100,57,0.6)', 'rgba(52,199,89,0.5)', 'rgba(255,255,255,0.3)'];
+        p.style.background = colors[Math.floor(Math.random() * colors.length)];
+        container.appendChild(p);
+        setTimeout(() => p.remove(), 4000);
+      }, 150);
+    }
+    function stopParticles() {
+      if (particleInterval) { clearInterval(particleInterval); particleInterval = null; }
+    }
+    function showSpeedCounter(speed) {
+      let counter = document.querySelector('.speed-counter');
+      if (!counter) {
+        counter = document.createElement('div');
+        counter.className = 'speed-counter';
+        document.getElementById('genParticles').parentElement.appendChild(counter);
+      }
+      counter.textContent = speed;
+      counter.classList.add('visible');
     }
 
     function hideModal() {
@@ -965,8 +1095,8 @@
     function buildIterationTracker(total) {
       iterTotal = total;
       const tracker = document.getElementById('iterationTracker');
-      const labels = ['Analyze', 'Generate'];
-      const icons = ['🔍', '✨'];
+      const labels = ['Generate'];
+      const icons = ['✨'];
       let html = '';
       for (let i = 1; i <= total; i++) {
         if (i > 1) html += `<div class="iter-connector" id="iterConn${i}"></div>`;
@@ -996,13 +1126,19 @@
       // Set active
       const step = document.getElementById(`iterStep${stepNum}`);
       if (step) step.classList.add('active');
+      // Animate connector filling
+      const conn = document.getElementById(`iterConn${stepNum}`);
+      if (conn && !conn.classList.contains('filled')) conn.classList.add('filling');
       // Update subtitle
-      document.getElementById('modalSubtitle').textContent = `Iteration ${stepNum} of ${iterTotal}`;
+      document.getElementById('modalSubtitle').textContent = `Generating…`;
       // Show speed if provided
       if (speed) {
         const speedEl = document.getElementById(`iterSpeed${stepNum}`);
         if (speedEl) speedEl.textContent = speed;
+        showSpeedCounter(speed);
       }
+      // Start particles when generation is active
+      startParticles();
     }
 
     function completeAllIterations() {
@@ -1030,17 +1166,19 @@
         // Extract speed if present
         const speedMatch = detail.match(/(\d[\d,]*\.?\d*)\s*tok\/s/);
         const speed = speedMatch ? `${speedMatch[1]} tok/s` : null;
-        const subtitles = ['Analyzing repository…', 'Generating HTML page…'];
+        const subtitles = ['Generating HTML page…'];
         if (speed) {
           updateIteration(step, speed);
+          showSpeedCounter(speed);
           const s = document.getElementById(`iterStep${step}`);
           if (s) { s.classList.remove('active'); s.classList.add('completed'); }
           const dot = s?.querySelector('.iter-dot');
           if (dot) dot.textContent = '✓';
           if (step < total) {
             const conn = document.getElementById(`iterConn${step + 1}`);
-            if (conn) conn.classList.add('filled');
+            if (conn) { conn.classList.remove('filling'); conn.classList.add('filled'); }
           }
+          stopParticles();
         } else {
           updateIteration(step, null);
           document.getElementById('modalSubtitle').textContent = subtitles[step - 1] || `Step ${step} of ${total}`;
@@ -1063,6 +1201,9 @@
 
     function generationComplete() {
       completeAllIterations();
+      stopParticles();
+      const speedCounter = document.querySelector('.speed-counter');
+      if (speedCounter) speedCounter.classList.remove('visible');
       const spinner = document.getElementById('modalSpinner');
       spinner.className = 'modal-spinner done';
       spinner.textContent = '✓';
