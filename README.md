@@ -131,6 +131,20 @@ export default {
 - **Deployment:** GitHub Pages via GitHub Actions
 - **Design:** Apple-inspired, CSS custom properties, SF Pro, dark/light mode
 
+## Cleanup
+
+The generator clones repositories to `tmp/repos/` during generation (reused with `--no-clone`). Over time this can consume substantial disk space.
+
+```bash
+# Remove all cached clones
+rm -rf tmp/
+
+# Check disk usage before cleaning
+du -sh tmp/
+```
+
+The `tmp/` directory is gitignored and safe to delete — it will be recreated as needed.
+
 ## License
 
 MIT
