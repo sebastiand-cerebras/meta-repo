@@ -65,6 +65,39 @@
 
 /* --- Generated Pages Section --- */
     #generatedSection { margin-bottom: 48px; }
+    .accordion-toggle {
+      width: 100%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0;
+      color: inherit;
+    }
+    .accordion-toggle:hover .accordion-chevron {
+      color: var(--accent-color);
+    }
+    .accordion-chevron {
+      font-size: 20px;
+      color: var(--text-secondary);
+      transition: transform 0.3s ease, color 0.2s;
+      flex-shrink: 0;
+    }
+    .accordion-chevron.open {
+      transform: rotate(180deg);
+    }
+    .accordion-body {
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.4s ease, opacity 0.3s ease;
+      opacity: 0;
+    }
+    .accordion-body.open {
+      max-height: 3000px;
+      opacity: 1;
+    }
     .generated-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -116,6 +149,30 @@
     .generated-card:hover .generated-card-arrow {
       color: var(--accent-color);
       transform: translateY(-50%) translateX(3px);
+    }
+    .generated-card-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: auto;
+    }
+    .regen-btn {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      text-decoration: none;
+    }
+    .regen-btn:hover {
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+      background: var(--accent-subtle);
     }
 
     /* --- Empty States --- */
@@ -211,20 +268,22 @@
 
     <!-- ===== HERO ===== -->
     <section class="hero">
-      <h2>Cerebras-Powered Visualization</h2>
-      <p>Beautiful, AI-generated visual pages for any GitHub repository — built in seconds, not hours.</p>
+      <h2>Cerebras-Powered Visualizations</h2>
+      <p>AI-generated visual pages for any GitHub repository — built in seconds, not hours.</p>
     </section>
 
     <!-- ===== GENERATED PAGES ===== -->
     <section id="generatedSection" style="display:none">
-      <div class="section-header">
+      <button class="accordion-toggle" onclick="toggleAccordion()">
         <div>
           <div class="section-title">Generated Pages</div>
           <div class="section-subtitle">Click any card to view the live visual page</div>
         </div>
-        <button class="btn btn-secondary btn-sm" onclick="refreshManifest()">↻ Refresh</button>
+        <span class="accordion-chevron" id="accordionChevron">▼</span>
+      </button>
+      <div class="accordion-body" id="accordionBody">
+        <div class="generated-grid" id="generatedGrid" style="margin-top: 20px;"></div>
       </div>
-      <div class="generated-grid" id="generatedGrid"></div>
     </section>
 
     <!-- ===== GET STARTED ===== -->
@@ -382,16 +441,91 @@
         const date = e.generatedAt ? new Date(e.generatedAt).toLocaleDateString('en-US', { month:'short', day:'numeric' }) : '';
         const externalBadge = e.isExternal ? `<span class="external-tag">External — ${e.owner}</span>` : '';
         return `
-          <a href="${e.url || e.path}" class="generated-card fade-in" target="_blank" rel="noopener">
-            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-right:32px">
-              <span style="font-size:20px;flex-shrink:0">${icon}</span>
-              <span class="generated-card-name">${e.repo}</span>
+          <div class="generated-card fade-in">
+            <a href="${e.url || e.path}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:12px;flex:1">
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-right:32px">
+                <span style="font-size:20px;flex-shrink:0">${icon}</span>
+                <span class="generated-card-name">${e.repo}</span>
+              </div>
+              ${externalBadge ? '<div>' + externalBadge + '</div>' : ''}
+              <div class="generated-card-meta">${e.owner} · ${e.type || 'project'}${date ? ' · ' + date : ''}</div>
+            </a>
+            <div class="generated-card-actions">
+              <button class="regen-btn" onclick="regenPage('${e.fullName}', this)" title="Regenerate this page">↻ Regenerate</button>
             </div>
-            ${externalBadge ? '<div>' + externalBadge + '</div>' : ''}
-            <div class="generated-card-meta">${e.owner} · ${e.type || 'project'}${date ? ' · ' + date : ''}</div>
             <span class="generated-card-arrow">→</span>
-          </a>`;
+          </div>`;
       }).join('');
+    }
+
+    // ============================================================
+    // Accordion
+    // ============================================================
+    function toggleAccordion() {
+      const body = document.getElementById('accordionBody');
+      const chevron = document.getElementById('accordionChevron');
+      body.classList.toggle('open');
+      chevron.classList.toggle('open');
+      // Remember state
+      localStorage.setItem('accordionOpen', body.classList.contains('open') ? '1' : '0');
+    }
+    function initAccordion() {
+      const wasOpen = localStorage.getItem('accordionOpen');
+      // Default to open on first visit
+      if (wasOpen !== '0') {
+        document.getElementById('accordionBody').classList.add('open');
+        document.getElementById('accordionChevron').classList.add('open');
+      }
+    }
+
+    // ============================================================
+    // Regenerate a page via localhost
+    // ============================================================
+    async function regenPage(fullName, btn) {
+      const origText = btn.textContent;
+      btn.textContent = '↻ Regenerating…';
+      btn.disabled = true;
+      btn.style.opacity = '0.6';
+      try {
+        const res = await fetch('http://localhost:3200/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ repos: [fullName] }),
+        });
+        if (!res.ok) throw new Error('Server returned ' + res.status);
+        const { jobId } = await res.json();
+        btn.textContent = '↻ Generating…';
+        // Poll for completion
+        const poll = setInterval(async () => {
+          try {
+            const jr = await fetch(`http://localhost:3200/api/jobs/${jobId}`);
+            const job = await jr.json();
+            if (job.status === 'done') {
+              clearInterval(poll);
+              btn.textContent = '✓ Done!';
+              btn.style.opacity = '1';
+              btn.style.color = 'var(--success-color)';
+              btn.style.borderColor = 'var(--success-color)';
+              setTimeout(() => {
+                btn.textContent = origText;
+                btn.disabled = false;
+                btn.style.color = '';
+                btn.style.borderColor = '';
+                refreshManifest();
+              }, 2000);
+            } else if (job.status === 'error') {
+              clearInterval(poll);
+              btn.textContent = '✗ Failed';
+              btn.style.color = 'var(--error-color)';
+              setTimeout(() => { btn.textContent = origText; btn.disabled = false; btn.style.color = ''; }, 3000);
+            }
+          } catch { /* keep polling */ }
+        }, 2000);
+      } catch (err) {
+        btn.textContent = '✗ Server offline';
+        btn.style.color = 'var(--error-color)';
+        setTimeout(() => { btn.textContent = origText; btn.disabled = false; btn.style.color = ''; btn.style.opacity = '1'; }, 3000);
+      }
     }
 
     // ============================================================
@@ -399,6 +533,7 @@
     // ============================================================
     document.addEventListener('DOMContentLoaded', async () => {
       initTheme();
+      initAccordion();
       await loadManifest();
     });
   </script>

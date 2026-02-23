@@ -8,7 +8,6 @@
  * Options:
  *   --no-push      Skip git commit and push
  *   --no-clone     Skip cloning (re-use existing tmp/repos/ clones)
- *   --iterations N Number of LLM refinement iterations (default: 10)
  *
  * Requires:
  *   - Node.js >= 18 (native fetch)
@@ -56,18 +55,16 @@ function parseArgs(argv) {
   const repos = [];
   let noPush   = false;
   let noClone  = false;
-  let iterations = 3;
 
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === '--no-push')    { noPush = true; continue; }
     if (arg === '--no-clone')   { noClone = true; continue; }
-    if (arg === '--iterations') { iterations = parseInt(argv[++i], 10) || 3; continue; }
     if (arg.startsWith('--'))   continue; // unknown flag
     if (arg.includes('/'))      repos.push(arg);
   }
 
-  return { repos, noPush, noClone, iterations };
+  return { repos, noPush, noClone };
 }
 
 // ============================================================
@@ -337,6 +334,7 @@ function buildContext(analysis, isExternal) {
   const sections = [];
 
   sections.push(`## Repository: ${analysis.owner}/${analysis.repo}`);
+  sections.push(`## GitHub URL: https://github.com/${analysis.owner}/${analysis.repo}`);
   if (isExternal) {
     sections.push(`⚠️  EXTERNAL REPOSITORY — You MUST display an "External — ${analysis.owner}" badge prominently at the top of the page (below the repo title). Style it with an orange/warning color.`);
   }
@@ -406,7 +404,7 @@ async function callCerebras(apiKey, messages) {
         body: JSON.stringify({
           model: MODEL,
           messages,
-          max_tokens: 40384,
+          max_tokens: 60384,
           temperature: 1.0,
         }),
         signal: AbortSignal.timeout(300_000), // 5-minute timeout
@@ -452,7 +450,7 @@ function extractHTML(content) {
 // ============================================================
 // Generate a visual page (LLM iterations)
 // ============================================================
-async function generatePage(apiKey, analysis, isExternal, iterations) {
+async function generatePage(apiKey, analysis, isExternal) {
   const context      = buildContext(analysis, isExternal);
   const typeTemplate = getTypeTemplate(analysis.type);
 
@@ -470,7 +468,28 @@ Hard rules:
 4. The page must be mobile-responsive.
 5. Make it visually STUNNING — use cards, icons (Unicode or inline SVG), gradients, stat tiles, diagrams.
 6. Do NOT dump the README verbatim — transform and curate the content visually.
-7. Include a "← Back to Explorer" link at the top linking to ../../index.html.`;
+7. Include a "← Back to Explorer" link at the top linking to ../../index.html.
+8. NEVER include a "Live Demo" button linking to "#" or a made-up URL. Only include a demo link if the README contains an actual deployed URL. Never link to "#".
+9. The GitHub repository URL is provided in the context — use it EXACTLY for all source/repo links. Do not guess repo URLs.
+10. BUDGET: Your response can be at most ~60,000 tokens. Keep the HTML under 1,200 lines / 80 KB. This is a hard ceiling — do NOT exceed it. Aim for 600–1,000 lines of dense, high-quality HTML.
+9. Every section must earn its place — prefer visual impact over volume. One polished diagram beats three text paragraphs.
+10. Use semantic HTML5 elements (section, article, nav, figure, aside, details) for structure.
+
+Design excellence checklist (incorporate as many as appropriate):
+- GLASSMORPHISM: Use backdrop-filter:blur(12px) with semi-transparent backgrounds on key cards or overlays.
+- STAT TILES: Large numeric stat values (font-size ≥ 2rem, font-weight 800) with small labels below; arrange in a 3–4 column grid.
+- GRADIENT ACCENTS: Subtle linear-gradient borders, text gradients on headings, gradient divider lines between sections.
+- HOVER MICRO-INTERACTIONS: Cards lift (translateY -4px) + shadow grows; buttons scale(1.02); icons rotate or pulse on hover.
+- ANIMATED COUNTERS: Use a small JS IntersectionObserver to animate stat numbers counting up when they scroll into view.
+- INLINE SVG ICONS: Create simple, clean SVG icons (16-24px) rather than relying solely on emoji. Mix both for variety.
+- FLOW DIAGRAMS: Use flexbox rows of styled nodes connected by CSS arrows (::after pseudo-elements with borders) to show architecture / data flow / pipelines.
+- CODE BLOCKS: Dark-themed (#0d1117) with syntax-colored spans, rounded corners, a subtle top bar with filename + copy button.
+- SECTION RHYTHM: Alternate between full-width sections and constrained-width (max-width: 800px) content for visual breathing room.
+- SCROLL ANIMATIONS: Use IntersectionObserver to add a .visible class with opacity 0→1 and translateY(20px→0) transitions as sections enter the viewport.
+- BADGE STRIPS: Show tech stack, language, framework as pill-shaped badges with subtle background colors.
+- FEATURE GRIDS: 2×2 or 3×2 grids of feature cards, each with an icon, title, and 1–2 sentence description.
+- HERO SECTION: Full-width with a radial gradient background glow, large title with text gradient, and a one-liner subtitle.
+- FOOTER: Clean, minimal footer with repo link, "Generated by Cerebras" attribution, and the "← Back to Explorer" link.`;
 
   // --- Single LLM call: generate the full HTML page ---
   process.stdout.write(`    Step 1/1: Generating visual page… `);
@@ -488,15 +507,30 @@ First think about: what makes this repo special? What are the key stats, archite
 Then generate the full HTML implementing your plan.
 
 Requirements:
-- Use the CSS design system variables provided
+- BUDGET: Keep the entire HTML document under 1,200 lines and under 80 KB. Aim for 600–1,000 lines of dense, polished HTML. Quality over quantity.
+- Use the CSS design system variables provided (--bg-primary, --bg-secondary, --accent-color, --shadow-lg, etc.)
 - Make it visually STUNNING and information-dense — not a wall of text
-- Use cards, grids, stat tiles, inline SVG icons/diagrams, gradients, hover effects
-- Include a realistic, working dark/light mode toggle
+- Use glassmorphism cards (backdrop-filter:blur), stat tile grids with large numbers, gradient accents, hover micro-interactions
+- Include animated stat counters (IntersectionObserver counting up), scroll-reveal animations (opacity + translateY transitions)
+- Build flow/architecture diagrams using flexbox + CSS arrows (::after pseudo-elements), not just text descriptions
+- Use inline SVG icons (simple, clean, 16-24px) alongside select emoji for visual variety
+- Code blocks should be dark-themed (#0d1117) with a top bar showing filename and rounded corners
+- Create a compelling hero section with radial gradient glow and text gradient on the title
+- Alternate between full-width and max-width:800px sections for visual rhythm
+- Include tech stack / language badges as colored pills
+- Include a realistic, working dark/light mode toggle (data-theme attribute + localStorage)
 - Include a "← Back to Explorer" link at the top (href="../../index.html")
 - The page should feel like a polished product landing page, not a README dump
+- Footer: repo link + "Generated by Cerebras" + back link
 ${isExternal ? `- Add an "External — ${analysis.owner}" warning badge near the top, styled in warning orange` : ''}
 
-Output only the complete HTML document.`;
+CRITICAL LINK RULES:
+- The EXACT GitHub repository URL is: https://github.com/${analysis.owner}/${analysis.repo}
+- Use ONLY this URL for ANY "View Source", "View on GitHub", "View Repository", or source code link. Do NOT guess or invent a different URL.
+- Do NOT include a "Live Demo" button or link UNLESS the README explicitly contains a real deployed URL (e.g., https://something.vercel.app, https://something.netlify.app, a custom domain). If no demo URL is found in the README, omit any demo button entirely.
+- NEVER link to "#" — every link must have a real destination or be omitted.
+
+Output only the complete HTML document. No preamble, no explanation, no markdown fences. Start with <!DOCTYPE html>.`;
 
   const pageResult = await callCerebras(apiKey, [
     { role: 'system', content: SYSTEM },
@@ -587,7 +621,7 @@ function log(msg) { process.stdout.write(msg + '\n'); }
 async function main() {
   loadEnv();
 
-  const { repos: repoArgs, noPush: noPushArg, noClone, iterations } = parseArgs(process.argv.slice(2));
+  const { repos: repoArgs, noPush: noPushArg, noClone } = parseArgs(process.argv.slice(2));
   const noPush = noPushArg || process.env.NO_PUSH === '1';
 
   if (repoArgs.length === 0) {
@@ -596,7 +630,6 @@ async function main() {
     log('Options:');
     log('  --no-push         Skip git commit and push');
     log('  --no-clone        Reuse existing tmp/repos/ clones');
-    log('  --iterations N    Number of refinement iterations (default: 10)');
     log('');
     log('Example:');
     log('  node generate.js seb/my-project johndoe/cool-lib');
@@ -681,7 +714,7 @@ async function main() {
     log(`  ✨ Generating visual page…`);
     let html;
     try {
-      html = await generatePage(apiKey, analysis, isExternal, iterations);
+      html = await generatePage(apiKey, analysis, isExternal);
     } catch (err) {
       log(`  ✗  Generation failed: ${err.message}`);
       continue;
