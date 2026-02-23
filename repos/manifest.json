@@ -2,16 +2,6 @@
   "generated": [
     {
       "owner": "seduerr91",
-      "repo": "meta-repo",
-      "fullName": "seduerr91/meta-repo",
-      "path": "repos/meta-repo/index.html",
-      "url": "repos/meta-repo/",
-      "isExternal": true,
-      "type": "generic",
-      "generatedAt": "2026-02-23T02:22:33.958Z"
-    },
-    {
-      "owner": "seduerr91",
       "repo": "pawraphrase_public",
       "fullName": "seduerr91/pawraphrase_public",
       "path": "repos/pawraphrase_public/index.html",
@@ -19,36 +9,6 @@
       "isExternal": true,
       "type": "ml",
       "generatedAt": "2026-02-22T19:19:16.177Z"
-    },
-    {
-      "owner": "sebastiand-cerebras",
-      "repo": "docker-cerebras-demo",
-      "fullName": "sebastiand-cerebras/docker-cerebras-demo",
-      "path": "repos/docker-cerebras-demo/index.html",
-      "url": "repos/docker-cerebras-demo/",
-      "isExternal": false,
-      "type": "generic",
-      "generatedAt": "2026-02-22T06:27:54.352Z"
-    },
-    {
-      "owner": "sebastiand-cerebras",
-      "repo": "cerebras-seb-playground",
-      "fullName": "sebastiand-cerebras/cerebras-seb-playground",
-      "path": "repos/cerebras-seb-playground/index.html",
-      "url": "repos/cerebras-seb-playground/",
-      "isExternal": false,
-      "type": "generic",
-      "generatedAt": "2026-02-22T06:28:20.474Z"
-    },
-    {
-      "owner": "sebastiand-cerebras",
-      "repo": "pydantic-ai",
-      "fullName": "sebastiand-cerebras/pydantic-ai",
-      "path": "repos/pydantic-ai/index.html",
-      "url": "repos/pydantic-ai/",
-      "isExternal": false,
-      "type": "api",
-      "generatedAt": "2026-02-22T06:28:54.167Z"
     },
     {
       "owner": "seduerr91",
@@ -71,26 +31,6 @@
       "generatedAt": "2026-02-22T16:24:55.347Z"
     },
     {
-      "owner": "seduerr91",
-      "repo": "seduerr91.github.io",
-      "fullName": "seduerr91/seduerr91.github.io",
-      "path": "repos/seduerr91.github.io/index.html",
-      "url": "repos/seduerr91.github.io/",
-      "isExternal": true,
-      "type": "ml",
-      "generatedAt": "2026-02-22T19:07:52.642Z"
-    },
-    {
-      "owner": "seduerr91",
-      "repo": "cbrsclaw",
-      "fullName": "seduerr91/cbrsclaw",
-      "path": "repos/cbrsclaw/index.html",
-      "url": "repos/cbrsclaw/",
-      "isExternal": true,
-      "type": "api",
-      "generatedAt": "2026-02-22T19:08:27.622Z"
-    },
-    {
       "owner": "zhenweig-cerebras",
       "repo": "openai-cookbook",
       "fullName": "zhenweig-cerebras/openai-cookbook",
@@ -109,16 +49,6 @@
       "isExternal": true,
       "type": "generic",
       "generatedAt": "2026-02-22T19:55:59.365Z"
-    },
-    {
-      "owner": "seduerr91",
-      "repo": "aia",
-      "fullName": "seduerr91/aia",
-      "path": "repos/aia/index.html",
-      "url": "repos/aia/",
-      "isExternal": true,
-      "type": "generic",
-      "generatedAt": "2026-02-22T19:56:17.861Z"
     },
     {
       "owner": "seduerr91",
