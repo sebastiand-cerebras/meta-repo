@@ -72,7 +72,8 @@
       cursor: pointer;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
+      gap: 12px;
       padding: 0;
       color: inherit;
     }
@@ -275,7 +276,7 @@
     <!-- ===== GENERATED PAGES ===== -->
     <section id="generatedSection" style="display:none">
       <button class="accordion-toggle" onclick="toggleAccordion()">
-        <div>
+        <div style="text-align: center;">
           <div class="section-title">Generated Pages</div>
           <div class="section-subtitle">Click any card to view the live visual page</div>
         </div>
@@ -314,11 +315,15 @@
             <div style="display: flex; gap: 16px; align-items: flex-start;">
               <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent-subtle); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">2</div>
               <div>
-                <div style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">Create a GitHub Personal Access Token</div>
-                <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;">Generate a PAT with <code style="font-family: monospace; background: var(--bg-tertiary); padding: 1px 5px; border-radius: 4px; font-size: 12px;">repo</code> scope so generated pages can be pushed automatically.</div>
-                <a href="https://github.com/settings/tokens/new?scopes=repo&description=meta-repo-visualizer" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px;">
+                <div style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">Install GitHub CLI &amp; Authenticate</div>
+                <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 6px;">Install <code style="font-family: monospace; background: var(--bg-tertiary); padding: 1px 5px; border-radius: 4px; font-size: 12px;">gh</code> so generated pages can be pushed and GitHub Pages enabled automatically.</div>
+                <div style="font-family: 'SF Mono', monospace; font-size: 12px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; line-height: 1.7; color: var(--text-secondary); margin-bottom: 8px;">
+                  <span style="color: var(--text-secondary);">$</span> <span style="color: var(--text-primary);">brew install gh</span><br>
+                  <span style="color: var(--text-secondary);">$</span> <span style="color: var(--text-primary);">gh auth login</span>
+                </div>
+                <a href="https://cli.github.com" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px;">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/></svg>
-                  Create Token
+                  cli.github.com
                 </a>
               </div>
             </div>
@@ -326,17 +331,14 @@
             <div style="display: flex; gap: 16px; align-items: flex-start;">
               <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent-subtle); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">3</div>
               <div>
-                <div style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">Download &amp; Run</div>
-                <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 6px;">Download the starter code, add your keys to <code style="font-family: monospace; background: var(--bg-tertiary); padding: 1px 5px; border-radius: 4px; font-size: 12px;">.env</code>, and start the server.</div>
+                <div style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">Clone, Configure &amp; Run</div>
+                <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 6px;">Clone the repo, add your Cerebras API key to <code style="font-family: monospace; background: var(--bg-tertiary); padding: 1px 5px; border-radius: 4px; font-size: 12px;">.env</code>, and start the server.</div>
                 <div style="font-family: 'SF Mono', monospace; font-size: 12px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; line-height: 1.7; color: var(--text-secondary); margin-bottom: 8px;">
-                  <span style="color: var(--text-secondary);">$</span> <span style="color: var(--text-primary);">unzip meta-repo-main.zip && cd meta-repo-main</span><br>
+                  <span style="color: var(--text-secondary);">$</span> <span style="color: var(--text-primary);">gh repo clone sebastiand-cerebras/meta-repo</span><br>
+                  <span style="color: var(--text-secondary);">$</span> <span style="color: var(--text-primary);">cd meta-repo</span><br>
                   <span style="color: var(--text-secondary);">$</span> <span style="color: var(--text-primary);">echo "CEREBRAS_API_KEY=your-key" > .env</span><br>
                   <span style="color: var(--text-secondary);">$</span> <span style="color: var(--text-primary);">npm install && node server.js</span>
                 </div>
-                <a href="https://github.com/sebastiand-cerebras/meta-repo/archive/refs/heads/main.zip" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px;">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                  Download Starter Code
-                </a>
               </div>
             </div>
 
@@ -344,7 +346,7 @@
               <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent-subtle); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">4</div>
               <div>
                 <div style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">Select Repos &amp; Generate</div>
-                <div style="font-size: 14px; color: var(--text-secondary);">Browse any GitHub user's repos, select up to 5, and generate visual pages. They auto-deploy to GitHub Pages.</div>
+                <div style="font-size: 14px; color: var(--text-secondary);">Open <code style="font-family: monospace; background: var(--bg-tertiary); padding: 1px 5px; border-radius: 4px; font-size: 12px;">localhost:3200</code>, browse any GitHub user's repos, select up to 5, and generate visual pages. They auto-deploy to GitHub Pages.</div>
               </div>
             </div>
 

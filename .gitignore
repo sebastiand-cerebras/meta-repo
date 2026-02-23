@@ -7,6 +7,9 @@ tmp/
 # Internal design reference (private — not for public repo)
 cerebras-style-html-raws/
 
+# AI tool state
+.opencode/
+
 # OS
 .DS_Store
 
