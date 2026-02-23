@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>seduerr91/leetcode - GitHub Showcase</title>
+    <style>
+        :root {
+            --bg-primary:#f5f5f7; --bg-secondary:#ffffff; --bg-tertiary:#f0f0f2; --bg-card:#ffffff;
+            --text-primary:rgb(43,25,16); --text-secondary:#86868b; --border-color:rgba(0,0,0,0.08);
+            --accent-color:rgb(224,100,57); --accent-hover:rgb(200,85,45); --accent-subtle:rgba(224,100,57,0.1);
+            --success-color:#34c759; --warning-color:#ff9500; --error-color:#ff3b30; --info-color:#007aff;
+            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.05);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg:0 8px 32px rgba(0,0,0,0.12);
+            --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-xl:24px;
+        }
+        [data-theme="dark"] {
+            --bg-primary:#000000; --bg-secondary:#1c1c1e; --bg-tertiary:#2c2c2e; --bg-card:#1c1c1e;
+            --text-primary:#f5f5f7; --text-secondary:#86868b; --border-color:rgba(255,255,255,0.1);
+            --accent-color:rgb(224,100,57); --accent-hover:rgb(240,115,70); --accent-subtle:rgba(224,100,57,0.15);
+            --success-color:#30d158; --warning-color:#ff9f0a; --error-color:#ff453a; --info-color:#0a84ff;
+            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.3);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.4),0 2px 4px -1px rgba(0,0,0,0.2);
+            --shadow-lg:0 8px 32px rgba(0,0,0,0.5);
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased; scroll-behavior: smooth;}
+        body{background:var(--bg-primary);color:var(--text-primary);min-height:100vh;transition:background .3s,color .3s; line-height:1.6; overflow-x: hidden;}
+
+        /* Typography */
+        h1, h2, h3, h4 { font-weight: 800; letter-spacing: -0.02em; color: var(--text-primary); }
+        h1 { font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.1; margin-bottom: 1rem; }
+        h2 { font-size: 2.25rem; margin-bottom: 2rem; text-align: center; }
+        h3 { font-size: 1.25rem; margin-bottom: 0.5rem; }
+        p { color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 1.1rem; }
+
+        /* Utilities */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .container-narrow { max-width: 800px; margin: 0 auto; padding: 0 20px; }
+        .text-gradient { background: linear-gradient(135deg, var(--accent-color), var(--warning-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .flex-center { display: flex; align-items: center; justify-content: center; }
+        .grid { display: grid; gap: 24px; }
+        .badge { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 99px; font-size: 0.8rem; font-weight: 600; }
+        .badge-accent { background: var(--accent-subtle); color: var(--accent-color); }
+        .badge-outline { border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-secondary); }
+
+        /* Components */
+        .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: var(--radius-md); font-weight: 600; text-decoration: none; transition: all 0.2s ease; cursor: pointer; border: none; font-size: 1rem; }
+        .btn-primary { background: var(--accent-color); color: #fff; box-shadow: 0 4px 14px rgba(224,100,57,0.3); }
+        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(224,100,57,0.4); }
+        .btn-ghost { background: transparent; color: var(--text-primary); border: 1px solid var(--border-color); }
+        .btn-ghost:hover { background: var(--bg-tertiary); transform: translateY(-2px); }
+
+        .card { background: var(--bg-card); border-radius: var(--radius-lg); padding: 32px; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); position: relative; overflow: hidden; }
+        .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+        
+        /* Icons */
+        svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+        /* Navigation */
+        nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 100; background: rgba(255,255,255,0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); transition: background 0.3s; }
+        [data-theme="dark"] nav { background: rgba(0,0,0,0.7); }
+        .nav-content { display: flex; justify-content: space-between; align-items: center; height: 64px; }
+        .nav-link { color: var(--text-secondary); text-decoration: none; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; font-weight: 500; transition: color 0.2s; }
+        .nav-link:hover { color: var(--accent-color); }
+        
+        /* Hero */
+        .hero { padding: 140px 0 80px; text-align: center; position: relative; overflow: hidden; }
+        .hero-glow { position: absolute; top: -50%; left: 50%; transform: translateX(-50%); width: 100vw; height: 1000px; background: radial-gradient(circle at center, var(--accent-subtle) 0%, transparent 60%); z-index: -1; opacity: 0.6; }
+        .hero-badges { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
+        .external-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(255, 149, 0, 0.1); color: var(--warning-color); padding: 6px 16px; border-radius: 99px; border: 1px solid rgba(255, 149, 0, 0.2); font-weight: 600; font-size: 0.85rem; margin-top: 24px; }
+        
+        /* Stats */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin-top: -40px; position: relative; z-index: 10; padding: 0 20px; max-width: 1000px; margin-left: auto; margin-right: auto; }
+        .stat-card { background: var(--bg-card); padding: 24px; border-radius: var(--radius-xl); text-align: center; border: 1px solid var(--border-color); box-shadow: var(--shadow-md); backdrop-filter: blur(10px); }
+        .stat-val { font-size: 3rem; font-weight: 800; color: var(--text-primary); line-height: 1; display: block; margin-bottom: 8px; font-variant-numeric: tabular-nums; }
+        .stat-label { font-size: 0.9rem; color: var(--text-secondary); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        /* Features */
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px; }
+        .feature-icon { width: 48px; height: 48px; background: var(--accent-subtle); color: var(--accent-color); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; font-size: 1.5rem; }
+        
+        /* Flow Diagram */
+        .flow-container { display: flex; flex-direction: column; gap: 16px; }
+        @media(min-width: 768px) {
+            .flow-container { flex-direction: row; align-items: flex-start; }
+        }
+        .flow-node { flex: 1; background: var(--bg-card); padding: 24px; border-radius: var(--radius-md); border: 1px solid var(--border-color); position: relative; text-align: center; box-shadow: var(--shadow-sm); transition: transform 0.2s; }
+        .flow-node:hover { transform: translateY(-4px); border-color: var(--accent-color); }
+        .flow-line { display: none; height: 2px; background: var(--border-color); flex: 1; align-self: center; max-width: 40px; margin: 0 -20px; position: relative; }
+        @media(min-width: 768px) { .flow-line { display: block; } }
+        .flow-number { width: 24px; height: 24px; background: var(--text-primary); color: var(--bg-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold; margin: 0 auto 12px; }
+
+        /* Tech Stack */
+        .tech-stack { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+        .tech-pill { padding: 8px 16px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; font-weight: 600; font-size: 0.9rem; color: var(--text-primary); display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .tech-pill:hover { border-color: var(--accent-color); color: var(--accent-color); transform: scale(1.05); }
+
+        /* Code Block */
+        .code-block { background: #0d1117; border-radius: var(--radius-md); overflow: hidden; border: 1px solid rgba(255,255,255,0.1); box-shadow: var(--shadow-lg); margin: 40px 0; }
+        .code-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .file-name { font-family: 'SF Mono', monospace; font-size: 0.85rem; color: #86868b; }
+        .copy-btn { background: transparent; border: none; color: #86868b; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 4px; }
+        .copy-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        pre { padding: 20px; overflow-x: auto; color: #c9d1d9; font-family: 'SF Mono', Consolas, monospace; font-size: 0.9rem; line-height: 1.5; }
+        .k { color: #ff7b72; }
+        .f { color: #d2a8ff; }
+        .s { color: #a5d6ff; }
+        .c { color: #8b949e; }
+        .n { color: #79c0ff; }
+
+        /* Footer */
+        footer { border-top: 1px solid var(--border-color); padding: 60px 0; margin-top: 80px; text-align: center; background: var(--bg-secondary); }
+        .footer-content { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .footer-links a { color: var(--text-secondary); text-decoration: none; margin: 0 10px; font-size: 0.9rem; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--accent-color); }
+
+        /* Scroll Animations */
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        .delay-1 { transition-delay: 0.1s; }
+        .delay-2 { transition-delay: 0.2s; }
+        .delay-3 { transition-delay: 0.3s; }
+
+    </style>
+</head>
+<body>
+
+    <!-- Nav -->
+    <nav>
+        <div class="container nav-content">
+            <a href="../../index.html" class="nav-link">
+                <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Explorer
+            </a>
+            <div class="flex-center" style="gap:16px">
+                <button id="theme-toggle" class="btn-ghost" style="padding: 8px 12px; border-radius: 8px;">
+                    <svg class="sun-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                    <svg class="moon-icon" viewBox="0 0 24 24" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="hero">
+        <div class="hero-glow"></div>
+        <div class="container">
+            <div class="hero-badges reveal">
+                <span class="badge badge-accent">Open Source</span>
+                <span class="badge badge-outline">Algorithmic Practice</span>
+            </div>
+            <h1 class="reveal delay-1">
+                LeetCode <span class="text-gradient">Mastery</span>
+            </h1>
+            <p class="reveal delay-2" style="max-width: 600px; margin: 0 auto 32px;">
+                A comprehensive collection of algorithms and data structures solutions designed for interview preparation and skill enhancement.
+            </p>
+            <div class="flex-center" style="gap: 16px; flex-wrap: wrap;" class="reveal delay-2">
+                <a href="https://github.com/seduerr91/leetcode" target="_blank" class="btn btn-primary">
+                    <svg viewBox="0 0 24 24" style="fill:currentColor; stroke:none"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    View Repository
+                </a>
+            </div>
+            
+            <div class="external-badge reveal delay-3">
+                <svg viewBox="0 0 24 24" style="width:16px; height:16px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                External — seduerr91
+            </div>
+        </div>
+    </header>
+
+    <!-- Stats -->
+    <section class="stats-grid reveal">
+        <div class="stat-card">
+            <span class="stat-val" data-target="100">0</span>
+            <span class="stat-label">Problems</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-val" data-target="4">0</span>
+            <span class="stat-label">Languages</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-val" data-target="12">0</span>
+            <span class="stat-label">Patterns</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-val" data-target="85">0</span>
+            <span class="stat-label">% Efficient</span>
+        </div>
+    </section>
+
+    <!-- Feature Grid -->
+    <section style="padding: 100px 0">
+        <div class="container">
+            <h2 class="reveal">Why this collection?</h2>
+            <div class="feature-grid">
+                <article class="card reveal delay-1">
+                    <div class="feature-icon">🏢</div>
+                    <h3>Company Specific</h3>
+                    <p>Curated solutions categorized by company (e.g., Apple) to help you target specific interview patterns.</p>
+                </article>
+                <article class="card reveal delay-2">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Optimized Code</h3>
+                    <p>Solutions are written with a focus on time and space complexity, ensuring optimal interview performance.</p>
+                </article>
+                <article class="card reveal delay-3">
+                    <div class="feature-icon">🧠</div>
+                    <h3>AI Augmented</h3>
+                    <p>Includes prompts and contexts generated to assist with LLM-based problem solving strategies.</p>
+                </article>
+                <article class="card reveal delay-1">
+                    <div class="feature-icon">📂</div>
+                    <h3>Clean Structure</h3>
+                    <p>Organized directory layout makes navigation painless, whether you're looking for Arrays or Graphs.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture / Flow -->
+    <section style="padding: 60px 0; background: var(--bg-tertiary);">
+        <div class="container-narrow">
+            <h2 class="reveal">The Problem Solving Loop</h2>
+            <p class="reveal" style="text-align:center">A systematic approach to cracking coding interviews.</p>
+            
+            <div class="flow-container reveal delay-1" style="margin-top: 40px;">
+                <div class="flow-node">
+                    <div class="flow-number">1</div>
+                    <h4>Analyze</h4>
+                    <p style="font-size:0.9rem; margin:0">Understand constraints and edge cases.</p>
+                </div>
+                <div class="flow-line"></div>
+                <div class="flow-node">
+                    <div class="flow-number">2</div>
+                    <h4>Pattern Match</h4>
+                    <p style="font-size:0.9rem; margin:0">Identify algo pattern (Sliding Window, DFS, etc).</p>
+                </div>
+                <div class="flow-line"></div>
+                <div class="flow-node">
+                    <div class="flow-number">3</div>
+                    <h4>Implement</h4>
+                    <p style="font-size:0.9rem; margin:0">Write clean, bug-free code.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack -->
+    <section style="padding: 100px 0">
+        <div class="container">
+            <h2 class="reveal">Tech Stack</h2>
+            <p class="reveal" style="text-align:center; margin-bottom: 40px;">Multi-language support for versatile practice.</p>
+            <div class="tech-stack reveal delay-1">
+                <span class="tech-pill"><span style="font-weight:900">Py</span> Python</span>
+                <span class="tech-pill"><span style="font-weight:900">JS</span> JavaScript</span>
+                <span class="tech-pill"><span style="font-weight:900">J</span> Java</span>
+                <span class="tech-pill"><span style="font-weight:900">C++</span> C++</span>
+                <span class="tech-pill"><span style="font-weight:900">Go</span> Go</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Example -->
+    <section style="padding: 0 0 100px;">
+        <div class="container-narrow">
+            <h2 class="reveal">Code Quality</h2>
+            <p class="reveal" style="text-align:center">Clean, readable, and efficient implementations.</p>
+            
+            <div class="code-block reveal delay-1">
+                <div class="code-header">
+                    <span class="file-name">two_sum.py</span>
+                    <button class="copy-btn">
+                        <svg viewBox="0 0 24 24" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code><span class="k">def</span> <span class="f">twoSum</span>(nums, target):
+    <span class="s">"""Finds two numbers such that they add up to target."""</span>
+    seen = {}
+    
+    <span class="k">for</span> i, num <span class="k">in</span> <span class="f">enumerate</span>(nums):
+        complement = target - num
+        
+        <span class="k">if</span> complement <span class="k">in</span> seen:
+            <span class="k">return</span> [seen[complement], i]
+            
+        seen[num] = i
+        
+    <span class="k">return</span> []  <span class="c"># No solution found</span></code></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container footer-content">
+            <div style="font-weight: 700; font-size: 1.2rem;">seduerr91/leetcode</div>
+            <div class="footer-links">
+                <a href="../../index.html">← Back to Explorer</a>
+                <a href="https://github.com/seduerr91/leetcode" target="_blank">GitHub Repository</a>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0;">
+                Generated by Cerebras
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle
+        const themeBtn = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        const sunIcon = document.querySelector('.sun-icon');
+        const moonIcon = document.querySelector('.moon-icon');
+
+        // Check local storage
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', savedTheme);
+        updateIcons(savedTheme);
+
+        themeBtn.addEventListener('click', () => {
+            const current = html.getAttribute('data-theme');
+            const next = current === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            updateIcons(next);
+        });
+
+        function updateIcons(theme) {
+            if (theme === 'dark') {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+            } else {
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+            }
+        }
+
+        // Scroll Reveal Animation
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Animated Stat Counters
+        const statObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target.querySelector('.stat-val');
+                    if (el && !el.classList.contains('counted')) {
+                        el.classList.add('counted');
+                        const target = parseInt(el.getAttribute('data-target'));
+                        animateValue(el, 0, target, 1500);
+                    }
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('.stat-card').forEach(el => statObserver.observe(el));
+
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                // Ease out quart
+                const easeProgress = 1 - Math.pow(1 - progress, 4);
+                obj.innerHTML = Math.floor(progress * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Copy Code Button Logic
+        const copyBtns = document.querySelectorAll('.copy-btn');
+        copyBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const code = btn.closest('.code-block').querySelector('code').innerText;
+                navigator.clipboard.writeText(code);
+                btn.innerHTML = `<span style="color:var(--success-color)">Copied!</span>`;
+                setTimeout(() => {
+                    btn.innerHTML = `<svg viewBox="0 0 24 24" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy`;
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>

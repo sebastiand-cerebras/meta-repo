@@ -149,6 +149,16 @@
       "isExternal": true,
       "type": "frontend",
       "generatedAt": "2026-02-23T01:44:25.688Z"
+    },
+    {
+      "owner": "seduerr91",
+      "repo": "leetcode",
+      "fullName": "seduerr91/leetcode",
+      "path": "repos/leetcode/index.html",
+      "url": "repos/leetcode/",
+      "isExternal": true,
+      "type": "generic",
+      "generatedAt": "2026-02-23T02:16:17.974Z"
     }
   ]
 }
