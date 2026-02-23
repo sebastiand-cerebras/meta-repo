@@ -58,7 +58,7 @@
       "url": "repos/wabike/",
       "isExternal": true,
       "type": "infra",
-      "generatedAt": "2026-02-22T20:02:37.495Z"
+      "generatedAt": "2026-02-23T01:19:47.861Z"
     },
     {
       "owner": "seduerr91",
@@ -129,6 +129,16 @@
       "isExternal": true,
       "type": "ml",
       "generatedAt": "2026-02-22T19:56:36.277Z"
+    },
+    {
+      "owner": "seduerr91",
+      "repo": "chrome-weather-extension",
+      "fullName": "seduerr91/chrome-weather-extension",
+      "path": "repos/chrome-weather-extension/index.html",
+      "url": "repos/chrome-weather-extension/",
+      "isExternal": true,
+      "type": "frontend",
+      "generatedAt": "2026-02-23T01:22:40.745Z"
     }
   ]
 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wabike — Infrastructure Showcase</title>
+    <title>Wabike - Voice-Enabled Infrastructure</title>
     <style>
         :root {
             --bg-primary:#f5f5f7; --bg-secondary:#ffffff; --bg-tertiary:#f0f0f2; --bg-card:#ffffff;
@@ -14,8 +14,6 @@
             --shadow-md:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
             --shadow-lg:0 8px 32px rgba(0,0,0,0.12);
             --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-xl:24px;
-            --font-main:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;
-            --code-bg:#1e1e1e; --code-text:#d4d4d4;
         }
         [data-theme="dark"] {
             --bg-primary:#000000; --bg-secondary:#1c1c1e; --bg-tertiary:#2c2c2e; --bg-card:#1c1c1e;
@@ -25,460 +23,346 @@
             --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.3);
             --shadow-md:0 4px 6px -1px rgba(0,0,0,0.4),0 2px 4px -1px rgba(0,0,0,0.2);
             --shadow-lg:0 8px 32px rgba(0,0,0,0.5);
-            --code-bg:#0d0d0d; --code-text:#e0e0e0;
         }
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        html{font-family:var(--font-main);-webkit-font-smoothing:antialiased;scroll-behavior: smooth}
-        body{background:var(--bg-primary);color:var(--text-primary);line-height:1.5;transition:background .3s,color .3s;overflow-x:hidden}
-        
-        /* Layout */
-        .container{max-width:1200px;margin:0 auto;padding:0 20px}
-        .section{padding:80px 0;position:relative}
-        .grid{display:grid;gap:24px}
-        .grid-2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
-        .grid-3{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
-        .flex{display:flex;align-items:center}
-        .flex-col{flex-direction:column}
-        .justify-between{justify-content:space-between}
-        .gap-4{gap:16px}
-        .gap-6{gap:24px}
-        .text-center{text-align:center}
-        .mt-4{margin-top:16px}
-        .mt-8{margin-top:32px}
-        .mb-2{margin-bottom:8px}
-        
-        /* Typography */
-        h1{font-size:3.5rem;line-height:1.1;letter-spacing:-0.03em;font-weight:700;margin-bottom:20px}
-        h2{font-size:2.25rem;letter-spacing:-0.02em;font-weight:600;margin-bottom:16px;color:var(--text-primary)}
-        h3{font-size:1.25rem;font-weight:600;margin-bottom:8px;color:var(--text-primary)}
-        p{color:var(--text-secondary);font-size:1.1rem;line-height:1.6}
-        .mono{font-family:"SF Mono",Menlo,Monaco,Consolas,monospace;font-size:0.9em}
+        html{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+        body{background:var(--bg-primary);color:var(--text-primary);min-height:100vh;transition:background .3s,color .3s;line-height:1.5;}
 
-        /* Components */
-        .badge{display:inline-flex;align-items:center;padding:6px 12px;border-radius:99px;font-size:0.85rem;font-weight:600;gap:6px}
-        .badge-external{background:linear-gradient(135deg, #FF9500 0%, #FF5E3A 100%);color:white;box-shadow:0 4px 12px rgba(255, 94, 58, 0.3);margin-bottom:24px;}
+        /* Utility */
+        .container{max-width:1200px;margin:0 auto;padding:0 24px}
+        .flex{display:flex}
+        .flex-col{flex-direction:column}
+        .items-center{align-items:center}
+        .justify-between{justify-content:space-between}
+        .gap-4{gap:1rem}
+        .grid{display:grid;gap:1.5rem}
+        .grid-cols-2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+        .grid-cols-3{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+        .text-center{text-align:center}
+        .text-sm{font-size:0.875rem;color:var(--text-secondary)}
+        .font-bold{font-weight:700}
+        .mt-4{margin-top:1rem}
+        .mb-4{margin-bottom:1rem}
+        .mb-8{margin-bottom:2rem}
+        .p-4{padding:1rem}
+        .p-6{padding:1.5rem}
+        .w-full{width:100%}
         
-        .card{background:var(--bg-card);border-radius:var(--radius-lg);padding:24px;border:1px solid var(--border-color);box-shadow:var(--shadow-sm);transition:transform 0.3s ease, box-shadow 0.3s ease;position:relative;overflow:hidden}
-        .card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
-        .card-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;background:var(--bg-tertiary);color:var(--accent-color);font-size:1.5rem}
-        
-        /* Navigation */
-        nav{padding:20px 0;border-bottom:1px solid var(--border-color);background:rgba(255,255,255,0.05);backdrop-filter:blur(10px);position:sticky;top:0;z-index:100}
-        .back-link{text-decoration:none;color:var(--text-secondary);font-weight:500;display:flex;align-items:center;gap:8px;transition:color 0.2s}
-        .back-link:hover{color:var(--accent-color)}
+        /* Nav */
+        nav{padding:1.5rem 0}
+        .nav-link{text-decoration:none;color:var(--text-secondary);font-weight:500;transition:color 0.2s;display:inline-flex;align-items:center;gap:6px;font-size:0.9rem}
+        .nav-link:hover{color:var(--accent-color)}
         
         /* Theme Toggle */
-        .theme-toggle{background:none;border:none;cursor:pointer;color:var(--text-primary);font-size:1.2rem;padding:8px;border-radius:50%;transition:background 0.2s}
+        .theme-toggle{background:transparent;border:1px solid var(--border-color);color:var(--text-primary);padding:8px;border-radius:50%;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center}
         .theme-toggle:hover{background:var(--bg-tertiary)}
         
         /* Hero */
-        .hero{min-height:80vh;display:flex;align-items:center;position:relative;overflow:hidden}
-        .hero-content{position:relative;z-index:2;max-width:800px}
-        #wave-canvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;opacity:0.4;pointer-events:none}
+        .hero{padding:4rem 0 3rem;text-align:center;position:relative;overflow:hidden}
+        .hero::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle, var(--accent-subtle) 0%, transparent 50%);opacity:0.4;z-index:-1;pointer-events:none}
+        .hero h1{font-size:3rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:1rem;background:linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .hero p{font-size:1.25rem;color:var(--text-secondary);max-width:600px;margin:0 auto 2rem}
         
-        /* Stats Strip */
-        .stats-strip{border-top:1px solid var(--border-color);border-bottom:1px solid var(--border-color);background:var(--bg-secondary)}
-        .stat-item{text-align:center;padding:20px}
-        .stat-value{display:block;font-size:1.5rem;font-weight:700;color:var(--text-primary)}
-        .stat-label{font-size:0.875rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em}
-
+        /* Badge */
+        .badge-external{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(255,149,0,0.1);color:#ff9500;border-radius:20px;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;border:1px solid rgba(255,149,0,0.2);margin-bottom:1.5rem}
+        
+        /* Cards */
+        .card{background:var(--bg-card);border-radius:var(--radius-lg);padding:1.5rem;border:1px solid var(--border-color);box-shadow:var(--shadow-md);transition:transform 0.2s, box-shadow 0.2s}
+        .card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+        .card-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;font-size:1.5rem}
+        
         /* Architecture Diagram */
-        .arch-svg-container{width:100%;height:auto;background:var(--bg-card);border-radius:var(--radius-xl);border:1px solid var(--border-color);padding:40px;overflow-x:auto;box-shadow:var(--shadow-md)}
-        .arch-node{fill:var(--bg-secondary);stroke:var(--border-color);stroke-width:2}
-        .arch-text{fill:var(--text-primary);font-family:var(--font-main);font-size:14px;font-weight:600;text-anchor:middle}
-        .arch-subtext{fill:var(--text-secondary);font-size:10px;text-anchor:middle}
-        .flow-line{fill:none;stroke:var(--border-color);stroke-width:2;stroke-dasharray:8;animation:dash 30s linear infinite}
-        .flow-pulse{fill:none;stroke:var(--accent-color);stroke-width:3;stroke-linecap:round;stroke-dasharray:10 200;animation:pulse 3s linear infinite}
+        .arch-container{background:var(--bg-secondary);border-radius:var(--radius-xl);padding:2rem;border:1px solid var(--border-color);margin-bottom:3rem;overflow-x:auto}
+        .arch-flow{display:flex;align-items:center;justify-content:center;gap:1.5rem;min-width:800px;padding:1rem}
         
-        @keyframes dash{to{stroke-dashoffset:-1000}}
-        @keyframes pulse{to{stroke-dashoffset:-210}}
-
-        /* CI/CD Pipeline */
-        .pipeline-steps{display:flex;justify-content:space-between;position:relative;margin-top:40px;flex-wrap:wrap;gap:20px}
-        .pipeline-track{position:absolute;top:25px;left:0;right:0;height:2px;background:var(--border-color);z-index:0}
-        .step{position:relative;z-index:1;background:var(--bg-card);padding:16px 24px;border-radius:var(--radius-md);border:1px solid var(--border-color);display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-sm);flex:1;min-width:200px}
-        .step-icon{width:32px;height:32px;background:var(--accent-subtle);color:var(--accent-color);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold}
+        .arch-node{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:1rem;width:140px;text-align:center;position:relative;box-shadow:var(--shadow-sm);z-index:2}
+        .arch-node strong{display:block;font-size:0.9rem;margin-bottom:4px}
+        .arch-node span{font-size:0.75rem;color:var(--text-secondary)}
+        .arch-node .icon{font-size:1.5rem;margin-bottom:6px;display:block}
         
-        /* Code Block */
-        .code-window{background:var(--code-bg);border-radius:var(--radius-md);overflow:hidden;color:var(--code-text);font-family:monospace;border:1px solid var(--border-color)}
-        .code-header{background:rgba(255,255,255,0.1);padding:10px 16px;display:flex;gap:6px}
-        .dot{width:10px;height:10px;border-radius:50%;background:#555}
-        .dot.red{background:#ff5f56}
-        .dot.yellow{background:#ffbd2e}
-        .dot.green{background:#27c93f}
-        .code-content{padding:20px;overflow-x:auto}
-        .code-line{display:block;opacity:0.9}
-        .code-key{color:#569cd6}
-        .code-val{color:#ce9178}
-        .code-comment{color:#6a9955}
-
-        /* Responsive */
-        @media(max-width:768px){
-            h1{font-size:2.5rem}
-            h2{font-size:1.75rem}
-            .hero{min-height:auto;padding:120px 0 60px}
-            .pipeline-steps{flex-direction:column}
-            .pipeline-track{width:2px;height:100%;top:0;left:25px;right:auto}
-            .step{padding:16px 16px 16px 60px;align-items:flex-start}
-            .step-icon{position:absolute;left:10px;top:16px}
+        /* Service Colors */
+        .svc-client { border-bottom: 3px solid var(--text-secondary); }
+        .svc-compute { border-bottom: 3px solid var(--success-color); background: rgba(52,199,89,0.05); }
+        .svc-infra { border-bottom: 3px solid var(--info-color); background: rgba(0,122,255,0.05); }
+        .svc-data { border-bottom: 3px solid #af52de; background: rgba(175,82,222,0.05); } /* Purple for secrets/integrations */
+        
+        .arch-connector{flex:1;height:2px;background:var(--border-color);position:relative}
+        .arch-connector::after{content:'→';position:absolute;right:0;top:-8px;background:var(--bg-secondary);color:var(--text-secondary);padding:0 4px;font-size:12px}
+        .arch-connector-label{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:0.7rem;color:var(--text-secondary);background:var(--bg-secondary);padding:0 4px;white-space:nowrap}
+        
+        /* Stack Tags */
+        .stack-tag{display:inline-block;padding:4px 10px;background:var(--bg-tertiary);color:var(--text-primary);border-radius:6px;font-size:0.8rem;font-weight:500;margin-right:6px;margin-bottom:6px;border:1px solid var(--border-color)}
+        
+        /* Pipeline Strip */
+        .pipeline{display:flex;align-items:center;justify-content:space-between;padding:1.5rem;background:var(--bg-card);border-radius:var(--radius-lg);border:1px solid var(--border-color);margin-bottom:2rem}
+        .step{display:flex;flex-direction:column;align-items:center;flex:1;position:relative}
+        .step-icon{width:40px;height:40px;background:var(--bg-tertiary);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:0.5rem;color:var(--text-secondary);z-index:2}
+        .step.active .step-icon{background:var(--success-color);color:white;box-shadow:0 0 0 4px rgba(52,199,89,0.2)}
+        .step-line{position:absolute;top:20px;left:50%;width:100%;height:2px;background:var(--border-color);z-index:1}
+        .step:last-child .step-line{display:none}
+        .step-text{font-size:0.8rem;font-weight:500;color:var(--text-secondary)}
+        
+        /* Table */
+        .resource-table{width:100%;border-collapse:collapse;font-size:0.9rem}
+        .resource-table th{text-align:left;padding:1rem;border-bottom:1px solid var(--border-color);color:var(--text-secondary);font-weight:600}
+        .resource-table td{padding:1rem;border-bottom:1px solid var(--border-color)}
+        .resource-table tr:last-child td{border-bottom:none}
+        
+        /* Config Box */
+        .config-box{background:var(--bg-tertiary);padding:1rem;border-radius:var(--radius-md);font-family:monospace;font-size:0.85rem;color:var(--text-primary);overflow-x:auto}
+        
+        /* Responsive adjustments */
+        @media (max-width:768px){
+            .hero h1{font-size:2rem}
+            .arch-flow{flex-direction:column;min-width:auto;}
+            .arch-connector{width:2px;height:30px;flex:none}
+            .arch-connector::after{top:auto;bottom:0;left:-8px;transform:rotate(90deg)}
+            .arch-connector-label{top:auto;bottom:-14px;left:30px;transform:none}
+            .pipeline{flex-direction:column;gap:1.5rem}
+            .step-line{width:2px;height:100%;top:40px;left:20px}
+            .step.active .step-icon{background:var(--bg-tertiary);color:var(--text-secondary);box-shadow:none} /* Reset active for mobile stack */
         }
     </style>
 </head>
 <body>
-    <canvas id="wave-canvas"></canvas>
 
-    <nav>
-        <div class="container flex justify-between">
-            <a href="../../index.html" class="back-link">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+    <!-- Navigation -->
+    <div class="container">
+        <nav class="flex justify-between items-center">
+            <a href="../../index.html" class="nav-link">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg>
                 Back to Explorer
             </a>
-            <button class="theme-toggle" id="theme-btn" aria-label="Toggle Theme">
-                <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                <svg class="sun-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>
             </button>
+        </nav>
+    </div>
+
+    <!-- Header -->
+    <header class="container hero">
+        <span class="badge-external">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+            External — seduerr91
+        </span>
+        <h1>Wabike</h1>
+        <p>Voice-first AI ebike consultant powered by FastAPI, AG2, and AWS ECS Fargate. Real-time routing & shop integration.</p>
+        
+        <div class="flex justify-center gap-4 flex-wrap" style="margin-top: 2rem;">
+            <a href="https://github.com/seduerr91/wabike" target="_blank" class="btn" style="background:var(--text-primary);color:var(--bg-primary);text-decoration:none;padding:10px 24px;border-radius:var(--radius-md);font-weight:600;transition:opacity 0.2s;">View Repository</a>
+            <a href="#" class="btn" style="background:var(--bg-card);color:var(--text-primary);border:1px solid var(--border-color);text-decoration:none;padding:10px 24px;border-radius:var(--radius-md);font-weight:600;">Live Demo</a>
         </div>
-    </nav>
+    </header>
 
-    <main>
-        <!-- HERO SECTION -->
-        <section class="section hero">
-            <div class="container hero-content">
-                <div class="badge badge-external">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                    External — seduerr91
-                </div>
-                <h1>Scalable Voice AI Infrastructure for Real-time Ebike Navigation</h1>
-                <p style="font-size:1.35rem;margin-top:24px;">
-                    A complete containerized cloud stack orchestrated via AWS ECS Fargate to power a voice-first AI routing assistant. Handles high-frequency WebSocket audio streams, integrates AG2 RealtimeAgents, and automates notifications via Slack.
-                </p>
-                <div class="flex gap-4 mt-8">
-                    <a href="https://github.com/seduerr91/wabike" target="_blank" style="text-decoration:none;background:var(--text-primary);color:var(--bg-primary);padding:12px 24px;border-radius:var(--radius-md);font-weight:600;font-size:0.95rem">View Repository</a>
-                    <button style="background:var(--bg-card);color:var(--text-primary);border:1px solid var(--border-color);padding:12px 24px;border-radius:var(--radius-md);font-weight:600;font-size:0.95rem;cursor:pointer">Read Docs</button>
+    <main class="container mb-8">
+        
+        <!-- Tech Stack Strip -->
+        <section class="mb-8 text-center">
+            <div class="mb-4 text-sm font-bold text-secondary">POWERED BY</div>
+            <div>
+                <span class="stack-tag">Python 3.11</span>
+                <span class="stack-tag">FastAPI</span>
+                <span class="stack-tag">WebSockets</span>
+                <span class="stack-tag">AG2 RealtimeAgent</span>
+                <span class="stack-tag">Docker</span>
+                <span class="stack-tag">AWS ECS Fargate</span>
+                <span class="stack-tag">Slack SDK</span>
+            </div>
+        </section>
+
+        <!-- Architecture Diagram Section -->
+        <section class="mb-8">
+            <div class="flex items-center gap-2 mb-4">
+                <div class="card-icon" style="width:32px;height:32px;margin:0;font-size:1rem;color:var(--info-color)">☁️</div>
+                <h2 class="font-bold">Infrastructure Architecture</h2>
+            </div>
+            <p class="text-sm mb-4">A real-time audio processing pipeline orchestrated via AWS container services.</p>
+            
+            <div class="arch-container">
+                <div class="arch-flow">
+                    <!-- Origin -->
+                    <div class="arch-node svc-client">
+                        <span class="icon">🌐</span>
+                        <strong>Browser / PWA</strong>
+                        <span>Client Audio</span>
+                    </div>
+                    
+                    <div class="arch-connector">
+                        <span class="arch-connector-label">WSS (Audio Stream)</span>
+                    </div>
+
+                    <!-- Entry -->
+                    <div class="arch-node svc-infra">
+                        <span class="icon">📡</span>
+                        <strong>AWS ALB</strong>
+                        <span>Load Balancer</span>
+                    </div>
+
+                    <div class="arch-connector">
+                        <span class="arch-connector-label">HTTP/WS</span>
+                    </div>
+
+                    <!-- Compute -->
+                    <div class="arch-node svc-compute" style="width:200px">
+                        <span class="icon">⚡</span>
+                        <strong>ECS Fargate</strong>
+                        <span>FastAPI + AG2 Agent</span>
+                    </div>
+
+                    <!-- Side Integrations -->
+                    <div class="flex-col" style="gap:20px">
+                        <div class="arch-node svc-data">
+                            <span class="icon">🔒</span>
+                            <strong>Secrets Mgr</strong>
+                            <span>Keys & Config</span>
+                        </div>
+                        <div class="arch-node svc-data" style="border-color:#4A154B; background:rgba(74,21,75,0.1)">
+                            <span class="icon">#</span>
+                            <strong>Slack API</strong>
+                            <span>Notifications</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- STATS STRIP -->
-        <div class="stats-strip">
-            <div class="container flex" style="flex-wrap:wrap;justify-content:center;">
-                <div class="stat-item"><span class="stat-value">&lt; 200ms</span><span class="stat-label">WebSocket Latency</span></div>
-                <div class="stat-item"><span class="stat-value">99.9%</span><span class="stat-label">Uptime Goal</span></div>
-                <div class="stat-item"><span class="stat-value">Fargate</span><span class="stat-label">Serverless Compute</span></div>
-                <div class="stat-item"><span class="stat-value">Real-time</span><span class="stat-label">Audio Processing</span></div>
+        <!-- Grid Layout for Features -->
+        <section class="grid grid-cols-2 mb-8">
+            <!-- Feature Card 1 -->
+            <div class="card">
+                <div class="card-icon" style="background:var(--accent-subtle);color:var(--accent-color)">🎙️</div>
+                <h3 class="font-bold mb-4">Voice-First Experience</h3>
+                <p class="text-sm">Real-time audio streaming via WebSockets. The browser captures voice, sends it to the backend, and receives streamed TTS responses instantly.</p>
             </div>
+            <!-- Feature Card 2 -->
+            <div class="card">
+                <div class="card-icon" style="background:rgba(52,199,89,0.1);color:var(--success-color)">🤖</div>
+                <h3 class="font-bold mb-4">AG2 RealtimeAgent</h3>
+                <p class="text-sm">Custom AI functions for ebike recommendations, store lookup, and route planning. Maintains conversation context throughout the session.</p>
+            </div>
+            <!-- Feature Card 3 -->
+            <div class="card">
+                <div class="card-icon" style="background:rgba(0,122,255,0.1);color:var(--info-color)">🐳</div>
+                <h3 class="font-bold mb-4">Containerized Deployment</h3>
+                <p class="text-sm">Dockerized Python application running on AWS ECS Fargate. No server management, just scalable compute power.</p>
+            </div>
+            <!-- Feature Card 4 -->
+            <div class="card">
+                <div class="card-icon" style="background:rgba(255,149,0,0.1);color:var(--warning-color)">⚙️</div>
+                <h3 class="font-bold mb-4">CI/CD Pipeline</h3>
+                <p class="text-sm">GitHub Actions workflow builds the Docker image, pushes to Amazon ECR, and triggers deployments on push to main.</p>
+            </div>
+        </section>
+
+        <!-- Resource Inventory Table -->
+        <section class="mb-8">
+            <h2 class="font-bold mb-4">Resource Inventory</h2>
+            <div class="card p-0" style="padding:0;overflow:hidden;">
+                <table class="resource-table">
+                    <thead>
+                        <tr style="background:var(--bg-tertiary)">
+                            <th>Service</th>
+                            <th>Purpose</th>
+                            <th>Region</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="color:var(--success-color);font-weight:600">ECS Fargate</td>
+                            <td>Container orchestration for FastAPI app</td>
+                            <td>us-west-2</td>
+                        </tr>
+                        <tr>
+                            <td style="color:var(--info-color);font-weight:600">Application Load Balancer</td>
+                            <td>Traffic routing for WebSocket & HTTP</td>
+                            <td>us-west-2</td>
+                        </tr>
+                        <tr>
+                            <td style="color:#af52de;font-weight:600">Secrets Manager</td>
+                            <td>Secure storage for API keys & tokens</td>
+                            <td>us-west-2</td>
+                        </tr>
+                        <tr>
+                            <td style="color:#ff9f0a;font-weight:600">Amazon ECR</td>
+                            <td>Docker image registry</td>
+                            <td>us-west-2</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Configuration & Deployment -->
+        <div class="grid grid-cols-2">
+            <section class="card">
+                <h3 class="font-bold mb-4 text-sm text-secondary">CONFIGURATION HIGHLIGHTS</h3>
+                <div class="config-box">
+                    <div style="margin-bottom:8px;opacity:0.7"># Environment Variables</div>
+                    <div style="color:var(--accent-color)">OPENAI_API_KEY=***</div>
+                    <div style="color:var(--info-color)">SLACK_BOT_TOKEN=***</div>
+                    <div style="color:var(--success-color)">AWS_DEFAULT_REGION=us-west-2</div>
+                    <div style="color:var(--text-primary)">AG2_MODEL=gpt-4o-realtime-preview</div>
+                </div>
+            </section>
+            
+            <section class="card">
+                <h3 class="font-bold mb-4 text-sm text-secondary">DEPLOYMENT PIPELINE</h3>
+                <div class="pipeline" style="margin-bottom:0;transform:scale(0.95);transform-origin:left top">
+                    <div class="step active">
+                        <div class="step-line"></div>
+                        <div class="step-icon">📤</div>
+                        <div class="step-text">Git Push</div>
+                    </div>
+                    <div class="step active">
+                        <div class="step-line"></div>
+                        <div class="step-icon">🔨</div>
+                        <div class="step-text">Build Image</div>
+                    </div>
+                    <div class="step active">
+                        <div class="step-line"></div>
+                        <div class="step-icon">📦</div>
+                        <div class="step-text">Push to ECR</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-line"></div>
+                        <div class="step-icon">🚀</div>
+                        <div class="step-text">Update ECS</div>
+                    </div>
+                </div>
+                <p class="text-sm mt-4">Automated via GitHub Actions. Builds on `ubuntu-latest` using `docker buildx` for multi-arch support.</p>
+            </section>
         </div>
 
-        <!-- ARCHITECTURE MAP -->
-        <section class="section">
-            <div class="container">
-                <div class="text-center mb-2">
-                    <h2>Cloud Architecture Map</h2>
-                    <p>Visual representation of the data flow from the client microphone to the cloud and back.</p>
-                </div>
-
-                <div class="arch-svg-container">
-                    <svg width="100%" height="400" viewBox="0 0 900 400" preserveAspectRatio="xMidYMid meet">
-                        Definitions for gradients
-                        <defs>
-                            <linearGradient id="grad-pulse" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" style="stop-color:var(--accent-color);stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:var(--info-color);stop-opacity:1" />
-                            </linearGradient>
-                        </defs>
-
-                        <!-- Connection Lines -->
-                        <!-- Browser to ALB -->
-                        <path class="flow-line" d="M170,200 L290,200" />
-                        <path class="flow-pulse" d="M170,200 L290,200" />
-                        
-                        <!-- ALB to ECS -->
-                        <path class="flow-line" d="M430,200 L550,200" />
-                        <path class="flow-pulse" d="M430,200 L550,200" />
-
-                        <!-- ECS to Secrets (Up) -->
-                        <path class="flow-line" d="M630,150 L630,100" />
-                        
-                        <!-- ECS to Slack (Down) -->
-                        <path class="flow-line" d="M630,250 L630,300" />
-                        <path class="flow-pulse" d="M630,250 L630,300" />
-
-                        <!-- Browser Node -->
-                        <rect x="30" y="150" width="140" height="100" rx="12" class="arch-node" />
-                        <text x="100" y="195" class="arch-text">Browser / PWA</text>
-                        <text x="100" y="215" class="arch-subtext">Mic Input / Audio Player</text>
-
-                        <!-- ALB Node -->
-                        <rect x="290" y="150" width="140" height="100" rx="12" class="arch-node" stroke="var(--info-color)" />
-                        <text x="360" y="195" class="arch-text">Load Balancer</text>
-                        <text x="360" y="215" class="arch-subtext">HTTPS Termination</text>
-
-                        <!-- ECS Node -->
-                        <rect x="550" y="150" width="160" height="100" rx="12" class="arch-node" stroke="var(--success-color)" />
-                        <text x="630" y="190" class="arch-text">AWS ECS Fargate</text>
-                        <text x="630" y="210" class="arch-subtext">FastAPI + AG2 Agent</text>
-
-                        <!-- Secrets Node -->
-                        <rect x="560" y="30" width="140" height="70" rx="8" class="arch-node" stroke="var(--accent-color)" />
-                        <text x="630" y="65" class="arch-text">Secrets Manager</text>
-                        <text x="630" y="80" class="arch-subtext">API Keys Storage</text>
-
-                        <!-- Slack Node -->
-                        <rect x="560" y="300" width="140" height="70" rx="8" class="arch-node" stroke="#4A154B" fill="#4A154B" style="fill:rgba(74,21,75,0.1)" />
-                        <text x="630" y="335" class="arch-text">Slack API</text>
-                        <text x="630" y="350" class="arch-subtext">Notifications</text>
-                    </svg>
-                </div>
-            </div>
-        </section>
-
-        <!-- RESOURCE INVENTORY -->
-        <section class="section" style="background:var(--bg-secondary)">
-            <div class="container">
-                <h2 class="mb-2">Resource Inventory</h2>
-                <p class="mb-2">Core provisioned resources and their roles within the architecture.</p>
-                
-                <div class="grid grid-3 mt-8">
-                    <div class="card">
-                        <div class="card-icon">☁️</div>
-                        <h3>AWS ECS Fargate</h3>
-                        <p>Serverless compute environment hosting the FastAPI container. Scales automatically based on concurrent WebSocket connections.</p>
-                    </div>
-                    <div class="card">
-                        <div class="card-icon">📦</div>
-                        <h3>Amazon ECR</h3>
-                        <p>Docker registry storing the Wabike application images. Integrated with CI/CD for automated builds and multi-platform support.</p>
-                    </div>
-                    <div class="card">
-                        <div class="card-icon">🥨</div>
-                        <h3>Application Load Balancer</h3>
-                        <p>Routes HTTPS traffic to the healthy ECS tasks. Handles WebSocket upgrades and SSL termination.</p>
-                    </div>
-                    <div class="card">
-                        <div class="card-icon">🔒</div>
-                        <h3>AWS Secrets Manager</h3>
-                        <p>Securely rotates and stores sensitive credentials (OpenAI keys, Slack tokens) injected at runtime.</p>
-                    </div>
-                    <div class="card">
-                        <div class="card-icon">🆔</div>
-                        <h3>AWS Cognito</h3>
-                        <p>Manages user authentication and authorization flows, securing the API endpoints.</p>
-                    </div>
-                    <div class="card">
-                        <div class="card-icon">⚙️</div>
-                        <h3>GitHub Actions</h3>
-                        <p>CI/CD orchestrator that builds Docker images and triggers deployments to the ECS cluster.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- CI/CD PIPELINE -->
-        <section class="section">
-            <div class="container">
-                <h2>CI/CD Pipeline</h2>
-                <p>Automated deployment path from code commit to production container update.</p>
-
-                <div class="pipeline-steps">
-                    <div class="pipeline-track"></div>
-                    <div class="step">
-                        <div class="step-icon">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
-                        </div>
-                        <div>
-                            <h4>Push to Main</h4>
-                            <p style="font-size:0.85rem;color:var(--text-secondary)">Code commit triggers workflow</p>
-                        </div>
-                    </div>
-                    <div class="step">
-                        <div class="step-icon">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path><polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon></svg>
-                        </div>
-                        <div>
-                            <h4>Docker Buildx</h4>
-                            <p style="font-size:0.85rem;color:var(--text-secondary)">Optimize & Push to ECR</p>
-                        </div>
-                    </div>
-                    <div class="step">
-                        <div class="step-icon">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>
-                        </div>
-                        <div>
-                            <h4>Update Service</h4>
-                            <p style="font-size:0.85rem;color:var(--text-secondary)">Rolling update on ECS</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECURITY SECTION -->
-        <section class="section" style="background:var(--bg-secondary)">
-            <div class="container">
-                <h2>Security & Hardening</h2>
-                <div class="grid grid-3 mt-8">
-                    <div class="card" style="border-top:4px solid var(--text-secondary)">
-                        <div class="flex justify-between mb-2">
-                            <h3>Least Privilege IAM</h3>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                        </div>
-                        <p style="font-size:0.9rem;">Task definitions utilize <code>ecs-trust-policy.json</code> ensuring Fargate tasks only have permission to fetch logs and pull their specific secrets, reducing blast radius.</p>
-                    </div>
-                    <div class="card" style="border-top:4px solid var(--accent-color)">
-                        <div class="flex justify-between mb-2">
-                            <h3>Secrets Isolation</h3>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
-                        </div>
-                        <p style="font-size:0.9rem;">Sensitive data is never hardcoded. <code>ecs-secrets-policy.json</code> enforces strict ARN-based read access to Secrets Manager.</p>
-                    </div>
-                    <div class="card" style="border-top:4px solid var(--success-color)">
-                        <div class="flex justify-between mb-2">
-                            <h3>Container Hardening</h3>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                        </div>
-                        <p style="font-size:0.9rem;">Built on <code>python:3.11-slim</code> to minimize attack surface. Implements non-root execution contexts and read-only root filesystems where applicable.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- CONFIG HIGHLIGHTS -->
-        <section class="section">
-            <div class="container">
-                <div class="flex flex-col items-center text-center">
-                    <h2>Configuration Highlights</h2>
-                    <p>Key environment variables required for the FastAPI and AG2 integration.</p>
-                </div>
-                
-                <div class="code-window mt-8" style="max-width:800px;margin-left:auto;margin-right:auto;">
-                    <div class="code-header">
-                        <div class="dot red"></div>
-                        <div class="dot yellow"></div>
-                        <div class="dot green"></div>
-                    </div>
-                    <div class="code-content mono">
-                        <span class="code-line"><span class="code-comment"># WABIKE .ENV Configuration</span></span>
-                        <span class="code-line">&nbsp;</span>
-                        <span class="code-line"><span class="code-key">APP_ENV</span>=<span class="code-val">production</span></span>
-                        <span class="code-line"><span class="code-key">AWS_COGNITO_CLIENT_ID</span>=<span class="code-val">us-west-2_********</span></span>
-                        <span class="code-line"><span class="code-key">AWS_REGION</span>=<span class="code-val">us-west-2</span></span>
-                        <span class="code-line"><span class="code-key">OPENAI_API_KEY</span>=<span class="code-val">sk-proj-******************</span></span>
-                        <span class="code-line"><span class="code-key">SLACK_BOT_TOKEN</span>=<span class="code-val">xoxb-******************</span></span>
-                        <span class="code-line"><span class="code-key">AG2_CONFIG_LIST</span>=<span class="code-val">/app/config/list.json</span></span>
-                        <span class="code-line"><span class="code-key">LOG_LEVEL</span>=<span class="code-val">INFO</span></span>
-                        <span class="code-line">&nbsp;</span>
-                        <span class="code-line"><span class="code-comment"># ECS Specifics</span></span>
-                        <span class="code-line"><span class="code-key">ECS_TASK_ROLE_ARN</span>=<span class="code-val">arn:aws:iam::...:role/WabikeTaskRole</span></span>
-                    </div>
-                </div>
-            </div>
-        </section>
     </main>
 
-    <footer style="border-top:1px solid var(--border-color);padding:40px 0;margin-top:80px;background:var(--bg-secondary)">
-        <div class="container text-center">
-            <p style="font-size:0.9rem;color:var(--text-secondary)">Design generated for repository: <span style="font-family:monospace">seduerr91/wabike</span></p>
-            <p class="mt-4" style="font-size:0.8rem;color:var(--text-secondary)">AG2 RealtimeAgent • FastAPI • AWS ECS • Slack Integration</p>
-        </div>
+    <footer class="text-center p-6" style="border-top:1px solid var(--border-color);margin-top:3rem;color:var(--text-secondary);font-size:0.875rem;">
+        <p>© 2024 seduerr91. Running on AWS ECS Fargate.</p>
     </footer>
 
     <script>
         // Theme Toggle Logic
-        const themeBtn = document.getElementById('theme-btn');
+        const themeBtn = document.getElementById('themeToggle');
         const html = document.documentElement;
         
-        // Check local storage or system preference
-        const savedTheme = localStorage.getItem('theme');
-        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        
-        if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
-            html.setAttribute('data-theme', 'dark');
+        // Icon SVGs
+        const sunIcon = '<svg class="sun-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>';
+        const moonIcon = '<svg class="moon-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+
+        function setTheme(theme) {
+            html.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            themeBtn.innerHTML = theme === 'light' ? sunIcon : moonIcon;
         }
 
+        // Init
+        const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        setTheme(savedTheme);
+
+        // Toggle
         themeBtn.addEventListener('click', () => {
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            
-            // Update Icon
-            const isDark = newTheme === 'dark';
-            themeBtn.innerHTML = isDark 
-                ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>'
-                : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+            const current = html.getAttribute('data-theme');
+            setTheme(current === 'light' ? 'dark' : 'light');
         });
-        
-        // Initial Icon Set
-        const iconInit = html.getAttribute('data-theme') === 'dark'
-            ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>'
-            : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
-        themeBtn.innerHTML = iconInit;
-
-        // Audio Waveform Animation
-        const canvas = document.getElementById('wave-canvas');
-        const ctx = canvas.getContext('2d');
-        
-        let width, height;
-        let waves = [];
-        
-        function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = document.querySelector('.hero').offsetHeight;
-        }
-        
-        class Wave {
-            constructor(y, color, speed, amplitude) {
-                this.y = y;
-                this.color = color;
-                this.speed = speed;
-                this.amplitude = amplitude;
-                this.offset = Math.random() * 100;
-            }
-            
-            draw(time) {
-                ctx.beginPath();
-                ctx.moveTo(0, this.y);
-                for (let i = 0; i < width; i++) {
-                    ctx.lineTo(i, this.y + Math.sin(i * 0.01 + time * this.speed + this.offset) * this.amplitude);
-                }
-                ctx.strokeStyle = this.color;
-                ctx.lineWidth = 2;
-                ctx.stroke();
-            }
-        }
-        
-        function initWaves() {
-            waves = [];
-            const isDark = html.getAttribute('data-theme') === 'dark';
-            const baseColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
-            const accentColor = 'rgba(224, 100, 57, 0.2)';
-            
-            waves.push(new Wave(height * 0.5, baseColor, 0.002, 30));
-            waves.push(new Wave(height * 0.5, baseColor, 0.003, 40));
-            waves.push(new Wave(height * 0.55, accentColor, 0.005, 20));
-            waves.push(new Wave(height * 0.45, accentColor, 0.004, 25));
-        }
-        
-        function animate(time) {
-            ctx.clearRect(0, 0, width, height);
-            waves.forEach(wave => wave.draw(time));
-            requestAnimationFrame(animate);
-        }
-        
-        window.addEventListener('resize', () => {
-            resize();
-            initWaves();
-        });
-        
-        resize();
-        initWaves();
-        animate(0);
-
-        // Re-init waves on theme change for color update
-        const observer = new MutationObserver(() => {
-            initWaves();
-        });
-        observer.observe(html, { attributes: true, attributeFilter: ['data-theme'] });
-
     </script>
 </body>
 </html>
