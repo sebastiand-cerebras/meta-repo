@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jjoycehe/tech-portfolio - Showcase</title>
+    <style>
+        :root {
+            --bg-primary:#f5f5f7; --bg-secondary:#ffffff; --bg-tertiary:#f0f0f2; --bg-card:#ffffff;
+            --text-primary:rgb(43,25,16); --text-secondary:#86868b; --border-color:rgba(0,0,0,0.08);
+            --accent-color:rgb(224,100,57); --accent-hover:rgb(200,85,45); --accent-subtle:rgba(224,100,57,0.1);
+            --success-color:#34c759; --warning-color:#ff9500; --error-color:#ff3b30; --info-color:#007aff;
+            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.05);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg:0 8px 32px rgba(0,0,0,0.12);
+            --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-xl:24px;
+        }
+        [data-theme="dark"] {
+            --bg-primary:#000000; --bg-secondary:#1c1c1e; --bg-tertiary:#2c2c2e; --bg-card:#1c1c1e;
+            --text-primary:#f5f5f7; --text-secondary:#86868b; --border-color:rgba(255,255,255,0.1);
+            --accent-color:rgb(224,100,57); --accent-hover:rgb(240,115,70); --accent-subtle:rgba(224,100,57,0.15);
+            --success-color:#30d158; --warning-color:#ff9f0a; --error-color:#ff453a; --info-color:#0a84ff;
+            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.3);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.4),0 2px 4px -1px rgba(0,0,0,0.2);
+            --shadow-lg:0 8px 32px rgba(0,0,0,0.5);
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased; scroll-behavior: smooth;}
+        body{background:var(--bg-primary);color:var(--text-primary);min-height:100vh;transition:background .3s,color .3s; line-height: 1.5; overflow-x: hidden;}
+
+        /* Utility */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .narrow { max-width: 800px; margin: 0 auto; padding: 0 20px; }
+        .flex { display: flex; align-items: center; }
+        .flex-col { flex-direction: column; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .gap-1 { gap: 0.5rem; }
+        .gap-2 { gap: 1rem; }
+        .gap-4 { gap: 2rem; }
+        .grid { display: grid; gap: 2rem; }
+        .grid-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+        .grid-3 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+        .text-center { text-align: center; }
+        .mt-4 { margin-top: 2rem; }
+        .mb-4 { margin-bottom: 2rem; }
+        
+        /* Typography */
+        h1 { font-size: 3rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
+        h2 { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; letter-spacing: -0.02em; }
+        h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
+        p { color: var(--text-secondary); }
+        .text-accent { color: var(--accent-color); }
+        
+        /* Links & Buttons */
+        a { text-decoration: none; color: inherit; transition: 0.2s; }
+        .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; transition: transform 0.1s, box-shadow 0.2s; border: none; }
+        .btn-primary { background: var(--accent-color); color: white; box-shadow: 0 4px 14px rgba(224,100,57,0.3); }
+        .btn-primary:hover { background: var(--accent-hover); transform: scale(1.02); }
+        .btn-ghost { background: transparent; color: var(--text-primary); border: 1px solid var(--border-color); }
+        .btn-ghost:hover { background: var(--bg-tertiary); }
+        
+        /* Components */
+        .badge { padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge-warning { background: rgba(255, 149, 0, 0.15); color: var(--warning-color); border: 1px solid rgba(255, 149, 0, 0.3); }
+        .badge-pill { padding: 0.25rem 0.75rem; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 500; background: var(--bg-tertiary); color: var(--text-secondary); border: 1px solid var(--border-color); display: inline-flex; gap: 0.5rem; align-items: center; }
+
+        .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-sm); transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); position: relative; overflow: hidden; }
+        .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: rgba(224,100,57,0.3); }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        [data-theme="dark"] .glass { background: rgba(28, 28, 30, 0.7); }
+
+        /* Nav */
+        nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1rem 0; background: rgba(255,255,255,0.8); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-color); transition: 0.3s; }
+        [data-theme="dark"] nav { background: rgba(0,0,0,0.8); }
+        .nav-content { height: 48px; }
+        .back-link { font-size: 0.9rem; font-weight: 500; color: var(--text-secondary); display: flex; align-items: center; gap: 0.25rem; }
+        .back-link:hover { color: var(--accent-color); }
+
+        /* Hero */
+        .hero { padding: 8rem 0 6rem; position: relative; overflow: hidden; }
+        .hero-glow { position: absolute; top: -20%; left: 50%; transform: translateX(-50%); width: 800px; height: 600px; background: radial-gradient(circle, rgba(224,100,57,0.15) 0%, transparent 70%); z-index: -1; pointer-events: none; filter: blur(60px); }
+        .gradient-text { background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-color) 200%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero-meta { margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+
+        /* Stats */
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 2rem; }
+        .stat-tile { background: var(--bg-secondary); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .stat-value { font-size: 2.5rem; font-weight: 800; color: var(--text-primary); line-height: 1; font-variant-numeric: tabular-nums; }
+        .stat-label { font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+
+        /* Architecture Diagram */
+        .diagram-container { background: var(--bg-tertiary); padding: 3rem; border-radius: var(--radius-xl); border: 1px solid var(--border-color); position: relative; overflow-x: auto; }
+        .flow-row { display: flex; align-items: center; justify-content: center; gap: 2rem; min-width: 800px; }
+        .node { background: var(--bg-card); border: 1px solid var(--border-color); padding: 1rem 1.5rem; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); position: relative; min-width: 140px; text-align: center; z-index: 2; transition: 0.3s; }
+        .node:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--accent-color); }
+        .node-icon { width: 32px; height: 32px; margin-bottom: 0.5rem; color: var(--accent-color); }
+        .node-connector { flex: 1; height: 2px; background: var(--border-color); position: relative; min-width: 40px; }
+        .node-connector::after { content: ''; position: absolute; right: 0; top: -4px; width: 8px; height: 8px; border-top: 2px solid var(--border-color); border-right: 2px solid var(--border-color); transform: rotate(45deg); }
+        
+        /* Code Block */
+        .code-block { background: #0d1117; padding: 1.5rem; border-radius: var(--radius-md); color: #e6edf3; font-family: 'SF Mono', Consolas, monospace; font-size: 0.9rem; overflow-x: auto; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 0 20px rgba(0,0,0,0.5); position: relative; }
+        .code-header { display: flex; justify-content: space-between; margin-bottom: 1rem; color: #8b949e; font-size: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; }
+        .kwd { color: #ff7b72; } .str { color: #a5d6ff; } .func { color: #d2a8ff; } .com { color: #8b949e; font-style: italic; }
+
+        /* Animations */
+        .reveal { opacity: 0; transform: translateY(20px); transition: all 0.6s ease-out; }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        /* Footer */
+        footer { margin-top: 6rem; padding: 3rem 0; border-top: 1px solid var(--border-color); color: var(--text-secondary); font-size: 0.9rem; background: var(--bg-secondary); }
+
+        /* Toggle */
+        .theme-toggle { background: none; border: none; cursor: pointer; color: var(--text-primary); padding: 0.5rem; border-radius: 50%; transition: background 0.2s; display: flex; align-items: center; justify-content: center; }
+        .theme-toggle:hover { background: var(--bg-tertiary); }
+        .theme-toggle svg { width: 20px; height: 20px; fill: currentColor; }
+
+        @media (min-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(4, 1fr); }
+            .flow-row { min-width: auto; justify-content: space-between; }
+            h1 { font-size: 4rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container flex justify-between nav-content">
+            <a href="../../index.html" class="back-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Explorer
+            </a>
+            <div class="flex gap-2">
+                <button id="themeToggle" class="theme-toggle" aria-label="Toggle Theme">
+                    <!-- Sun Icon -->
+                    <svg class="sun" style="display:none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2" fill="none"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="2"/></svg>
+                    <!-- Moon Icon -->
+                    <svg class="moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-glow"></div>
+        <div class="container text-center reveal">
+            <div class="flex justify-center mb-4">
+                <span class="badge badge-warning">External — jjoycehe</span>
+            </div>
+            <h1>Build Your Own<br><span class="gradient-text">Technical Portfolio</span></h1>
+            <p class="mt-4" style="font-size: 1.25rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+                A complete Docusaurus template to deploy a personal tech portfolio directly to GitHub Pages with zero configuration costs.
+            </p>
+            
+            <div class="hero-meta justify-center">
+                <a href="https://github.com/jjoycehe/tech-portfolio" target="_blank" class="btn btn-primary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    View on GitHub
+                </a>
+            </div>
+
+            <div style="margin-top: 2rem;">
+                <div class="flex justify-center gap-1 wrap">
+                    <span class="badge-pill">Docusaurus</span>
+                    <span class="badge-pill">Docker</span>
+                    <span class="badge-pill">GitHub Actions</span>
+                    <span class="badge-pill">React</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="container reveal">
+        <div class="stats-grid glass">
+            <div class="stat-tile">
+                <div class="stat-value" data-count="1">0</div>
+                <div class="stat-label">Click Deploy</div>
+            </div>
+            <div class="stat-tile">
+                <div class="stat-value" data-count="100" suffix="%">0%</div>
+                <div class="stat-label">Free Hosting</div>
+            </div>
+            <div class="stat-tile">
+                <div class="stat-value" data-count="0" prefix="$">$0</div>
+                <div class="stat-label">Monthly Cost</div>
+            </div>
+            <div class="stat-tile">
+                <div class="stat-value" data-count="3">0</div>
+                <div class="stat-label">Config Steps</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container mt-4 mb-4 reveal">
+        <div class="narrow text-center">
+            <h2>Infrastructure Overview</h2>
+            <p>How your code transforms into a live portfolio automatically.</p>
+        </div>
+        <div class="diagram-container mt-4">
+            <!-- Architecture Flow -->
+            <div class="flow-row">
+                <!-- Step 1 -->
+                <div class="node">
+                    <svg class="node-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                    <strong>Fork / Edit</strong>
+                    <div style="font-size: 0.75rem; color: var(--text-secondary);">GitHub Repo</div>
+                </div>
+                
+                <div class="node-connector"></div>
+
+                <!-- Step 2 -->
+                <div class="node">
+                    <svg class="node-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                    <strong>GitHub Actions</strong>
+                    <div style="font-size: 0.75rem; color: var(--text-secondary);">Docker Build & Test</div>
+                </div>
+
+                <div class="node-connector"></div>
+
+                <!-- Step 3 -->
+                <div class="node">
+                    <svg class="node-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <strong>Push Artifacts</strong>
+                    <div style="font-size: 0.75rem; color: var(--text-secondary);">To gh-pages Branch</div>
+                </div>
+
+                <div class="node-connector"></div>
+
+                <!-- Step 4 -->
+                <div class="node" style="border-color: var(--success-color);">
+                    <svg class="node-icon" style="color: var(--success-color);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                    <strong>Live Site</strong>
+                    <div style="font-size: 0.75rem; color: var(--text-secondary);">GitHub Pages CDN</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Setup Grid -->
+    <section class="container mt-4 reveal">
+        <div class="narrow">
+            <h2>Deployment Workflow</h2>
+            <p>Three simple actions to get your personal brand online.</p>
+        </div>
+        <div class="grid grid-3 mt-4">
+            <div class="card glass">
+                <div class="flex justify-between mb-4">
+                    <div style="background: var(--accent-subtle); color: var(--accent-color); padding: 0.5rem; border-radius: var(--radius-sm);">01</div>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                </div>
+                <h3>Fork & Configure</h3>
+                <p>Fork the repository to your account. Enable GitHub Actions and set the Source to <code>gh-pages</code> in Settings.</p>
+            </div>
+            <div class="card glass">
+                <div class="flex justify-between mb-4">
+                    <div style="background: var(--accent-subtle); color: var(--accent-color); padding: 0.5rem; border-radius: var(--radius-sm);">02</div>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                </div>
+                <h3>Personalize Content</h3>
+                <p>Edit <code>website/siteConfig.js</code> to update your name, tagline, social links, and project details.</p>
+            </div>
+            <div class="card glass">
+                <div class="flex justify-between mb-4">
+                    <div style="background: var(--accent-subtle); color: var(--accent-color); padding: 0.5rem; border-radius: var(--radius-sm);">03</div>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                </div>
+                <h3>Auto-Deploy</h3>
+                <p>Push your changes. The Docker container builds the site via Actions and publishes it globally.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Configuration File -->
+    <section class="container mt-4 mb-4 reveal">
+        <div class="glass" style="padding: 3rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+            <div class="flex justify-between items-center mb-4">
+                <h3><span style="color:var(--accent-color)">//</span> siteConfig.js</h3>
+                <span class="badge-pill">Single Source of Truth</span>
+            </div>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>website/siteConfig.js</span>
+                    <span>JAVASCRIPT</span>
+                </div>
+<pre>
+<span class="com">// 1. Define your public identity</span>
+<span class="kwd">const</span> config = {
+  <span class="func">title</span>: <span class="str">'YOUR NAME'</span>,        <span class="com">// Appears in header & SEO</span>
+  <span class="func">tagline</span>: <span class="str">'Creative Developer | Open Source Enthusiast'</span>,
+  
+  <span class="com">// 2. Point to your GitHub Pages</span>
+  <span class="func">url</span>: <span class="str">'https://YOUR-USER.github.io'</span>,
+  <span class="func">baseUrl</span>: <span class="str">'/tech-portfolio/'</span>,
+  <span class="func">organizationName</span>: <span class="str">'YOUR-USER'</span>,
+
+  <span class="com">// 3. Connect socials</span>
+  <span class="func">headerLinks</span>: [
+    { <span class="func">href</span>: <span class="str">'https://github.com/YOUR-USER'</span>, <span class="func">label</span>: <span class="str">'GitHub'</span> },
+    { <span class="func">href</span>: <span class="str">'https://linkedin.com/in/YOUR-PROFILE'</span>, <span class="func">label</span>: <span class="str">'LinkedIn'</span> }
+  ]
+};
+</pre>
+            </div>
+            <div class="flex justify-end mt-4">
+                <a href="https://github.com/jjoycehe/tech-portfolio" target="_blank" class="btn btn-ghost" style="font-size: 0.9rem;">
+                    View full config on GitHub &rarr;
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Docker / Specs -->
+    <section class="container reveal" style="padding-bottom: 4rem;">
+        <h2 class="narrow">Environment & Runtime</h2>
+        <div class="grid grid-2 mt-4">
+            <div class="card">
+                <div class="flex gap-2 mb-2">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--info-color)" stroke-width="2"><path d="M20 7h-9"></path><path d="M14 17H5"></path><circle cx="17" cy="17" r="3"></circle><circle cx="7" cy="7" r="3"></circle></svg>
+                    <h3>Build Environment</h3>
+                </div>
+                <p>Uses a lightweight <strong>Node:LTS</strong> Docker image to ensure reproducible builds across any machine.</p>
+                <div class="mt-4 badge-pill">Dockerfile</div>
+            </div>
+            <div class="card">
+                <div class="flex gap-2 mb-2">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    <h3>Secure by Default</h3>
+                </div>
+                <p>Leverages GitHub's built-in secret management and permission scopes to safely deploy static assets.</p>
+                <div class="mt-4 badge-pill">GitHub Actions</div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container flex flex-col gap-2 justify-center text-center">
+            <div class="flex justify-center gap-2">
+                <a href="https://github.com/jjoycehe/tech-portfolio" target="_blank" style="font-weight: 600;">https://github.com/jjoycehe/tech-portfolio</a>
+            </div>
+            <p>Generated by Cerebras &bull; <a href="../../index.html">Back to Explorer</a></p>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Logic
+        const toggle = document.getElementById('themeToggle');
+        const sun = document.querySelector('.sun');
+        const moon = document.querySelector('.moon');
+        const html = document.documentElement;
+
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', savedTheme);
+        updateIcons(savedTheme);
+
+        toggle.addEventListener('click', () => {
+            const current = html.getAttribute('data-theme');
+            const next = current === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            updateIcons(next);
+        });
+
+        function updateIcons(theme) {
+            if (theme === 'dark') {
+                sun.style.display = 'block';
+                moon.style.display = 'none';
+            } else {
+                sun.style.display = 'none';
+                moon.style.display = 'block';
+            }
+        }
+
+        // Intersection Observer for Scroll Animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    
+                    // Trigger counters if inside
+                    const counters = entry.target.querySelectorAll('.stat-value');
+                    counters.forEach(counter => {
+                        const target = +counter.getAttribute('data-count');
+                        const prefix = counter.getAttribute('prefix') || '';
+                        const suffix = counter.getAttribute('suffix') || '';
+                        if (counter.innerText === '0' + suffix || counter.innerText === prefix + '0') {
+                            let count = 0;
+                            const inc = target / 50;
+                            const updateCount = () => {
+                                count += inc;
+                                if (count < target) {
+                                    counter.innerText = prefix + Math.ceil(count) + suffix;
+                                    requestAnimationFrame(updateCount);
+                                } else {
+                                    counter.innerText = prefix + target + suffix;
+                                }
+                            };
+                            updateCount();
+                        }
+                    });
+                    
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    </script>
+</body>
+</html>

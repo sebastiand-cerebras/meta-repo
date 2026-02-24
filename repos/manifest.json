@@ -109,6 +109,46 @@
       "isExternal": true,
       "type": "infra",
       "generatedAt": "2026-02-23T17:27:20.051Z"
+    },
+    {
+      "owner": "jjoycehe",
+      "repo": "shiny-fiesta",
+      "fullName": "jjoycehe/shiny-fiesta",
+      "path": "repos/shiny-fiesta/index.html",
+      "url": "repos/shiny-fiesta/",
+      "isExternal": true,
+      "type": "generic",
+      "generatedAt": "2026-02-24T00:04:07.222Z"
+    },
+    {
+      "owner": "jjoycehe",
+      "repo": "covid-19-data",
+      "fullName": "jjoycehe/covid-19-data",
+      "path": "repos/covid-19-data/index.html",
+      "url": "repos/covid-19-data/",
+      "isExternal": true,
+      "type": "generic",
+      "generatedAt": "2026-02-24T00:04:35.244Z"
+    },
+    {
+      "owner": "jjoycehe",
+      "repo": "tech-portfolio",
+      "fullName": "jjoycehe/tech-portfolio",
+      "path": "repos/tech-portfolio/index.html",
+      "url": "repos/tech-portfolio/",
+      "isExternal": true,
+      "type": "infra",
+      "generatedAt": "2026-02-24T00:04:48.471Z"
+    },
+    {
+      "owner": "jjoycehe",
+      "repo": "cs429h_bootcamp",
+      "fullName": "jjoycehe/cs429h_bootcamp",
+      "path": "repos/cs429h_bootcamp/index.html",
+      "url": "repos/cs429h_bootcamp/",
+      "isExternal": true,
+      "type": "generic",
+      "generatedAt": "2026-02-24T00:05:03.808Z"
     }
   ]
 }
