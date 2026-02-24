@@ -331,64 +331,6 @@
       line-height: 1.5;
     }
 
-    /* Try it section */
-    .try-it {
-      width: 100%;
-      max-width: 640px;
-      margin-top: 24px;
-    }
-    .try-input-row {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    .try-input-row input {
-      flex: 1;
-      padding: 14px 18px;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      color: var(--text-primary);
-      font-size: 16px;
-      outline: none;
-      transition: border-color 0.2s ease;
-    }
-    .try-input-row input:focus {
-      border-color: var(--accent-color);
-    }
-    .try-input-row input::placeholder {
-      color: var(--text-secondary);
-    }
-    .try-btn {
-      padding: 14px 28px;
-      background: var(--accent-color);
-      color: white;
-      border: none;
-      border-radius: var(--radius-md);
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      white-space: nowrap;
-    }
-    .try-btn:hover {
-      background: var(--accent-hover);
-      transform: translateY(-1px);
-    }
-    .try-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-    .try-status {
-      text-align: center;
-      font-size: 14px;
-      color: var(--text-secondary);
-      min-height: 24px;
-    }
-    .try-status.success { color: var(--success-color); font-weight: 600; }
-    .try-status.error { color: var(--error-color); }
-
     /* QR section */
     .qr-section {
       display: flex;
@@ -697,22 +639,8 @@
       </div>
     </div>
 
-    <!-- SLIDE 7: Try It -->
+    <!-- SLIDE 7: Get Started -->
     <div class="slide" data-slide="6">
-      <div class="slide-eyebrow">Your Turn</div>
-      <h2>Try It Right Now</h2>
-      <p class="subtitle">Enter any public GitHub repo. We'll generate a visual page live.</p>
-      <div class="try-it">
-        <div class="try-input-row">
-          <input type="text" id="repoInput" placeholder="owner/repo (e.g. fastapi/fastapi)" onkeydown="if(event.key==='Enter') generateLive()" />
-          <button class="try-btn" id="generateBtn" onclick="generateLive()">Generate →</button>
-        </div>
-        <div class="try-status" id="tryStatus"></div>
-      </div>
-    </div>
-
-    <!-- SLIDE 8: Get Started -->
-    <div class="slide" data-slide="7">
       <div class="slide-eyebrow">Get Started</div>
       <h2>Take It Home</h2>
       <p class="subtitle">Run this tool locally. Generate visual pages for any repo — yours, your team's, or anyone's.</p>
@@ -725,19 +653,11 @@
             <a href="https://github.com/sebastiand-cerebras/meta-repo" target="_blank" rel="noopener" style="display: inline-block; margin-top: 10px; color: var(--accent-color); font-weight: 600; font-size: 14px; text-decoration: none;">github.com/sebastiand-cerebras/meta-repo →</a>
           </div>
         </div>
-        <div class="qr-section">
-          <img src="../assets/cerebras-cli.png" alt="cerebras-cli" style="width: 120px; height: 120px; flex-shrink: 0; border-radius: 8px; object-fit: contain; background: var(--bg-tertiary);" />
-          <div class="qr-text">
-            <h3>Build Fast with cerebras-cli</h3>
-            <p>Scaffold, develop, and iterate on full-stack apps at lightning speed — powered by Cerebras inference.</p>
-            <a href="https://www.npmjs.com/package/cerebras-cli" target="_blank" rel="noopener" style="display: inline-block; margin-top: 10px; color: var(--accent-color); font-weight: 600; font-size: 14px; text-decoration: none;">npm install -g cerebras-cli →</a>
-          </div>
-        </div>
       </div>
     </div>
 
-    <!-- SLIDE 9: Thank You -->
-    <div class="slide" data-slide="8">
+    <!-- SLIDE 8: Thank You -->
+    <div class="slide" data-slide="7">
       <div class="thankyou-layout">
         <div class="thankyou-left">
           <div style="background: linear-gradient(135deg, #e0e5ec 0%, #d0d8e8 100%); border-radius: var(--radius-xl); padding: 32px; display:flex; align-items:center; justify-content:center; width:100%; max-width:380px; aspect-ratio:4/5;">
@@ -919,77 +839,6 @@
           </a>`).join('');
       } catch {
         document.getElementById('liveExamples').innerHTML = '<div style="color:var(--text-secondary);grid-column:1/-1;text-align:center">Could not load examples</div>';
-      }
-    }
-
-    // ============================================================
-    // Live generation (connects to local server)
-    // ============================================================
-    async function generateLive() {
-      const input = document.getElementById('repoInput');
-      const repo = input.value.trim();
-      const status = document.getElementById('tryStatus');
-      const btn = document.getElementById('generateBtn');
-
-      if (!repo || !repo.includes('/')) {
-        status.className = 'try-status error';
-        status.textContent = 'Enter a valid owner/repo (e.g. fastapi/fastapi)';
-        return;
-      }
-
-      btn.disabled = true;
-      btn.textContent = 'Generating…';
-      status.className = 'try-status';
-      status.textContent = 'Starting generation…';
-
-      try {
-        const startRes = await fetch('http://localhost:3200/api/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ repos: [repo] })
-        });
-
-        if (!startRes.ok) {
-          const err = await startRes.json().catch(() => ({}));
-          throw new Error(err.error || `Server error ${startRes.status}`);
-        }
-
-        const { jobId } = await startRes.json();
-        status.textContent = 'Analyzing repository…';
-
-        // Poll
-        let logIdx = 0;
-        while (true) {
-          await new Promise(r => setTimeout(r, 2000));
-          const poll = await fetch(`http://localhost:3200/api/jobs/${jobId}?since=${logIdx}`);
-          const job = await poll.json();
-
-          // Show latest meaningful log
-          for (const entry of job.logs) {
-            if (entry.message.includes('Step 1')) status.textContent = '✨ Generating visual page…';
-            else if (entry.message.includes('Committing')) status.textContent = '🚀 Pushing to GitHub…';
-            else if (entry.message.includes('Written')) {
-              const m = entry.message.match(/Written:.*\((.+)\)/);
-              status.textContent = `📄 Page generated${m ? ' — ' + m[1] : ''}`;
-            }
-          }
-          logIdx = job.totalLogs;
-
-          if (job.status === 'success') {
-            status.className = 'try-status success';
-            status.textContent = '✅ Done! Page generated and deployed. Check the examples slide!';
-            loadExamples();
-            break;
-          } else if (job.status === 'error') {
-            throw new Error('Generation failed — check server logs');
-          }
-        }
-      } catch (err) {
-        status.className = 'try-status error';
-        status.textContent = `❌ ${err.message}. Is the local server running on port 3200?`;
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Generate →';
       }
     }
 
