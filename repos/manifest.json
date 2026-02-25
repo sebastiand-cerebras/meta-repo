@@ -179,6 +179,16 @@
       "isExternal": true,
       "type": "ml",
       "generatedAt": "2026-02-25T03:45:47.440Z"
+    },
+    {
+      "owner": "ishaan-awasthi",
+      "repo": "COOK",
+      "fullName": "ishaan-awasthi/COOK",
+      "path": "repos/COOK/index.html",
+      "url": "repos/COOK/",
+      "isExternal": true,
+      "type": "generic",
+      "generatedAt": "2026-02-25T03:47:21.069Z"
     }
   ]
 }

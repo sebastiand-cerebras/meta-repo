@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COOK - Compiler for Object-Oriented Keys</title>
+    <style>
+        /* CORE VARIABLES & RESET */
+        :root {
+            --bg-primary:#f5f5f7; --bg-secondary:#ffffff; --bg-tertiary:#f0f0f2; --bg-card:#ffffff;
+            --text-primary:rgb(43,25,16); --text-secondary:#86868b; --border-color:rgba(0,0,0,0.08);
+            --accent-color:rgb(224,100,57); --accent-hover:rgb(200,85,45); --accent-subtle:rgba(224,100,57,0.1);
+            --success-color:#34c759; --warning-color:#ff9500; --error-color:#ff3b30; --info-color:#007aff;
+            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.05);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg:0 8px 32px rgba(0,0,0,0.12);
+            --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-xl:24px;
+            --font-sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;
+            --glass-bg:rgba(255, 255, 255, 0.7);
+            --glass-border:rgba(255, 255, 255, 0.5);
+        }
+        [data-theme="dark"] {
+            --bg-primary:#000000; --bg-secondary:#1c1c1e; --bg-tertiary:#2c2c2e; --bg-card:#1c1c1e;
+            --text-primary:#f5f5f7; --text-secondary:#86868b; --border-color:rgba(255,255,255,0.1);
+            --accent-color:rgb(224,100,57); --accent-hover:rgb(240,115,70); --accent-subtle:rgba(224,100,57,0.15);
+            --success-color:#30d158; --warning-color:#ff9f0a; --error-color:#ff453a; --info-color:#0a84ff;
+            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.3);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.4),0 2px 4px -1px rgba(0,0,0,0.2);
+            --shadow-lg:0 8px 32px rgba(0,0,0,0.5);
+            --glass-bg:rgba(28, 28, 30, 0.7);
+            --glass-border:rgba(255, 255, 255, 0.1);
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{font-family:var(--font-sans);-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+        body{background:var(--bg-primary);color:var(--text-primary);min-height:100vh;transition:background .3s,color .3s;line-height:1.5}
+
+        /* TYPOGRAPHY */
+        h1, h2, h3 { font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
+        h1 { font-size: clamp(2.5rem, 5vw, 4rem); margin-bottom: 1rem; }
+        h2 { font-size: clamp(1.8rem, 3vw, 2.5rem); margin-bottom: 1.5rem; }
+        h3 { font-size: 1.25rem; margin-bottom: 0.5rem; }
+        p { color: var(--text-secondary); margin-bottom: 1.25rem; font-size: 1.05rem; }
+        a { text-decoration: none; color: inherit; transition: color 0.2s; }
+        
+        /* UTILITIES */
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; }
+        .flex-center { display: flex; align-items: center; justify-content: center; }
+        .flex-between { display: flex; align-items: center; justify-content: space-between; }
+        .text-gradient {
+            background: linear-gradient(135deg, var(--accent-color), var(--error-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .badge {
+            display: inline-flex; align-items: center; padding: 4px 12px;
+            border-radius: 99px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .badge-warning { background: rgba(255, 149, 0, 0.15); color: var(--warning-color); border: 1px solid rgba(255, 149, 0, 0.3); }
+        .badge-accent { background: var(--accent-subtle); color: var(--accent-color); }
+        .badge-tech { background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); }
+
+        /* COMPONENT: BADGE STRIPS */
+        .badges-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
+
+        /* COMPONENT: CARDS & GLASSMORPHISM */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* COMPONENT: STAT TILES */
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin: 40px 0; }
+        .stat-tile {
+            background: var(--bg-secondary); border: 1px solid var(--border-color);
+            padding: 24px; border-radius: var(--radius-md); text-align: center;
+            transition: 0.3s;
+        }
+        .stat-tile:hover { border-color: var(--accent-color); transform: scale(1.02); }
+        .stat-number { font-size: 2.5rem; font-weight: 800; color: var(--text-primary); line-height: 1; margin-bottom: 4px; display: block;}
+        .stat-label { font-size: 0.8rem; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.05em; font-weight: 600; }
+
+        /* COMPONENT: ICONS */
+        .icon { width: 24px; height: 24px; fill: currentColor; display: inline-block; vertical-align: middle; }
+        .icon-lg { width: 48px; height: 48px; margin-bottom: 12px; color: var(--accent-color); }
+        .icon-box {
+            width: 56px; height: 56px; border-radius: 12px;
+            background: var(--accent-subtle); color: var(--accent-color);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        /* COMPONENT: NAVIGATION */
+        nav {
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 100;
+            background: rgba(var(--bg-primary), 0.8); backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color); height: 60px;
+            display: flex; align-items: center;
+        }
+        .nav-inner { width: 100%; display: flex; justify-content: space-between; align-items: center; }
+        .back-link { font-size: 0.9rem; font-weight: 500; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
+        .back-link:hover { color: var(--accent-color); }
+        .theme-toggle {
+            background: none; border: none; cursor: pointer; color: var(--text-primary);
+            padding: 8px; border-radius: 50%; transition: background 0.2s;
+        }
+        .theme-toggle:hover { background: var(--bg-tertiary); }
+
+        /* SECTIONS */
+        section { padding: 80px 0; position: relative; overflow: hidden; }
+        
+        /* HERO */
+        .hero {
+            min-height: 80vh; display: flex; flex-direction: column; justify-content: center; text-align: center;
+            position: relative;
+        }
+        .hero-glow {
+            position: absolute; width: 600px; height: 600px; background: radial-gradient(circle, var(--accent-subtle) 0%, transparent 70%);
+            top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: -1; opacity: 0.6;
+        }
+        .hero-subtitle { font-size: 1.25rem; color: var(--text-primary); opacity: 0.8; max-width: 600px; margin: 0 auto 2rem auto; }
+        .external-badge { margin-top: 16px; display: inline-block; }
+        
+        /* DIAGRAM / FLOW */
+        .flow-diagram {
+            display: flex; align-items: center; justify-content: space-between;
+            margin: 40px 0; flex-wrap: wrap; gap: 20px;
+        }
+        .flow-node {
+            background: var(--bg-secondary); border: 1px solid var(--border-color);
+            padding: 16px 24px; border-radius: var(--radius-md);
+            font-weight: 600; color: var(--text-primary);
+            position: relative; z-index: 2;
+            display: flex; align-items: center; gap: 10px;
+            box-shadow: var(--shadow-sm);
+        }
+        .flow-node:hover { border-color: var(--accent-color); color: var(--accent-color); }
+        .flow-arrow {
+            flex-grow: 1; height: 2px; background: var(--border-color);
+            position: relative; min-width: 30px;
+        }
+        .flow-arrow::after {
+            content: ''; position: absolute; right: 0; top: -4px;
+            border-width: 5px 0 5px 6px; border-style: solid; border-color: transparent transparent transparent var(--border-color);
+        }
+
+        /* CODE BLOCK */
+        .code-block {
+            background: #0d1117; border-radius: var(--radius-md); overflow: hidden;
+            box-shadow: var(--shadow-lg); border: 1px solid rgba(255,255,255,0.1);
+            margin: 30px 0; width: 100%;
+        }
+        .code-header {
+            background: rgba(255,255,255,0.05); padding: 10px 16px;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 0.85rem; color: #8b949e; font-family: monospace;
+        }
+        .code-content {
+            padding: 20px; overflow-x: auto; font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem; line-height: 1.6; color: #c9d1d9;
+        }
+        .tok-kw { color: #ff7b72; } /* Keyword */
+        .tok-func { color: #d2a8ff; } /* Function */
+        .tok-str { color: #a5d6ff; } /* String */
+        .tok-comment { color: #8b949e; font-style: italic; } /* Comment */
+
+        /* BUTTONS */
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 12px 24px; border-radius: var(--radius-md);
+            font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.2s;
+            border: none;
+        }
+        .btn-primary {
+            background: var(--accent-color); color: white; box-shadow: 0 4px 14px rgba(224,100,57,0.3);
+        }
+        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px); }
+
+        /* FOOTER */
+        footer {
+            border-top: 1px solid var(--border-color); padding: 40px 0; margin-top: 60px;
+            background: var(--bg-secondary); text-align: center;
+        }
+        .footer-links a { color: var(--text-secondary); margin: 0 10px; font-size: 0.9rem; }
+        .footer-links a:hover { color: var(--accent-color); }
+        .attribution { font-size: 0.8rem; color: var(--text-secondary); opacity: 0.6; margin-top: 10px; }
+
+        /* ANIMATIONS */
+        .animate-on-scroll { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+        .animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
+        .delay-1 { transition-delay: 0.1s; }
+        .delay-2 { transition-delay: 0.2s; }
+        .delay-3 { transition-delay: 0.3s; }
+
+        @media (max-width: 768px) {
+            .flow-diagram { flex-direction: column; }
+            .flow-arrow { width: 2px; height: 30px; min-width: 2px; }
+            .flow-arrow::after { top: auto; bottom: -4px; left: -4px; border-width: 0 5px 6px 5px; border-color: transparent transparent var(--border-color) transparent; }
+            h1 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <div class="container nav-inner">
+            <a href="../../index.html" class="back-link">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                Back to Explorer
+            </a>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                <!-- SVG handled by JS -->
+            </button>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-glow"></div>
+        <div class="container animate-on-scroll">
+            <div class="badges-row justify-center">
+                <span class="badge badge-accent">V1.0 Released</span>
+            </div>
+            <h1>COOK <span class="text-gradient">language</span></h1>
+            <p class="hero-subtitle">
+                A statically-typed & selectively-interpreted esoteric DSL. <br>
+                Where code looks like a recipe.
+            </p>
+            <div class="flex-center" style="gap: 16px; flex-wrap: wrap;">
+                <a href="https://github.com/ishaan-awasthi/COOK" target="_blank" class="btn btn-primary">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    View Source
+                </a>
+            </div>
+            <div class="external-badge badge badge-warning animate-on-scroll delay-1">
+                ⚠️ External Repository — ishaan-awasthi
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="container">
+        <div class="stat-grid animate-on-scroll">
+            <div class="stat-tile">
+                <span class="stat-number" data-target="4">0</span>
+                <span class="stat-label">Core Java Files</span>
+            </div>
+            <div class="stat-tile">
+                <span class="stat-number" data-target="1">0</span>
+                <span class="stat-label">Major Version</span>
+            </div>
+            <div class="stat-tile">
+                <span class="stat-number">∞</span>
+                <span class="stat-label">Syntax Forgiveness</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- OVERVIEW -->
+    <section class="container">
+        <div class="grid-2">
+            <div class="glass-card animate-on-scroll">
+                <div class="icon-box">
+                    <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                </div>
+                <h3>The Philosophy</h3>
+                <p>Inspired by the analogy that "coding is like cooking," COOK lets you write programs that resemble recipes. No more worrying if your peeler supports carrots in version 4.3.</p>
+            </div>
+            <div class="glass-card animate-on-scroll delay-1">
+                <div class="icon-box">
+                    <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                </div>
+                <h3>Selectively Interpreted</h3>
+                <p>Built on Java, COOK tokenizes only the "Keys" (process and argument keys). Filler text, punctuation, and capitalization are often ignored, making it incredibly forgiving.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ARCHITECTURE FLOW -->
+    <section class="container" style="max-width: 900px;">
+        <h2 class="animate-on-scroll" style="text-align: center;">How it works</h2>
+        <p class="animate-on-scroll" style="text-align: center;">The execution flow from raw text to output.</p>
+        
+        <div class="flow-diagram animate-on-scroll delay-1">
+            <div class="flow-node">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                source.txt
+            </div>
+            <div class="flow-arrow"></div>
+            <div class="flow-node">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M9.66 3c.46 0 .84.36.92.81l.72 4.31c.08.46-.24.89-.7.97l-4.31.72c-.46.08-.89-.24-.97-.7-.08-.46.24-.89.7-.97L8.3 8.1 6.1 5.9c-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0l2.2 2.2.54-3.26c.09-.44.48-.77.94-.77zm9.74 4.61c-.46.08-.78.51-.7.97l.72 4.31c.08.46-.24.89-.7.97l-4.31.72c-.46.08-.89-.24-.97-.7-.08-.46.24-.89.7-.97l2.28-.38-2.2-2.2c-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0l2.2 2.2.54-3.26c.07-.45.5-.77.96-.69zM5.41 14c.46 0 .84.36.92.81l.72 4.31c.08.46-.24.89-.7.97l-4.31.72c-.46.08-.89-.24-.97-.7-.08-.46.24-.89.7-.97l3.26-.54-2.19-2.19c-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0l2.2 2.2.54-3.26c.08-.45.47-.77.93-.77z" transform="scale(0.8)"/></svg>
+                Lexer.java
+            </div>
+            <div class="flow-arrow"></div>
+            <div class="flow-node">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                Interpreter
+            </div>
+            <div class="flow-arrow"></div>
+            <div class="flow-node" style="color: var(--success-color); border-color: rgba(52, 199, 89, 0.3);">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                Output
+            </div>
+        </div>
+        <div class="glass-card animate-on-scroll delay-2" style="margin-top: 30px;">
+            <h4>Architecture Detail</h4>
+            <p style="margin-bottom: 0;">
+                The <strong>Lexer</strong> selectively tokenizes lines based on defined keys. Then, the <strong>Classifier</strong> categorizes tokens, and the <strong>Interpreter</strong> executes the logic. Any text not matching a key is treated as a comment, allowing for "recipes" that read like plain English.
+            </p>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="container animate-on-scroll">
+        <h2>Key Ingredients</h2>
+        <div class="grid-2">
+            <div class="glass-card">
+                <div class="flex-between">
+                    <h3>Forgiving Syntax</h3>
+                    <svg class="icon" style="color:var(--success-color);" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                </div>
+                <p>Add filler text, punctuation, or capitalization freely. Only the specific "Keys" matter to the compiler.</p>
+            </div>
+            <div class="glass-card">
+                <div class="flex-between">
+                    <h3>Statically-Typed</h3>
+                    <svg class="icon" style="color:var(--info-color);" viewBox="0 0 24 24"><path d="M9 11.75c-1.19 0-2.15-1.1-2.15-2.25S7.81 7.25 9 7.25s2.15 1.1 2.15 2.25-1.1 2.25-2.15 2.25zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-.29.02-.58.05-.86 2.36-1.05 4.23-2.98 5.21-5.37C11.07 8.33 14.05 10 17.42 10c.78 0 1.53-.09 2.25-.26.21.71.33 1.47.33 2.26 0 4.41-3.59 8-8 8z"/></svg>
+                </div>
+                <p>Despite the English-like appearance, the language maintains strict type safety under the hood for reliable execution.</p>
+            </div>
+            <div class="glass-card">
+                <div class="flex-between">
+                    <h3>Reference Keys</h3>
+                    <svg class="icon" style="color:var(--accent-color);" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                </div>
+                <p>Variables and values are defined via special reference keys that point tokens, keeping the syntax clean.</p>
+            </div>
+            <div class="glass-card">
+                <div class="flex-between">
+                    <h3>Plain English</h3>
+                    <svg class="icon" style="color:var(--text-secondary);" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/></svg>
+                </div>
+                <p>Designed for intuition. A COOK program reads like a list of instructions or a recipe card.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- TECH STACK -->
+    <section class="container animate-on-scroll">
+        <h3>Built With</h3>
+        <div class="flex-center" style="gap: 12px; flex-wrap: wrap; margin-top: 20px;">
+            <span class="badge badge-tech" style="display:flex; align-items:center; gap:6px;">
+                <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="currentColor"><path d="M8.851 18.56s-.917.534.653.714c1.902.218 2.874.187 4.969-.211 0 0 .552.346 1.321.646-4.699 2.013-10.633-.118-6.943-1.149M8.276 15.933s-1.028.761.542.924c2.032.209 3.636.227 6.413-.308 0 0 .384.389.987.602-5.679 1.661-12.007.13-7.942-1.218M13.116 11.475c1.158 1.333-.304 2.533-.304 2.533s2.939-1.518 1.589-3.418c-1.261-1.772-2.228-2.652 3.007-5.688 0-.001-8.216 2.051-4.292 6.573M19.33 20.504s.679.559-.747.991c-2.712.822-11.288 1.069-13.669.033-.856-.373.75-.89 1.254-.998.527-.114.828-.093.828-.093-.953-.671-6.156 1.317-2.643 1.887 9.58 1.553 17.462-.7 14.977-1.82M9.292 13.21s-4.362 1.036-1.544 1.412c1.189.159 3.561.123 5.77-.062 1.806-.152 3.618-.477 3.618-.477s-.637.272-1.098.587c-4.429 1.165-12.986.623-10.522-.568 2.082-1.006 3.776-.891 3.776-.891M17.116 17.584c4.503-2.34 2.421-4.589.968-4.285-.355.074-.515.138-.515.138s.132-.207.385-.297c2.875-1.011 5.086 2.981-.928 4.562 0-.001.07-.062.09-.118M14.401 0s2.494 2.494-2.365 6.33c-3.896 3.077-.889 4.832 0 6.836-2.274-2.053-3.943-3.858-2.824-5.539 1.644-2.469 6.197-3.665 5.189-7.627M9.734 23.924c4.322.277 10.959-.153 11.116-2.198 0 0-.302.775-3.572 1.391-3.688.694-8.239.613-10.937.168 0-.001.553.457 3.393.639"/></svg>
+                Java
+            </span>
+            <span class="badge badge-tech">IntelliJ IDEA</span>
+            <span class="badge badge-tech">Object-Oriented</span>
+            <span class="badge badge-tech">Esoteric Lang</span>
+        </div>
+    </section>
+
+    <!-- GETTING STARTED -->
+    <section class="container" style="max-width: 800px;">
+        <h2 class="animate-on-scroll">Getting Started</h2>
+        <div class="glass-card animate-on-scroll delay-1">
+            <p><strong>1. Clone the repository</strong></p>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Terminal</span>
+                </div>
+                <div class="code-content">
+                    git clone https://github.com/ishaan-awasthi/COOK
+                </div>
+            </div>
+
+            <p><strong>2. Setup the Scanner</strong><br>In <code>Main.java</code>, update the file path to point to your recipe text file:</p>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>src/Main.java</span>
+                </div>
+                <div class="code-content">
+                    <span class="tok-kw">Scanner</span> scanner = <span class="tok-func">new</span> <span class="tok-kw">Scanner</span>(<span class="tok-func">new</span> <span class="tok-kw">File</span>(<span class="tok-func">new</span> <span class="tok-kw">File</span>(<span class="tok-str">""</span>).<span class="tok-func">getAbsolutePath</span>()+<span class="tok-str">"/src/sample.txt"</span>));
+                </div>
+            </div>
+            
+            <p style="margin-bottom: 0;"><strong>3. Cook it up!</strong><br>Run <code>Main.java</code> in your IDE. The execution results will appear in your process terminal.</p>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="https://github.com/ishaan-awasthi/COOK" target="_blank">GitHub Repository</a>
+                <span>•</span>
+                <a href="../../index.html">Back to Explorer</a>
+            </div>
+            <p class="attribution">Generated by Cerebras</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- THEME TOGGLE ---
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        
+        // Icons for Toggle
+        const sunIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
+        const moonIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
+
+        function setTheme(theme) {
+            html.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            themeToggle.innerHTML = theme === 'dark' ? sunIcon : moonIcon;
+        }
+
+        const savedTheme = localStorage.getItem('theme') || window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        setTheme(savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        });
+
+        // --- ANIMATION OBSERVER ---
+        const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target); // Only animate once
+                    
+                    // Trigger counter if it's a stat tile
+                    const counter = entry.target.querySelector('.stat-number[data-target]');
+                    if (counter) animateCounter(counter);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-on-scroll, .stat-tile').forEach(el => observer.observe(el));
+
+        // --- ANIMATED COUNTERS ---
+        function animateCounter(el) {
+            const target = parseInt(el.getAttribute('data-target'));
+            if (!target) return;
+            
+            let current = 0;
+            const increment = target / 30; // Speed of animation
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    el.textContent = target + "+";
+                    clearInterval(timer);
+                } else {
+                    el.textContent = Math.ceil(current);
+                }
+            }, 40);
+        }
+    </script>
+</body>
+</html>
+```
