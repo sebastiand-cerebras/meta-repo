@@ -159,6 +159,16 @@
       "isExternal": true,
       "type": "generic",
       "generatedAt": "2026-02-24T04:44:54.158Z"
+    },
+    {
+      "owner": "seduerr91",
+      "repo": "eval-suite",
+      "fullName": "seduerr91/eval-suite",
+      "path": "repos/eval-suite/index.html",
+      "url": "repos/eval-suite/",
+      "isExternal": true,
+      "type": "ml",
+      "generatedAt": "2026-02-25T00:49:01.399Z"
     }
   ]
 }
