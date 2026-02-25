@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oumi - Open Source AI Modeling Platform</title>
+    <style>
+        :root {
+            --bg-primary:#f5f5f7; --bg-secondary:#ffffff; --bg-tertiary:#f0f0f2; --bg-card:#ffffff;
+            --text-primary:rgb(43,25,16); --text-secondary:#86868b; --border-color:rgba(0,0,0,0.08);
+            --accent-color:rgb(224,100,57); --accent-hover:rgb(200,85,45); --accent-subtle:rgba(224,100,57,0.1);
+            --success-color:#34c759; --warning-color:#ff9500; --error-color:#ff3b30; --info-color:#007aff;
+            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.05);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg:0 8px 32px rgba(0,0,0,0.12);
+            --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-xl:24px;
+        }
+        [data-theme="dark"] {
+            --bg-primary:#000000; --bg-secondary:#1c1c1e; --bg-tertiary:#2c2c2e; --bg-card:#1c1c1e;
+            --text-primary:#f5f5f7; --text-secondary:#86868b; --border-color:rgba(255,255,255,0.1);
+            --accent-color:rgb(224,100,57); --accent-hover:rgb(240,115,70); --accent-subtle:rgba(224,100,57,0.15);
+            --success-color:#30d158; --warning-color:#ff9f0a; --error-color:#ff453a; --info-color:#0a84ff;
+            --shadow-sm:0 1px 2px 0 rgba(0,0,0,0.3);
+            --shadow-md:0 4px 6px -1px rgba(0,0,0,0.4),0 2px 4px -1px rgba(0,0,0,0.2);
+            --shadow-lg:0 8px 32px rgba(0,0,0,0.5);
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased; scroll-behavior: smooth;}
+        body{background:var(--bg-primary);color:var(--text-primary);min-height:100vh;transition:background .3s,color .3s; line-height: 1.6;}
+
+        /* Utilities */
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+        .container-narrow { max-width: 800px; margin: 0 auto; padding: 0 24px; }
+        .flex { display: flex; align-items: center; }
+        .flex-col { display: flex; flex-direction: column; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .gap-2 { gap: 0.5rem; } .gap-4 { gap: 1rem; } .gap-8 { gap: 2rem; }
+        .grid { display: grid; gap: 1.5rem; }
+        .text-center { text-align: center; }
+        .mt-4 { margin-top: 1rem; } .mt-8 { margin-top: 2rem; } .mb-4 { margin-bottom: 1rem; } 
+        .mb-8 { margin-bottom: 2rem; } .py-12 { padding-top: 3rem; padding-bottom: 3rem; }
+        .hidden-mobile { display: none; }
+        @media(min-width: 768px) { .hidden-mobile { display: flex; } .grid-2 { grid-template-columns: repeat(2,1fr); } .grid-3 { grid-template-columns: repeat(3,1fr); } .grid-4 { grid-template-columns: repeat(4,1fr); } }
+        
+        /* UI Elements */
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 20px; border-radius: var(--radius-md);
+            font-weight: 600; text-decoration: none; transition: all 0.2s ease;
+            font-size: 0.95rem; border: 1px solid transparent;
+        }
+        .btn-primary { background: var(--accent-color); color: white; box-shadow: 0 4px 14px rgba(224,100,57,0.3); }
+        .btn-primary:hover { background: var(--accent-hover); transform: scale(1.02); }
+        .btn-secondary { background: var(--bg-secondary); border-color: var(--border-color); color: var(--text-primary); box-shadow: var(--shadow-sm); }
+        .btn-secondary:hover { background: var(--bg-tertiary); transform: translateY(-1px); }
+        
+        .badge-pill {
+            display: inline-block; padding: 4px 12px; border-radius: 20px;
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .badge-warning { background: rgba(255, 149, 0, 0.15); color: var(--warning-color); }
+        .badge-soft { background: var(--bg-tertiary); color: var(--text-secondary); }
+        
+        /* Header */
+        header {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(var(--bg-primary), 0.8); /* Fallback */
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 0;
+        }
+        
+        /* Hero */
+        .hero {
+            position: relative; overflow: hidden;
+            padding: 6rem 0 4rem;
+            text-align: center;
+        }
+        .hero-glow {
+            position: absolute; width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(224,100,57,0.15) 0%, rgba(0,0,0,0) 70%);
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: -1; pointer-events: none;
+        }
+        [data-theme="dark"] .hero-glow { background: radial-gradient(circle, rgba(224,100,57,0.25) 0%, rgba(0,0,0,0) 70%); }
+        
+        h1 {
+            font-size: 3rem; font-weight: 800; line-height: 1.1;
+            margin-bottom: 1rem; letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent-color));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        @media(min-width: 768px) { h1 { font-size: 4.5rem; } }
+        
+        .subtitle { font-size: 1.25rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto 2rem; }
+        
+        /* Stat Tiles */
+        .stat-value { font-size: 2.5rem; font-weight: 800; color: var(--text-primary); line-height: 1.1; }
+        .stat-label { font-size: 0.875rem; color: var(--text-secondary); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+        .stat-card {
+            background: var(--bg-card); padding: 1.5rem; border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+
+        /* Flow Diagram */
+        .pipeline-container {
+            display: flex; flex-direction: column; gap: 1rem;
+        }
+        @media(min-width: 768px) {
+            .pipeline-container {
+                flex-direction: row; align-items: stretch; justify-content: center;
+                gap: 0;
+            }
+        }
+        .pipeline-node {
+            flex: 1;
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius-md); padding: 1.5rem;
+            position: relative; display: flex; flex-direction: column; align-items: center;
+            text-align: center; box-shadow: var(--shadow-sm);
+            backdrop-filter: blur(5px);
+        }
+        .pipeline-icon {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: var(--bg-tertiary); color: var(--info-color);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 1rem; font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+        .pipeline-node:hover .pipeline-icon { transform: scale(1.1) rotate(5deg); background: var(--accent-subtle); color: var(--accent-color); }
+        .pipeline-arrow {
+            display: none; color: var(--text-secondary); font-size: 1.5rem;
+        }
+        @media(min-width: 768px) {
+            .pipeline-arrow { display: flex; align-items: center; justify-content: center; width: 40px; }
+            .pipeline-arrow::after {
+                content: ''; width: 0; height: 0;
+                border-top: 6px solid transparent; border-bottom: 6px solid transparent; border-left: 8px solid var(--text-secondary);
+                opacity: 0.5;
+            }
+        }
+
+        /* Feature Cards */
+        .feature-card {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg); padding: 1.5rem;
+            transition: all 0.3s ease; position: relative; overflow: hidden;
+        }
+        .feature-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--accent-color); }
+        .feature-icon { font-size: 2rem; margin-bottom: 1rem; display: inline-block; }
+        .feature-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .feature-desc { font-size: 0.95rem; color: var(--text-secondary); }
+
+        /* Code Block */
+        .code-block {
+            background: #0d1117; border-radius: var(--radius-md); overflow: hidden;
+            box-shadow: var(--shadow-lg); font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            margin: 2rem 0; border: 1px solid #30363d;
+        }
+        .code-header {
+            background: #161b22; padding: 8px 16px; border-bottom: 1px solid #30363d;
+            display: flex; justify-content: space-between; align-items: center; color: #86868b; font-size: 0.85rem;
+        }
+        .code-content { padding: 1.5rem; overflow-x: auto; color: #e6edf3; font-size: 0.9rem; }
+        .token-kw { color: #ff7b72; } .token-func { color: #d2a8ff; } .token-str { color: #a5d6ff; } .token-cmt { color: #8b949e; }
+
+        /* Scroll Animations */
+        .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        /* Tech Stack Badges */
+        .tech-strip { display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; }
+        .tech-badge {
+            background: var(--bg-secondary); border: 1px solid var(--border-color);
+            padding: 6px 14px; border-radius: var(--radius-sm);
+            font-size: 0.85rem; color: var(--text-primary); font-weight: 500;
+            display: flex; align-items: center; gap: 6px;
+            transition: background 0.2s;
+        }
+        .tech-badge:hover { background: var(--bg-tertiary); }
+
+        /* Footer */
+        footer { border-top: 1px solid var(--border-color); padding: 3rem 0; margin-top: 4rem; background: var(--bg-secondary); }
+        .footer-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; margin: 0 10px; }
+        .footer-links a:hover { color: var(--accent-color); }
+
+        /* Icons */
+        .icon { width: 18px; height: 18px; fill: currentColor; }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container flex justify-between">
+            <div class="flex gap-4">
+                <a href="../../index.html" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;">
+                    ← Back to Explorer
+                </a>
+                <div class="flex items-center gap-2">
+                    <span style="font-weight: 700; font-size: 1.1rem;">Oumi</span>
+                </div>
+            </div>
+            <button id="theme-toggle" class="btn btn-secondary" aria-label="Toggle Dark Mode">
+                <svg id="moon-icon" class="icon" viewBox="0 0 24 24" style="display:none"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>
+                <svg id="sun-icon" class="icon" viewBox="0 0 24 24"><path d="M6.995 12c0 2.761 2.246 5.007 5.007 5.007s5.007-2.246 5.007-5.007S14.761 6.995 12 6.995 6.995 9.24 6.995 12zM11 19h2v3h-2zm0-17h2v3h-2zm-9 9h3v2H2zm17 0h3v2h-3zM5.637 19.778l-1.414-1.414 2.121-2.121 1.414 1.414zM16.242 6.344l2.122-2.122 1.414 1.414-2.122 2.122zM6.344 7.759 4.223 5.637l1.415-1.414 2.12 2.122zm13.434 10.605-1.414 1.414-2.122-2.122 1.414-1.414z"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-glow"></div>
+        <div class="container">
+            <div class="mb-4">
+                <span class="badge-pill badge-warning">External — oumi-ai</span>
+                <span class="badge-pill badge-soft" style="vertical-align: middle; margin-left: 8px;">v0.6.0 Released</span>
+            </div>
+            
+            <h1 class="reveal">Everything you need to<br>build foundation models</h1>
+            <p class="subtitle reveal">End-to-end platform for training, evaluation, and deployment of state-of-the-art AI models.</p>
+            
+            <div class="flex justify-center gap-4 mb-8 reveal">
+                <a href="https://github.com/oumi-ai/oumi" target="_blank" class="btn btn-primary">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    View Source
+                </a>
+                <a href="https://oumi.ai/docs/en/latest/index.html" target="_blank" class="btn btn-secondary">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                    Documentation
+                </a>
+            </div>
+
+            <div class="tech-strip reveal">
+                <div class="tech-badge">🐍 Python 3.10-3.13</div>
+                <div class="tech-badge">🤗 Transformers</div>
+                <div class="tech-badge">⚡ DeepSpeed</div>
+                <div class="tech-badge">🧪 RLHF / PPO</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="container py-12">
+        <div class="grid grid-3 gap-8" id="stats-grid">
+            <div class="stat-card text-center reveal">
+                <div class="stat-value" data-target="20">0</div>
+                <div class="stat-label">Research Notebooks</div>
+            </div>
+            <div class="stat-card text-center reveal">
+                <div class="stat-value" style="color:var(--accent-color)">v0.6.0</div>
+                <div class="stat-label">Latest Stable Release</div>
+            </div>
+            <div class="stat-card text-center reveal">
+                <div class="stat-value">Apache</div>
+                <div class="stat-label">Open Source License</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pipeline Section -->
+    <section class="container-narrow py-12">
+        <div class="text-center mb-8 reveal">
+            <h2 style="font-size:2rem; margin-bottom:0.5rem">The Oumi Workflow</h2>
+            <p style="color:var(--text-secondary)">From raw data to deployed foundation models</p>
+        </div>
+        
+        <div class="pipeline-container reveal">
+            <div class="pipeline-node">
+                <div class="pipeline-icon">📊</div>
+                <h3 style="font-size:1.1rem; font-weight:700">Synthesis</h3>
+                <p style="font-size:0.85rem; color:var(--text-secondary); margin-top:0.5rem">Auto-generate high-quality training data</p>
+            </div>
+            
+            <div class="pipeline-arrow"></div>
+            
+            <div class="pipeline-node">
+                <div class="pipeline-icon">⚡</div>
+                <h3 style="font-size:1.1rem; font-weight:700">Training</h3>
+                <p style="font-size:0.85rem; color:var(--text-secondary); margin-top:0.5rem">Distributed SFT, DPO & RLHF</p>
+            </div>
+            
+            <div class="pipeline-arrow"></div>
+            
+            <div class="pipeline-node">
+                <div class="pipeline-icon">🔬</div>
+                <h3 style="font-size:1.1rem; font-weight:700">Evaluation</h3>
+                <p style="font-size:0.85rem; color:var(--text-secondary); margin-top:0.5rem">Benchmark with AlpacaEval, MT-Bench</p>
+            </div>
+            
+            <div class="pipeline-arrow"></div>
+            
+            <div class="pipeline-node">
+                <div class="pipeline-icon">🚀</div>
+                <h3 style="font-size:1.1rem; font-weight:700">Deploy</h3>
+                <p style="font-size:0.85rem; color:var(--text-secondary); margin-top:0.5rem">Launch on custom clusters or cloud</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Grid -->
+    <section class="container py-12">
+        <h2 class="text-center mb-8 reveal" style="font-size:2rem">Platform Capabilities</h2>
+        <div class="grid grid-2 md:grid-3 gap-8">
+            
+            <!-- Card 1 -->
+            <article class="feature-card reveal">
+                <div class="feature-icon">👁️</div>
+                <h3 class="feature-title">Vision & LLMs</h3>
+                <p class="feature-desc">First-class support for Vision Language Models (VLMs) like Qwen-VL and LLaVA training.</p>
+            </article>
+
+            <!-- Card 2 -->
+            <article class="feature-card reveal">
+                <div class="feature-icon">🧠</div>
+                <h3 class="feature-title">Advanced Algorithms</h3>
+                <p class="feature-desc">Implements GRPO, KTO, DPO, and standard SFT with support for TRL integration.</p>
+            </article>
+
+            <!-- Card 3 -->
+            <article class="feature-card reveal">
+                <div class="feature-icon">☁️</div>
+                <h3 class="feature-title">Scalable Infrastructure</h3>
+                <p class="feature-desc">Manage compute resources on Slurm, AWS, GCP, and custom clusters seamlessly.</p>
+            </article>
+
+            <!-- Card 4 -->
+            <article class="feature-card reveal">
+                <div class="feature-icon">📝</div>
+                <h3 class="feature-title">Ready-to-Run Recipes</h3>
+                <p class="feature-desc">Includes pre-configured recipes for Llama 3, Mistral, and Gemma fine-tuning.</p>
+            </article>
+
+            <!-- Card 5 -->
+            <article class="feature-card reveal">
+                <div class="feature-icon">🧪</div>
+                <h3 class="feature-title">Evaluation Suite</h3>
+                <p class="feature-desc">Built-in evaluators and wrappers for standard LLM benchmarks and custom judges.</p>
+            </article>
+
+            <!-- Card 6 -->
+            <article class="feature-card reveal">
+                <div class="feature-icon">⚙️</div>
+                <h3 class="feature-title">Config Driven</h3>
+                <p class="feature-desc">Manage experiments with robust YAML configs, supporting hyperparameter sweeps.</p>
+            </article>
+
+        </div>
+    </section>
+
+    <!-- Code/Installation -->
+    <section class="container-narrow py-12">
+        <div class="reveal">
+            <h2 class="text-center mb-8" style="font-size:2rem">Get Started Quickly</h2>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>terminal</span>
+                    <span style="font-size:0.75rem">bash</span>
+                </div>
+                <div class="code-content">
+                    <div><span class="token-cmt"># Install via pip</span></div>
+                    <div><span class="token-kw">pip</span> install oumi</div>
+                    <br>
+                    <div><span class="token-cmt"># Run a training job</span></div>
+                    <div><span class="token-kw">oumi</span> train --config configs/examples/llama3_instruct.yaml</div>
+                    <br>
+                    <div><span class="token-cmt"># Or use Docker for reproducibility</span></div>
+                    <div><span class="token-kw">docker</span> build -t oumi .</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Notebooks Preview -->
+    <section class="container py-12">
+        <div class="text-center mb-8 reveal">
+            <h2 style="font-size:2rem">Interactive Notebooks</h2>
+            <p style="color:var(--text-secondary)">Learn by doing</p>
+        </div>
+        <div class="grid grid-2 gap-8 reveal">
+            <div class="feature-card" style="border-left: 4px solid var(--accent-color);">
+                <h4 style="font-weight:700; font-size:1.1rem; margin-bottom:0.25rem;">Oumi - A Tour</h4>
+                <p style="font-size:0.85rem; color:var(--text-secondary)">Introduction to the core APIs and functionalities.</p>
+            </div>
+            <div class="feature-card" style="border-left: 4px solid var(--info-color);">
+                <h4 style="font-weight:700; font-size:1.1rem; margin-bottom:0.25rem;">Distill a Large Model</h4>
+                <p style="font-size:0.85rem; color:var(--text-secondary)">Complete walkthrough of knowledge distillation techniques.</p>
+            </div>
+            <div class="feature-card" style="border-left: 4px solid var(--success-color);">
+                <h4 style="font-weight:700; font-size:1.1rem; margin-bottom:0.25rem;">Evaluation with MT Bench</h4>
+                <p style="font-size:0.85rem; color:var(--text-secondary)">Setting up Judges and running multi-turn LLM evaluation.</p>
+            </div>
+            <div class="feature-card" style="border-left: 4px solid var(--warning-color);">
+                <h4 style="font-weight:700; font-size:1.1rem; margin-bottom:0.25rem;">Launching Jobs Remotely</h4>
+                <p style="font-size:0.85rem; color:var(--text-secondary)">Execute training scripts on remote clusters efficiently.</p>
+            </div>
+        </div>
+        <div class="text-center mt-8">
+            <a href="https://github.com/oumi-ai/oumi/tree/main/notebooks" target="_blank" class="btn btn-secondary">View All Notebooks →</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container flex flex-col justify-center gap-4 text-center">
+            <div class="flex gap-4 justify-center">
+                <a href="https://github.com/oumi-ai/oumi" target="_blank" style="display:flex; align-items:center; gap:0.5rem; color:var(--text-primary); text-decoration:none;">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    oumi-ai/oumi
+                </a>
+            </div>
+            <div class="footer-links">
+                <a href="../../index.html">← Back to Explorer</a>
+            </div>
+            <p style="font-size:0.8rem; color:var(--text-secondary); margin-top:1rem;">
+                Generated by Cerebras. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const html = document.documentElement;
+
+        function setTheme(theme) {
+            html.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            if (theme === 'dark') {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+            } else {
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+            }
+        }
+
+        // Init Theme
+        const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        setTheme(savedTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        });
+
+        // Scroll Reveal Animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    
+                    // Trigger number counters if it's a stat card
+                    const statValue = entry.target.querySelector('.stat-value[data-target]');
+                    if (statValue) {
+                        animateValue(statValue, 0, parseInt(statValue.getAttribute('data-target')), 1500);
+                        // Prevent re-animating
+                        statValue.removeAttribute('data-target');
+                    }
+                    
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Number Counter Animation
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+    </script>
+</body>
+</html>

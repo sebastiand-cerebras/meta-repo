@@ -169,6 +169,16 @@
       "isExternal": true,
       "type": "ml",
       "generatedAt": "2026-02-25T00:49:01.399Z"
+    },
+    {
+      "owner": "oumi-ai",
+      "repo": "oumi",
+      "fullName": "oumi-ai/oumi",
+      "path": "repos/oumi/index.html",
+      "url": "repos/oumi/",
+      "isExternal": true,
+      "type": "ml",
+      "generatedAt": "2026-02-25T03:45:47.440Z"
     }
   ]
 }
