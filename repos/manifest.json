@@ -209,6 +209,16 @@
       "isExternal": true,
       "type": "generic",
       "generatedAt": "2026-03-18T02:06:06.632Z"
+    },
+    {
+      "owner": "magnhaug",
+      "repo": "quotespree",
+      "fullName": "magnhaug/quotespree",
+      "path": "repos/quotespree/index.html",
+      "url": "repos/quotespree/",
+      "isExternal": true,
+      "type": "api",
+      "generatedAt": "2026-03-18T02:07:41.294Z"
     }
   ]
 }
